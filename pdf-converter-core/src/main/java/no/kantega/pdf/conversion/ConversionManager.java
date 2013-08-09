@@ -72,11 +72,11 @@ public class ConversionManager {
 
     private final long processTimeout;
 
-    private final ConversionBridge conversionBridge;
+    private final WordConversionBridge conversionBridge;
     private final ShellTimeoutHelper shellTimeoutHelper;
 
     public ConversionManager(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        this.conversionBridge = new ConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
+        this.conversionBridge = new WordConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         this.shellTimeoutHelper = new ShellTimeoutHelper();
     }

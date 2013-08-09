@@ -17,6 +17,8 @@ import static org.testng.AssertJUnit.assertFalse;
 
 public class ConversionManagerTest {
 
+    public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
+
     private ConversionManager conversionManager;
 
     private File baseFolder, docx, pdf;
@@ -45,7 +47,7 @@ public class ConversionManagerTest {
         assertEquals(future.getSource(), docx);
     }
 
-    @Test(expectedExceptions = TimeoutException.class, timeOut = 10000L)
+    @Test(expectedExceptions = TimeoutException.class, timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testInterruption() throws Exception {
         conversionManager.startConversion(docx, pdf).get(1L, TimeUnit.MILLISECONDS);
     }

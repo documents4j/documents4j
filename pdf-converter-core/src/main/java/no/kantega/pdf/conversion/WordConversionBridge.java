@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-class ConversionBridge {
+class WordConversionBridge {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionBridge.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WordConversionBridge.class);
 
     private final File baseFolder;
     private final File visualBasicScript, powerShellScript;
@@ -25,7 +25,7 @@ class ConversionBridge {
 
     private final ResourceExporter resourceExporter;
 
-    public ConversionBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
+    public WordConversionBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         this.baseFolder = baseFolder;
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         resourceExporter = new ResourceExporter(baseFolder);

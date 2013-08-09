@@ -1,24 +1,30 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.util.FileTransformationFuture;
+import no.kantega.pdf.conversion.ConversionManager;
 
 import java.io.File;
 import java.util.concurrent.*;
 
-class WrappingConversionFuture implements RunnableFuture<Boolean>, FileTransformationFuture<Boolean>, Comparable<WrappingConversionFuture> {
+class WrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<WrappingConversionFuture> {
+
+    private static final String PDF_FILE_EXTENSION = ".pdf";
 
     private final int priority;
 
     private final File source, target;
-    private final LocalSessionFactory sessionFactory;
+    private final boolean deleteSource, deleteTarget;
+
+    private final ConversionManager conversionManager;
 
     private Future<Boolean> underlyingFuture;
 
-    WrappingConversionFuture(File source, File target, int priority, LocalSessionFactory sessionFactory) {
+    WrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, ConversionManager conversionManager) {
         this.source = source;
         this.target = target;
+        this.deleteSource = deleteSource;
+        this.deleteTarget = deleteTarget;
         this.priority = priority;
-        this.sessionFactory = sessionFactory;
+        this.conversionManager = conversionManager;
         this.underlyingFuture = new UnstartedConversionFuture(this);
     }
 
@@ -26,16 +32,46 @@ class WrappingConversionFuture implements RunnableFuture<Boolean>, FileTransform
     public synchronized void run() {
         try {
             if (!underlyingFuture.isCancelled()) {
-                underlyingFuture = sessionFactory.getConversionManager().startConversion(source, target);
+                underlyingFuture = conversionManager.startConversion(source, target);
                 underlyingFuture.get();
+                renameIfVisualBasicAutoAppend();
+                onConversionFinished();
             } else {
                 underlyingFuture = new CancelledConversionFuture();
             }
         } catch (Exception e) {
             underlyingFuture = new FailedConversionFuture(e);
+            onConversionFailed(e);
         } finally {
             notifyAll();
         }
+    }
+
+    private void renameIfVisualBasicAutoAppend() {
+        // Visual Basic will rename output files into 'output.pdf' if the dictated output name does not end on '.pdf'
+        if (!target.getName().endsWith(PDF_FILE_EXTENSION)) {
+            File renamedFile = new File(target.getAbsolutePath().concat(PDF_FILE_EXTENSION));
+            if (renamedFile.exists()) {
+                renamedFile.renameTo(target);
+            }
+        }
+    }
+
+    protected void onConversionFinished() {
+        removeFiles();
+    }
+
+    protected void onConversionCancelled() {
+        removeFiles();
+    }
+
+    protected void onConversionFailed(Exception e) {
+        removeFiles();
+    }
+
+    private void removeFiles() {
+        if (deleteSource) source.delete();
+        if (deleteTarget) target.delete();
     }
 
     @Override
@@ -46,8 +82,10 @@ class WrappingConversionFuture implements RunnableFuture<Boolean>, FileTransform
         } finally {
             if (cancelled) {
                 underlyingFuture = new CancelledConversionFuture();
+                notifyAll();
+                // Call last to ensure notifyAll is called in case of an exception
+                onConversionCancelled();
             }
-            notifyAll();
         }
     }
 
@@ -72,17 +110,15 @@ class WrappingConversionFuture implements RunnableFuture<Boolean>, FileTransform
         return underlyingFuture.get(timeout, unit);
     }
 
-    @Override
-    public File getSource() {
+    protected File getSource() {
         return source;
     }
 
-    @Override
-    public File getTarget() {
+    protected File getTarget() {
         return target;
     }
 
-    int getPriority() {
+    protected int getPriority() {
         return priority;
     }
 

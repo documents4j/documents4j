@@ -43,7 +43,12 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Webservice (Jersey) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- Webservice -->
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
@@ -55,6 +60,7 @@
             <artifactId>jersey-media-multipart</artifactId>
         </dependency>
 
+        <!-- Webservice (Testing) -->
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-inmemory</artifactId>

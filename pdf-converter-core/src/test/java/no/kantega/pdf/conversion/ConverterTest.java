@@ -18,13 +18,13 @@ public class ConverterTest {
 
     public static final int INOVATION_COUNT = 20;
 
-    private ConversionBridge converter;
+    private WordConversionBridge converter;
     private File folder, docx, pdf;
 
     @BeforeMethod(firstTimeOnly = true)
     public void setUp() throws Exception {
         folder = Files.createTempDir();
-        converter = new ConversionBridge(folder, 1L, TimeUnit.MINUTES);
+        converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
         pdf = TestResource.PDF.absoluteTo(folder);
     }
 

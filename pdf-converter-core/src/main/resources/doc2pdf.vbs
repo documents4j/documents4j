@@ -33,16 +33,6 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   docInputFile = fileSystemObject.GetAbsolutePathName(docInputFile)
   baseFolder = fileSystemObject.GetParentFolderName(docInputFile)
 
-  ' Make file name if necessary
-  If Len(pdfOutputFile) = 0 Then
-    pdfOutputFile = fileSystemObject.GetBaseName(docInputFile) + ".pdf"
-  End If
-
-  ' Adjust folder if necessary
-  If Len(fileSystemObject.GetParentFolderName(pdfOutputFile)) = 0 Then
-    pdfOutputFile = baseFolder + "\" + pdfOutputFile
-  End If
-
   ' Open word document
   Set wordDocument = wordDocuments.Open(docInputFile, false, true, false)
 

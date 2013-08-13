@@ -1,4 +1,4 @@
-package no.kantega.pdf.util;
+package no.kantega.pdf.job;
 
 public class ConversionException extends RuntimeException {
 

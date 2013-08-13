@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-core</artifactId>
+            <artifactId>pdf-converter-api</artifactId>
             <version>${project.version}</version>
         </dependency>
 

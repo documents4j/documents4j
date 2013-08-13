@@ -5,11 +5,12 @@ import no.kantega.pdf.conversion.ConversionManager;
 import java.io.File;
 import java.util.concurrent.*;
 
-class WrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<WrappingConversionFuture> {
+abstract class WrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<WrappingConversionFuture> {
 
     private static final String PDF_FILE_EXTENSION = ".pdf";
 
     private final int priority;
+    private final long createTime;
 
     private final File source, target;
     private final boolean deleteSource, deleteTarget;
@@ -24,6 +25,7 @@ class WrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<Wr
         this.deleteSource = deleteSource;
         this.deleteTarget = deleteTarget;
         this.priority = priority;
+        this.createTime = System.currentTimeMillis();
         this.conversionManager = conversionManager;
         this.underlyingFuture = new UnstartedConversionFuture(this);
     }
@@ -124,6 +126,18 @@ class WrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<Wr
 
     @Override
     public int compareTo(WrappingConversionFuture other) {
-        return priority - other.getPriority();
+        int priorityDifference = priority - other.getPriority();
+        if (priorityDifference == 0) {
+            long timeDifference = createTime - other.createTime;
+            if (timeDifference > Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE;
+            } else if (timeDifference < Integer.MIN_VALUE) {
+                return Integer.MIN_VALUE;
+            } else {
+                return (int) timeDifference;
+            }
+        } else {
+            return priorityDifference;
+        }
     }
 }

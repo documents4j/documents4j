@@ -2,16 +2,15 @@ package no.kantega.pdf.conversion;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
-import no.kantega.pdf.util.FileTransformationFuture;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertFalse;
 
@@ -40,11 +39,9 @@ public class ConversionManagerTest {
     public void testStartConversion() throws Exception {
         assertTrue(docx.exists());
         assertFalse(pdf.exists());
-        FileTransformationFuture<Boolean> future = conversionManager.startConversion(docx, pdf);
+        Future<Boolean> future = conversionManager.startConversion(docx, pdf);
         assertTrue(future.get());
-        assertTrue(future.getTarget().exists());
-        assertEquals(future.getTarget(), pdf);
-        assertEquals(future.getSource(), docx);
+        assertTrue(pdf.exists());
     }
 
     @Test(expectedExceptions = TimeoutException.class, timeOut = DEFAULT_CONVERSION_TIMEOUT)

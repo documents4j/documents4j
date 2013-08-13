@@ -1,20 +1,19 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.util.IStreamConsumer;
 import org.testng.reporters.Files;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-class ToFileConsumer implements IStreamConsumer {
+class ToFileStreamConsumer implements IStreamConsumer {
 
     private boolean cancelled, run;
     private Exception exception;
 
     private final File file;
 
-    public ToFileConsumer(File file) {
+    public ToFileStreamConsumer(File file) {
         this.file = file;
     }
 

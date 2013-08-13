@@ -1,6 +1,6 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.util.ConversionException;
+import no.kantega.pdf.job.ConversionException;
 import no.kantega.pdf.util.ResourceExporter;
 import no.kantega.pdf.util.ShellResource;
 import no.kantega.pdf.util.ShellTimeoutHelper;
@@ -33,6 +33,7 @@ class WordConversionBridge {
         visualBasicScript = resourceExporter.materializeVisualBasic(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
         powerShellScript = resourceExporter.materializePowerShell(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
         runScript(ShellResource.WORD_STARTUP_SCRIPT);
+        LOGGER.info("From-Word-Converter was started");
     }
 
     public Process startProcess(File source, File target) {
@@ -69,6 +70,7 @@ class WordConversionBridge {
             visualBasicScript.delete();
             powerShellScript.delete();
         }
+        LOGGER.info("From-Word-Converter was shut down");
     }
 
     private void runScript(ShellResource scriptResource) {

@@ -70,7 +70,7 @@ public class ConverterTest {
     }
 
     @Test(dependsOnMethods = "testConvertBlocking", invocationCount = INOVATION_COUNT,
-            threadPoolSize = 3, timeOut = DEFAULT_CONVERSION_TIMEOUT * INOVATION_COUNT)
+            threadPoolSize = 3, timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertBlockingParallel() throws Exception {
         File folder = Files.createTempDir();
         testConvertBlocking(folder);

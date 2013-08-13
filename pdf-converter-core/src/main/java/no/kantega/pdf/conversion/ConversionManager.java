@@ -1,16 +1,16 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.util.FileTransformationFuture;
 import no.kantega.pdf.util.ShellTimeoutHelper;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ConversionManager {
 
-    private class ConversionFuture implements FileTransformationFuture<Boolean> {
+    private class ConversionFuture implements Future<Boolean> {
 
         private final Process process;
         private final File source, target;
@@ -58,16 +58,6 @@ public class ConversionManager {
         public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return shellTimeoutHelper.waitFor(process, timeout, unit) == 0;
         }
-
-        @Override
-        public File getTarget() {
-            return target;
-        }
-
-        @Override
-        public File getSource() {
-            return source;
-        }
     }
 
     private final long processTimeout;
@@ -81,7 +71,7 @@ public class ConversionManager {
         this.shellTimeoutHelper = new ShellTimeoutHelper();
     }
 
-    public FileTransformationFuture<Boolean> startConversion(File source, File target) {
+    public Future<Boolean> startConversion(File source, File target) {
         return new ConversionFuture(conversionBridge.startProcess(source, target), source, target);
     }
 

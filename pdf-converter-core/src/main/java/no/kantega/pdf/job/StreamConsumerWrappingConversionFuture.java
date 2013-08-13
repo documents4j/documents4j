@@ -2,7 +2,6 @@ package no.kantega.pdf.job;
 
 import com.google.common.io.Closeables;
 import no.kantega.pdf.conversion.ConversionManager;
-import no.kantega.pdf.util.IStreamConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,16 +12,16 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileLock;
 
-class OutputStreamConsumerWrappingConversionFuture extends WrappingConversionFuture {
+class StreamConsumerWrappingConversionFuture extends WrappingConversionFuture {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamConsumerWrappingConversionFuture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StreamConsumerWrappingConversionFuture.class);
 
-    private final IStreamConsumer streamConsumer;
+    private final IStreamConsumer callback;
 
-    OutputStreamConsumerWrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget,
-                                                 ConversionManager conversionManager, IStreamConsumer streamConsumer) {
+    StreamConsumerWrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget,
+                                           ConversionManager conversionManager, IStreamConsumer callback) {
         super(source, target, priority, deleteSource, deleteTarget, conversionManager);
-        this.streamConsumer = streamConsumer;
+        this.callback = callback;
     }
 
     @Override
@@ -32,7 +31,7 @@ class OutputStreamConsumerWrappingConversionFuture extends WrappingConversionFut
             fileInputStream = new FileInputStream(getTarget());
             FileLock fileLock = fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);
             try {
-                streamConsumer.onComplete(fileInputStream);
+                callback.onComplete(fileInputStream);
             } finally {
                 try {
                     fileLock.release();
@@ -57,7 +56,7 @@ class OutputStreamConsumerWrappingConversionFuture extends WrappingConversionFut
     @Override
     protected void onConversionCancelled() {
         try {
-            streamConsumer.onCancel();
+            callback.onCancel();
         } finally {
             super.onConversionCancelled();
         }
@@ -66,7 +65,7 @@ class OutputStreamConsumerWrappingConversionFuture extends WrappingConversionFut
     @Override
     protected void onConversionFailed(Exception e) {
         try {
-            streamConsumer.onException(e);
+            callback.onException(e);
         } finally {
             super.onConversionFailed(e);
         }

@@ -15,7 +15,6 @@ public class LocalConverterTest {
 
     private File folder, docx, pdf;
     private LocalConverter localConverter;
-    private ToFileConsumer toFileConsumer;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -25,22 +24,26 @@ public class LocalConverterTest {
 
         docx = TestResource.DOCX.materializeIn(folder);
         pdf = TestResource.PDF.absoluteTo(folder);
-        toFileConsumer = new ToFileConsumer(pdf);
     }
 
     @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToConsumer() throws Exception {
-        localConverter.schedule(docx, toFileConsumer).get();
+        ToFileStreamConsumer toFileStreamConsumer = new ToFileStreamConsumer(pdf);
+        localConverter.schedule(docx, toFileStreamConsumer).get();
         assertTrue(pdf.exists());
-        assertFalse(toFileConsumer.isCancelled());
-        assertTrue(toFileConsumer.isRun());
-        toFileConsumer.rethrow();
+        assertFalse(toFileStreamConsumer.isCancelled());
+        assertTrue(toFileStreamConsumer.isRun());
+        toFileStreamConsumer.rethrow();
     }
 
     @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToFile() throws Exception {
-        localConverter.schedule(docx, pdf).get();
+        FeedbackFileConsumer callback = new FeedbackFileConsumer();
+        localConverter.schedule(docx, pdf, callback).get();
         assertTrue(pdf.exists());
+        assertTrue(callback.isCompleted());
+        assertFalse(callback.isCancelled());
+        callback.rethrow();
     }
 
     @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)

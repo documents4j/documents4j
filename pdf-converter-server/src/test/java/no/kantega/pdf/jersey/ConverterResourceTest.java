@@ -46,7 +46,7 @@ public class ConverterResourceTest extends AbstractJerseyTest {
         testConversion(docx, pdf);
     }
 
-    @Test(invocationCount = 50, threadPoolSize = 3, dependsOnMethods = "testSingleConversion")
+    @Test(invocationCount = 50, dependsOnMethods = "testSingleConversion")
     public void testMultipleConversion() throws Exception {
         testSingleConversion();
     }

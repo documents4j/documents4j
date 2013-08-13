@@ -26,7 +26,7 @@ public class ConverterResourceTest extends AbstractJerseyTest {
     private File docx, pdf;
 
     @Override
-    @BeforeMethod(firstTimeOnly = true)
+    @BeforeMethod(firstTimeOnly = true, alwaysRun = true)
     public void setUp() throws Exception {
         super.setUp();
         File folder = Files.createTempDir();
@@ -35,7 +35,7 @@ public class ConverterResourceTest extends AbstractJerseyTest {
     }
 
     @Override
-    @AfterMethod(lastTimeOnly = true)
+    @AfterMethod(lastTimeOnly = true, alwaysRun = true)
     public void tearDown() throws Exception {
         super.tearDown();
     }

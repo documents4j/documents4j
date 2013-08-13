@@ -1,6 +1,8 @@
 package no.kantega.pdf.conversion;
 
 import no.kantega.pdf.util.ShellTimeoutHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -10,15 +12,14 @@ import java.util.concurrent.TimeoutException;
 
 public class ConversionManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
+
     private class ConversionFuture implements Future<Boolean> {
 
         private final Process process;
-        private final File source, target;
 
-        private ConversionFuture(Process process, File source, File target) {
+        private ConversionFuture(Process process) {
             this.process = process;
-            this.source = source;
-            this.target = target;
         }
 
         @Override
@@ -69,14 +70,16 @@ public class ConversionManager {
         this.conversionBridge = new WordConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         this.shellTimeoutHelper = new ShellTimeoutHelper();
+        LOGGER.info("Word-To-PDF-Conversion-Manager was started");
     }
 
     public Future<Boolean> startConversion(File source, File target) {
-        return new ConversionFuture(conversionBridge.startProcess(source, target), source, target);
+        return new ConversionFuture(conversionBridge.startProcess(source, target));
     }
 
     public void shutDown() {
         conversionBridge.shutDown();
         shellTimeoutHelper.shutDown();
+        LOGGER.info("Word-To-PDF-Conversion-Manager was shut down");
     }
 }

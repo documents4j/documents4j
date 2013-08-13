@@ -2,8 +2,8 @@ package no.kantega.pdf.jersey;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -16,13 +16,13 @@ public class ParallelConverterResourceTest extends AbstractJerseyTest {
     }
 
     @Override
-    @BeforeTest
+    @BeforeClass(alwaysRun = true)
     public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    @AfterTest
+    @AfterClass(alwaysRun = true)
     public void tearDown() throws Exception {
         super.tearDown();
     }

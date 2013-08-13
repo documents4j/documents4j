@@ -23,7 +23,7 @@ public class ConversionManagerTest {
 
     private File baseFolder, docx, pdf;
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception {
         baseFolder = Files.createTempDir();
         conversionManager = new ConversionManager(baseFolder, 5000L, TimeUnit.MILLISECONDS);
@@ -31,7 +31,7 @@ public class ConversionManagerTest {
         pdf = TestResource.PDF.absoluteTo(baseFolder);
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDown() throws Exception {
         conversionManager.shutDown();
     }

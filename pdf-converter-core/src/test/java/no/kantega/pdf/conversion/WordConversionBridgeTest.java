@@ -20,14 +20,14 @@ public class WordConversionBridgeTest {
     private WordConversionBridge converter;
     private File folder, docx, pdf;
 
-    @BeforeMethod(firstTimeOnly = true)
+    @BeforeMethod(firstTimeOnly = true, alwaysRun = true)
     public void setUp() throws Exception {
         folder = Files.createTempDir();
         pdf = TestResource.PDF.absoluteTo(folder);
         converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
     }
 
-    @AfterMethod(lastTimeOnly = true)
+    @AfterMethod(lastTimeOnly = true, alwaysRun = true)
     public void tearDown() throws Exception {
         converter.shutDown();
     }

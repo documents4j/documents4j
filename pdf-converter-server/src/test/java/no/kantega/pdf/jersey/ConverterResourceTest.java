@@ -9,6 +9,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -17,14 +18,20 @@ import java.io.InputStream;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
+@Test(singleThreaded = true)
 public class ConverterResourceTest extends AbstractJerseyTest {
 
     private static final long CONVERSION_TIMEOUT = 10000L;
+
+    private File docx, pdf;
 
     @Override
     @BeforeMethod(firstTimeOnly = true)
     public void setUp() throws Exception {
         super.setUp();
+        File folder = Files.createTempDir();
+        docx = TestResource.DOCX.materializeIn(folder);
+        pdf = TestResource.PDF.absoluteTo(folder);
     }
 
     @Override
@@ -40,20 +47,12 @@ public class ConverterResourceTest extends AbstractJerseyTest {
 
     @Test(timeOut = CONVERSION_TIMEOUT)
     public void testSingleConversion() throws Exception {
-        File folder = Files.createTempDir(),
-                docx = TestResource.DOCX.materializeIn(folder),
-                pdf = TestResource.PDF.absoluteTo(folder);
-        testConversion(docx, pdf);
+        testConversion(target(), docx, pdf);
     }
 
-    @Test(invocationCount = 50, dependsOnMethods = "testSingleConversion")
-    public void testMultipleConversion() throws Exception {
-        testSingleConversion();
-    }
+    static void testConversion(WebTarget webTarget, File docx, File pdf) throws Exception {
 
-    public void testConversion(File docx, File pdf) throws Exception {
-
-        Response response = target().path("convert")
+        Response response = webTarget.path("convert")
                 .request(CustomMediaType.APPLICATION_PDF)
                 .post(Entity.entity(docx, CustomMediaType.WORD_DOCX));
 
@@ -70,5 +69,4 @@ public class ConverterResourceTest extends AbstractJerseyTest {
         assertTrue(pdf.exists());
         assertTrue(pdf.length() > 0L);
     }
-
 }

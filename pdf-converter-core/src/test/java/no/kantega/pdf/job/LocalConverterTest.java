@@ -2,7 +2,7 @@ package no.kantega.pdf.job;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
-import no.kantega.pdf.conversion.ConverterTest;
+import no.kantega.pdf.conversion.WordConversionBridgeTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -11,6 +11,7 @@ import java.io.File;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+@Test(singleThreaded = true)
 public class LocalConverterTest {
 
     private File folder, docx, pdf;
@@ -26,7 +27,7 @@ public class LocalConverterTest {
         pdf = TestResource.PDF.absoluteTo(folder);
     }
 
-    @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToConsumer() throws Exception {
         ToFileStreamConsumer toFileStreamConsumer = new ToFileStreamConsumer(pdf);
         localConverter.schedule(docx, toFileStreamConsumer).get();
@@ -36,7 +37,7 @@ public class LocalConverterTest {
         toFileStreamConsumer.rethrow();
     }
 
-    @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToFile() throws Exception {
         FeedbackFileConsumer callback = new FeedbackFileConsumer();
         localConverter.schedule(docx, pdf, callback).get();
@@ -46,7 +47,7 @@ public class LocalConverterTest {
         callback.rethrow();
     }
 
-    @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToFileNoExtension() throws Exception {
         pdf = new File(folder, "temp");
         localConverter.schedule(docx, pdf).get();

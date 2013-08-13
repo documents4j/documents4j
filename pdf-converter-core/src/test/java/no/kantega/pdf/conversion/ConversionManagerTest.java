@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertFalse;
 
+@Test(singleThreaded = true)
 public class ConversionManagerTest {
 
     public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
@@ -35,7 +36,7 @@ public class ConversionManagerTest {
         conversionManager.shutDown();
     }
 
-    @Test(timeOut = ConverterTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testStartConversion() throws Exception {
         assertTrue(docx.exists());
         assertFalse(pdf.exists());

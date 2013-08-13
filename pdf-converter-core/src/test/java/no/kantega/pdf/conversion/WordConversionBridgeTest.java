@@ -12,11 +12,10 @@ import java.util.concurrent.TimeUnit;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class ConverterTest {
+@Test(singleThreaded = true)
+public class WordConversionBridgeTest {
 
     public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
-
-    public static final int INOVATION_COUNT = 20;
 
     private WordConversionBridge converter;
     private File folder, docx, pdf;
@@ -24,8 +23,8 @@ public class ConverterTest {
     @BeforeMethod(firstTimeOnly = true)
     public void setUp() throws Exception {
         folder = Files.createTempDir();
-        converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
         pdf = TestResource.PDF.absoluteTo(folder);
+        converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
     }
 
     @AfterMethod(lastTimeOnly = true)
@@ -56,10 +55,10 @@ public class ConverterTest {
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertBlocking() throws Exception {
-        testConvertBlocking(folder);
+        testConvertBlocking(converter, folder);
     }
 
-    private void testConvertBlocking(File folder) throws Exception {
+    static void testConvertBlocking(WordConversionBridge converter, File folder) throws Exception {
         File pdf = TestResource.PDF.absoluteTo(folder);
         File docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());
@@ -67,12 +66,5 @@ public class ConverterTest {
         boolean returnValue = converter.convertBlocking(docx, pdf);
         assertTrue(returnValue);
         assertTrue(pdf.exists());
-    }
-
-    @Test(dependsOnMethods = "testConvertBlocking", invocationCount = INOVATION_COUNT,
-            threadPoolSize = 3, timeOut = DEFAULT_CONVERSION_TIMEOUT)
-    public void testConvertBlockingParallel() throws Exception {
-        File folder = Files.createTempDir();
-        testConvertBlocking(folder);
     }
 }

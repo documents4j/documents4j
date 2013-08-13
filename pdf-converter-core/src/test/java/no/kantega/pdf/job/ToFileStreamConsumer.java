@@ -1,8 +1,9 @@
 package no.kantega.pdf.job;
 
-import org.testng.reporters.Files;
+import com.google.common.io.ByteStreams;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,7 +22,9 @@ class ToFileStreamConsumer implements IStreamConsumer {
     public void onComplete(InputStream inputStream) {
         run = true;
         try {
-            Files.copyFile(inputStream, file);
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            ByteStreams.copy(inputStream, fileOutputStream);
+            fileOutputStream.close();
         } catch (IOException e) {
             exception = e;
         }
@@ -29,6 +32,7 @@ class ToFileStreamConsumer implements IStreamConsumer {
 
     @Override
     public void onCancel() {
+        cancelled = true;
     }
 
     @Override

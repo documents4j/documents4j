@@ -1,24 +1,25 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.util.FileTransformationFuture;
 import no.kantega.pdf.util.ShellTimeoutHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ConversionManager {
 
-    private class ConversionFuture implements FileTransformationFuture<Boolean> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
+
+    private class ConversionFuture implements Future<Boolean> {
 
         private final Process process;
-        private final File source, target;
 
-        private ConversionFuture(Process process, File source, File target) {
+        private ConversionFuture(Process process) {
             this.process = process;
-            this.source = source;
-            this.target = target;
         }
 
         @Override
@@ -58,35 +59,27 @@ public class ConversionManager {
         public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             return shellTimeoutHelper.waitFor(process, timeout, unit) == 0;
         }
-
-        @Override
-        public File getTarget() {
-            return target;
-        }
-
-        @Override
-        public File getSource() {
-            return source;
-        }
     }
 
     private final long processTimeout;
 
-    private final ConversionBridge conversionBridge;
+    private final WordConversionBridge conversionBridge;
     private final ShellTimeoutHelper shellTimeoutHelper;
 
     public ConversionManager(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        this.conversionBridge = new ConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
+        this.conversionBridge = new WordConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         this.shellTimeoutHelper = new ShellTimeoutHelper();
+        LOGGER.info("Word-To-PDF-Conversion-Manager was started");
     }
 
-    public FileTransformationFuture<Boolean> startConversion(File source, File target) {
-        return new ConversionFuture(conversionBridge.startProcess(source, target), source, target);
+    public Future<Boolean> startConversion(File source, File target) {
+        return new ConversionFuture(conversionBridge.startProcess(source, target));
     }
 
     public void shutDown() {
         conversionBridge.shutDown();
         shellTimeoutHelper.shutDown();
+        LOGGER.info("Word-To-PDF-Conversion-Manager was shut down");
     }
 }

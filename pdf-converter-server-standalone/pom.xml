@@ -5,29 +5,23 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>no.kantega</groupId>
         <artifactId>pdf-converter-parent</artifactId>
+        <groupId>no.kantega</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-core</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>pdf-converter-server-standalone</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-api</artifactId>
+            <artifactId>pdf-converter-server</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
         </dependency>
     </dependencies>
 

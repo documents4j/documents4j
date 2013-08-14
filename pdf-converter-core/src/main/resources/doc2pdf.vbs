@@ -43,8 +43,11 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   wordDocument.Close WdDoNotSaveChanges
 
   ' Free local resources
-  Set wordApplication = Nothing
   Set fileSystemObject = Nothing
+  Set wordApplication = Nothing
+  Set wordDocument = Nothing
+  Set wordDocuments = Nothing
+  Set baseFolder = Nothing
 
 End Function
 

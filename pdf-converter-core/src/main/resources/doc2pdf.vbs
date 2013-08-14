@@ -22,7 +22,6 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   Dim wordApplication
   Dim wordDocument
   Dim wordDocuments
-  Dim baseFolder
 
   ' Get existing instance of word
   Set wordApplication = GetObject(, "Word.Application")
@@ -31,7 +30,6 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   ' Find files
   Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
   docInputFile = fileSystemObject.GetAbsolutePathName(docInputFile)
-  baseFolder = fileSystemObject.GetParentFolderName(docInputFile)
 
   ' Open word document
   Set wordDocument = wordDocuments.Open(docInputFile, false, true, false)
@@ -47,7 +45,6 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   Set wordApplication = Nothing
   Set wordDocument = Nothing
   Set wordDocuments = Nothing
-  Set baseFolder = Nothing
 
 End Function
 

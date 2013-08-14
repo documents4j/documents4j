@@ -7,7 +7,8 @@ import java.io.File;
 public enum TestResource {
 
     DOCX("test.docx"),
-    PDF(DOCX.getLocalPath().concat(".pdf"));
+    PDF(DOCX.getLocalPath().concat(".pdf")),
+    WORD_TEST_SCRIPT("checkword.vbs");
 
     private final String path;
 

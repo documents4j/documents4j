@@ -1,6 +1,6 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.util.ConversionException;
+import no.kantega.pdf.job.ConversionException;
 import no.kantega.pdf.util.ResourceExporter;
 import no.kantega.pdf.util.ShellResource;
 import no.kantega.pdf.util.ShellTimeoutHelper;
@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-class ConversionBridge {
+class WordConversionBridge {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionBridge.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WordConversionBridge.class);
 
     private final File baseFolder;
     private final File visualBasicScript, powerShellScript;
@@ -25,7 +25,7 @@ class ConversionBridge {
 
     private final ResourceExporter resourceExporter;
 
-    public ConversionBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
+    public WordConversionBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         this.baseFolder = baseFolder;
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         resourceExporter = new ResourceExporter(baseFolder);
@@ -33,6 +33,7 @@ class ConversionBridge {
         visualBasicScript = resourceExporter.materializeVisualBasic(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
         powerShellScript = resourceExporter.materializePowerShell(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
         runScript(ShellResource.WORD_STARTUP_SCRIPT);
+        LOGGER.info("From-Word-Converter was started");
     }
 
     public Process startProcess(File source, File target) {
@@ -69,6 +70,7 @@ class ConversionBridge {
             visualBasicScript.delete();
             powerShellScript.delete();
         }
+        LOGGER.info("From-Word-Converter was shut down");
     }
 
     private void runScript(ShellResource scriptResource) {

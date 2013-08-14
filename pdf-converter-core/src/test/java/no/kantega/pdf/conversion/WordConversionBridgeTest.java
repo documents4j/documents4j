@@ -2,6 +2,7 @@ package no.kantega.pdf.conversion;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
+import no.kantega.pdf.WordAssert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -12,29 +13,31 @@ import java.util.concurrent.TimeUnit;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public class ConverterTest {
+@Test(singleThreaded = true)
+public class WordConversionBridgeTest {
 
     public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
 
-    public static final int INOVATION_COUNT = 20;
-
-    private ConversionBridge converter;
+    private WordConversionBridge converter;
     private File folder, docx, pdf;
 
-    @BeforeMethod(firstTimeOnly = true)
+    @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception {
+        WordAssert.assertWordNotRunning();
         folder = Files.createTempDir();
-        converter = new ConversionBridge(folder, 1L, TimeUnit.MINUTES);
         pdf = TestResource.PDF.absoluteTo(folder);
+        converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
     }
 
-    @AfterMethod(lastTimeOnly = true)
+    @AfterMethod(alwaysRun = true)
     public void tearDown() throws Exception {
         converter.shutDown();
+        WordAssert.assertWordNotRunning();
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertNonblocking() throws Exception {
+        WordAssert.assertWordRunning();
         docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());
         assertFalse(TestResource.PDF.absoluteTo(folder).exists());
@@ -46,6 +49,7 @@ public class ConverterTest {
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertNonblockingFail() throws Exception {
+        WordAssert.assertWordRunning();
         docx = TestResource.DOCX.absoluteTo(folder);
         assertFalse(docx.exists());
         assertFalse(TestResource.PDF.absoluteTo(folder).exists());
@@ -56,10 +60,11 @@ public class ConverterTest {
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertBlocking() throws Exception {
-        testConvertBlocking(folder);
+        WordAssert.assertWordRunning();
+        testConvertBlocking(converter, folder);
     }
 
-    private void testConvertBlocking(File folder) throws Exception {
+    static void testConvertBlocking(WordConversionBridge converter, File folder) throws Exception {
         File pdf = TestResource.PDF.absoluteTo(folder);
         File docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());
@@ -67,12 +72,5 @@ public class ConverterTest {
         boolean returnValue = converter.convertBlocking(docx, pdf);
         assertTrue(returnValue);
         assertTrue(pdf.exists());
-    }
-
-    @Test(dependsOnMethods = "testConvertBlocking", invocationCount = INOVATION_COUNT,
-            threadPoolSize = 3, timeOut = DEFAULT_CONVERSION_TIMEOUT * INOVATION_COUNT)
-    public void testConvertBlockingParallel() throws Exception {
-        File folder = Files.createTempDir();
-        testConvertBlocking(folder);
     }
 }

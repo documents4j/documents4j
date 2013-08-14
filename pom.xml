@@ -15,11 +15,13 @@
         <module>pdf-converter-server</module>
         <module>pdf-converter-api</module>
         <module>pdf-converter-ws</module>
+        <module>pdf-converter-server-standalone</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java.ws.rs>2.0</version.java.ws.rs>
+        <version.javax.inject>1.0.0-PRD</version.javax.inject>
         <version.jersey>2.1</version.jersey>
         <version.guava>14.0.1</version.guava>
         <version.slf4j>1.7.5</version.slf4j>
@@ -28,6 +30,20 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${version.jersey}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>inject-api</artifactId>
+                <version>${version.javax.inject}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
@@ -62,17 +78,18 @@
                 <version>${version.java.ws.rs}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${version.jersey}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
 
         <!-- Testing / Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>

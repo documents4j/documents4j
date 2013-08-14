@@ -1,7 +1,5 @@
 package no.kantega.pdf.jersey;
 
-import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.testng.annotations.AfterMethod;
@@ -15,14 +13,7 @@ public abstract class AbstractJerseyTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(getComponent())
-                .packages("org.glassfish.jersey.examples.multipart")
-                .register(MultiPartFeature.class);
-    }
-
-    @Override
-    protected void configureClient(ClientConfig clientConfig) {
-        clientConfig.register(MultiPartFeature.class);
+        return new ResourceConfig(getComponent());
     }
 
     @Override

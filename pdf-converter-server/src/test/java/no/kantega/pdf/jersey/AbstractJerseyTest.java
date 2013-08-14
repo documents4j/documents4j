@@ -16,11 +16,6 @@ public abstract class AbstractJerseyTest extends JerseyTest {
         return new ResourceConfig(getComponent());
     }
 
-//    @Override
-//    protected void configureClient(ClientConfig clientConfig) {
-//        clientConfig.register(MultiPartFeature.class);
-//    }
-
     @Override
     @BeforeMethod
     public void setUp() throws Exception {

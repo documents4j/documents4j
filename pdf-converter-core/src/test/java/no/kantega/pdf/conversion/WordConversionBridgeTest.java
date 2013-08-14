@@ -2,6 +2,7 @@ package no.kantega.pdf.conversion;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
+import no.kantega.pdf.WordAssert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -20,20 +21,23 @@ public class WordConversionBridgeTest {
     private WordConversionBridge converter;
     private File folder, docx, pdf;
 
-    @BeforeMethod(firstTimeOnly = true, alwaysRun = true)
+    @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception {
+        WordAssert.assertWordNotRunning();
         folder = Files.createTempDir();
         pdf = TestResource.PDF.absoluteTo(folder);
         converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
     }
 
-    @AfterMethod(lastTimeOnly = true, alwaysRun = true)
+    @AfterMethod(alwaysRun = true)
     public void tearDown() throws Exception {
         converter.shutDown();
+        WordAssert.assertWordNotRunning();
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertNonblocking() throws Exception {
+        WordAssert.assertWordRunning();
         docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());
         assertFalse(TestResource.PDF.absoluteTo(folder).exists());
@@ -45,6 +49,7 @@ public class WordConversionBridgeTest {
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertNonblockingFail() throws Exception {
+        WordAssert.assertWordRunning();
         docx = TestResource.DOCX.absoluteTo(folder);
         assertFalse(docx.exists());
         assertFalse(TestResource.PDF.absoluteTo(folder).exists());
@@ -55,6 +60,7 @@ public class WordConversionBridgeTest {
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testConvertBlocking() throws Exception {
+        WordAssert.assertWordRunning();
         testConvertBlocking(converter, folder);
     }
 

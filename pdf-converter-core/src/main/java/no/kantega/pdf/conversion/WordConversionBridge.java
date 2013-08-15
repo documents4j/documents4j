@@ -37,7 +37,7 @@ class WordConversionBridge {
     }
 
     public Process startProcess(File source, File target) {
-        String command = String.format("\"%s\" \"%s\" \"%s\" \"%s\"", powerShellScript, visualBasicScript, source, target);
+        String command = String.format("%s \"%s\" \"%s\" \"%s\"", powerShellScript.getAbsolutePath(), visualBasicScript.getAbsolutePath(), source, target);
         try {
             return Runtime.getRuntime().exec(command, null, baseFolder);
         } catch (IOException e) {
@@ -67,17 +67,17 @@ class WordConversionBridge {
             runScript(ShellResource.WORD_SHUTDOWN_SCRIPT);
             shellTimeoutHelper.shutDown();
         } finally {
-            visualBasicScript.delete();
             powerShellScript.delete();
+            visualBasicScript.delete();
         }
         LOGGER.info("From-Word-Converter was shut down");
     }
 
     private void runScript(ShellResource scriptResource) {
-        File visualBasic = resourceExporter.materializeVisualBasic(scriptResource);
         File powerShell = resourceExporter.materializePowerShell(scriptResource);
+        File visualBasic = resourceExporter.materializeVisualBasic(scriptResource);
         try {
-            String command = String.format("%s %s", powerShell.getAbsolutePath(), visualBasic.getAbsolutePath());
+            String command = String.format("%s \"%s\"", powerShell.getAbsolutePath(), visualBasic.getAbsolutePath());
             Process process = Runtime.getRuntime().exec(command, null, baseFolder);
             int result = shellTimeoutHelper.waitForOrTerminate(process, processTimeout, TimeUnit.MILLISECONDS);
             if (result != 0) {
@@ -88,8 +88,8 @@ class WordConversionBridge {
             LOGGER.error(message, e);
             throw new ConversionException(message, e);
         } finally {
-            visualBasic.delete();
             powerShell.delete();
+            visualBasic.delete();
         }
     }
 }

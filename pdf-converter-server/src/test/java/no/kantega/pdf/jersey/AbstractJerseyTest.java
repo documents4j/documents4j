@@ -1,9 +1,10 @@
 package no.kantega.pdf.jersey;
 
+import no.kantega.pdf.jersey.application.WebConverterTestBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 import javax.ws.rs.core.Application;
 
@@ -13,18 +14,20 @@ public abstract class AbstractJerseyTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(getComponent());
+        return new ResourceConfig(getComponent()).register(new WebConverterTestBinder());
     }
 
     @Override
-    @BeforeMethod
+    @BeforeClass
     public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    @AfterMethod
+    @AfterClass
     public void tearDown() throws Exception {
         super.tearDown();
     }
+
+
 }

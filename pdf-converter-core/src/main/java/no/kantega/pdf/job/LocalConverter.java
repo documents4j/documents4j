@@ -70,8 +70,9 @@ public class LocalConverter implements IConverter {
         conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
         conversionExecutorService = new ThreadPoolExecutor(converterCorePoolSize, converterMaximumPoolSize,
                 converterThreadLifeTime, converterThreadLifeTimeUnit, new PriorityBlockingQueue<Runnable>());
+//        conversionExecutorService = Executors.newCachedThreadPool();
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
-        LOGGER.info("To-PDF-Converter was started");
+        LOGGER.info("Local To-PDF converter is running");
     }
 
     @Override
@@ -290,15 +291,20 @@ public class LocalConverter implements IConverter {
             try {
                 Runtime.getRuntime().removeShutdownHook(shutdownHook);
             } catch (IllegalStateException e) {
-            /* cannot remove shutdown hook when shut down is in progress */
+                /* cannot remove shutdown hook when shut down is in progress - ignore */
             }
         } finally {
             tempFileFolder.delete();
         }
-        LOGGER.info("To-PDF-Converter was shut down");
+        LOGGER.info("Local To-PDF converter is shut down");
     }
 
     private class LocalConverterShutdownHook extends Thread {
+
+        private LocalConverterShutdownHook() {
+            super(String.format("shutdown hook: %s", LocalConverter.class));
+        }
+
         @Override
         public void run() {
             shutDown();

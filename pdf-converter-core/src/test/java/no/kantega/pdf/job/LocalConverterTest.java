@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;
 import no.kantega.pdf.WordAssert;
-import no.kantega.pdf.conversion.WordConversionBridgeTest;
+import no.kantega.pdf.conversion.MicrosoftWordBridgeTest;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -34,7 +34,7 @@ public class LocalConverterTest {
         WordAssert.assertWordNotRunning();
     }
 
-    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToConsumer() throws Exception {
         WordAssert.assertWordRunning();
         ToFileStreamConsumer toFileStreamConsumer = new ToFileStreamConsumer(pdf);
@@ -45,7 +45,7 @@ public class LocalConverterTest {
         toFileStreamConsumer.rethrow();
     }
 
-    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToFile() throws Exception {
         WordAssert.assertWordRunning();
         FeedbackFileConsumer callback = new FeedbackFileConsumer();
@@ -56,7 +56,7 @@ public class LocalConverterTest {
         callback.rethrow();
     }
 
-    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testScheduleFileToFileNoExtension() throws Exception {
         WordAssert.assertWordRunning();
         pdf = new File(folder, "temp");

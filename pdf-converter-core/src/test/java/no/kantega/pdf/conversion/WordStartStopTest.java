@@ -16,13 +16,13 @@ public class WordStartStopTest {
     @Test(timeOut = START_STOP_TIMEOUT, invocationCount = 5)
     public void testWordStartup() throws Exception {
         WordAssert.assertWordNotRunning();
-        WordConversionBridge wordConversionBridge = null;
+        MicrosoftWordBridge microsoftWordBridge = null;
         try {
-            wordConversionBridge = new WordConversionBridge(Files.createTempDir(), 2L, TimeUnit.MINUTES);
+            microsoftWordBridge = new MicrosoftWordBridge(Files.createTempDir(), 2L, TimeUnit.MINUTES);
             WordAssert.assertWordRunning();
         } finally {
-            assertNotNull(wordConversionBridge);
-            wordConversionBridge.shutDown();
+            assertNotNull(microsoftWordBridge);
+            microsoftWordBridge.shutDown();
         }
         WordAssert.assertWordNotRunning();
     }

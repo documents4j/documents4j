@@ -20,7 +20,8 @@ class MicrosoftWordBridge implements ExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
 
-    private static final Object LOCK = new Object();
+    private static final Object START_STOP_LOCK = new Object();
+    private static volatile boolean READY = false;
 
     private final File baseFolder;
     private final File visualBasicScript, powerShellScript;
@@ -29,19 +30,19 @@ class MicrosoftWordBridge implements ExternalConverter {
 
     private final ResourceExporter resourceExporter;
 
-    private volatile boolean ready = false;
-
     public MicrosoftWordBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         this.baseFolder = baseFolder;
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         resourceExporter = new ResourceExporter(baseFolder);
         visualBasicScript = resourceExporter.materializeVisualBasic(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
         powerShellScript = resourceExporter.materializePowerShell(ShellResource.WORD_PDF_CONVERSION_SCRIPT);
-        synchronized (LOCK) {
-            runScript(ShellResource.WORD_STARTUP_SCRIPT);
-            ready = true;
+        synchronized (START_STOP_LOCK) {
+            if (!READY) {
+                runScript(ShellResource.WORD_STARTUP_SCRIPT);
+                READY = true;
+                LOGGER.info("From-Word-Converter was started");
+            }
         }
-        LOGGER.info("From-Word-Converter was started");
     }
 
     private StartedProcess startProcess(List<String> commands) throws IOException {
@@ -67,7 +68,7 @@ class MicrosoftWordBridge implements ExternalConverter {
 
     @Override
     public StartedProcess convertNonBlocking(File source, File target) {
-        if (!ready) {
+        if (!READY) {
             throw new IllegalStateException(String.format("Converter %s is not ready", toString()));
         }
         try {
@@ -97,21 +98,23 @@ class MicrosoftWordBridge implements ExternalConverter {
 
     @Override
     public boolean isReady() {
-        return ready;
+        return READY;
     }
 
     @Override
     public void shutDown() {
-        synchronized (LOCK) {
-            try {
-                runScript(ShellResource.WORD_SHUTDOWN_SCRIPT);
-            } finally {
-                powerShellScript.delete();
-                visualBasicScript.delete();
-                ready = false;
+        synchronized (START_STOP_LOCK) {
+            if (READY) {
+                try {
+                    runScript(ShellResource.WORD_SHUTDOWN_SCRIPT);
+                    READY = false;
+                } finally {
+                    powerShellScript.delete();
+                    visualBasicScript.delete();
+                }
+                LOGGER.info("From-Word-Converter was shut down");
             }
         }
-        LOGGER.info("From-Word-Converter was shut down");
     }
 
     private void runScript(ShellResource scriptResource) {
@@ -134,6 +137,6 @@ class MicrosoftWordBridge implements ExternalConverter {
 
     @Override
     public String toString() {
-        return String.format("MicrosoftWordBridge[ready=%b]", ready);
+        return String.format("MicrosoftWordBridge[ready=%b]", READY);
     }
 }

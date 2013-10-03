@@ -4,7 +4,7 @@ import no.kantega.pdf.conversion.ConversionManager;
 
 import java.io.File;
 
-class FileConsumerWrappingConversionFutureImpl extends WrappingConversionFuture {
+class FileConsumerWrappingConversionFutureImpl extends AbstractWrappingConversionFuture {
 
     private final IFileConsumer callback;
 

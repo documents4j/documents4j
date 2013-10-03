@@ -48,9 +48,9 @@ public class LocalConverter implements IConverter {
 
     }
 
-    private static final String TEMP_FILE_PREFIX = "stream";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
+
+    private static final String TEMP_FILE_PREFIX = "stream";
 
     private final Thread shutdownHook;
 
@@ -70,7 +70,6 @@ public class LocalConverter implements IConverter {
         conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
         conversionExecutorService = new ThreadPoolExecutor(converterCorePoolSize, converterMaximumPoolSize,
                 converterThreadLifeTime, converterThreadLifeTimeUnit, new PriorityBlockingQueue<Runnable>());
-//        conversionExecutorService = Executors.newCachedThreadPool();
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
         LOGGER.info("Local To-PDF converter is running");
     }

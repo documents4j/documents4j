@@ -1,11 +1,19 @@
 package no.kantega.pdf.job;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 class CancelledConversionFuture implements Future<Boolean> {
+
+    private static final Future<Boolean> INSTANCE = new CancelledConversionFuture();
+
+    static Future<Boolean> getInstance() {
+        return INSTANCE;
+    }
+
+    private CancelledConversionFuture() {
+        /* do nothing */
+    }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
@@ -23,12 +31,12 @@ class CancelledConversionFuture implements Future<Boolean> {
     }
 
     @Override
-    public Boolean get() throws InterruptedException, ExecutionException {
+    public Boolean get() {
         return false;
     }
 
     @Override
-    public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public Boolean get(long timeout, TimeUnit unit) {
         return false;
     }
 }

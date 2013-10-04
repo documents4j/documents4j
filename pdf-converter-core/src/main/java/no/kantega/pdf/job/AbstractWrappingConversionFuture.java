@@ -1,6 +1,8 @@
 package no.kantega.pdf.job;
 
 import no.kantega.pdf.conversion.ConversionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.*;
@@ -8,6 +10,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<AbstractWrappingConversionFuture> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractWrappingConversionFuture.class);
 
     private static final String PDF_FILE_EXTENSION = ".pdf";
 
@@ -44,6 +48,7 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
         if (isCancelled()) {
             return;
         }
+        LOGGER.trace("Beginning conversion job");
         // Otherwise, run the actual procedure.
         boolean signalCondition = false;
         lock.lock();

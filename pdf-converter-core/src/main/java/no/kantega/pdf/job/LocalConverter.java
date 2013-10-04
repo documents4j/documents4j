@@ -68,8 +68,10 @@ public class LocalConverter implements IConverter {
         tempFileFolder.mkdir();
         uniqueNameMaker = new AtomicLong();
         conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-        conversionExecutorService = new ThreadPoolExecutor(converterCorePoolSize, converterMaximumPoolSize,
-                converterThreadLifeTime, converterThreadLifeTimeUnit, new PriorityBlockingQueue<Runnable>());
+        conversionExecutorService = new ThreadPoolExecutor(
+                converterCorePoolSize, converterMaximumPoolSize,
+                converterThreadLifeTime, converterThreadLifeTimeUnit,
+                new PriorityBlockingQueue<Runnable>(converterCorePoolSize, JobComparator.getInstance()));
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
         LOGGER.info("Local To-PDF converter is running");
     }

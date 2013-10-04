@@ -9,8 +9,10 @@ import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -93,15 +95,28 @@ class LinkColumn extends AbstractColumn<FileMatcher.FileRow, Void> {
     @Override
     public void populateItem(Item<ICellPopulator<FileMatcher.FileRow>> cellItem,
                              String componentId, IModel<FileMatcher.FileRow> rowModel) {
-        File file = side == Side.LEFT ? rowModel.getObject().getLeft() : rowModel.getObject().getRight();
-        cellItem.add(new LinkPanel(componentId, file));
+        cellItem.add(new LinkPanel(componentId, new AlternateFileModel(rowModel)));
+    }
+
+    private class AlternateFileModel extends AbstractReadOnlyModel<File> {
+
+        private final IModel<FileMatcher.FileRow> rowModel;
+
+        private AlternateFileModel(IModel<FileMatcher.FileRow> rowModel) {
+            this.rowModel = rowModel;
+        }
+
+        @Override
+        public File getObject() {
+            return side == Side.LEFT ? rowModel.getObject().getLeft() : rowModel.getObject().getRight();
+        }
     }
 }
 
 class LinkPanel extends Panel {
 
-    LinkPanel(String id, File file) {
+    LinkPanel(String id, IModel<File> file) {
         super(id);
-        add(new DownloadLink("file", file).setBody(Model.of(file.getName())));
+        add(new DownloadLink("file", file).setBody(new PropertyModel<String>(file, "name")));
     }
 }

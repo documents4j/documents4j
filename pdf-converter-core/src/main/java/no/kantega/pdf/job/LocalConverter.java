@@ -136,7 +136,7 @@ public class LocalConverter implements IConverter {
     }
 
     private Future<Boolean> schedule(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, IFileConsumer callback) {
-        RunnableFuture<Boolean> job = new FileConsumerWrappingConversionFutureImpl(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
+        RunnableFuture<Boolean> job = new FileConsumerWrappingConversionFuture(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
         conversionExecutorService.submit(job);
         return job;
     }

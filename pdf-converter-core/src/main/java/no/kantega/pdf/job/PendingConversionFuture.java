@@ -37,11 +37,11 @@ class PendingConversionFuture implements Future<Boolean> {
         if (isCancelled()) {
             return false;
         }
-        // The wrapper will synchronize on changeLock for this call. This is because the synchronization
-        // MUST be executed BEFORE this method call is bound dynamically. Otherwise, this method might
-        // be bound before the actual conversion is executed but might only be executed after the
-        // conversion terminates. This would result in a dead lock.
-        conversionJob.getChangeLock().wait();
+        conversionJob.getPendingCondition().await();
+        // If the wait condition terminated without an exception, it is save to call the wrapper's
+        // get method which will never delegate to this method since a count down to 0 it implies
+        // that the wrapped future reference was already replaced either by cancellation or by job
+        // completion. (Therefore, this will never result in an endless loop.)
         return conversionJob.get();
     }
 
@@ -50,16 +50,17 @@ class PendingConversionFuture implements Future<Boolean> {
         if (isCancelled()) {
             return false;
         }
-        long millisecondsToWait = unit.toMillis(timeout);
         // See comment in PendingConversionFuture#get().
-        conversionJob.getChangeLock().wait(millisecondsToWait);
+        conversionJob.getPendingCondition().await(timeout, unit);
         // The Object#lock(long) method has a different contract than the Future contract. Instead of throwing
         // a TimeoutException, it will simply resume its execution. Therefore, we need to additionally check if the
-        // job that is described by this wrapper has already terminated.
+        // job that is described by this wrapper has already terminated. However, instead of relying on the return
+        // value, we simply check for the wrapper' state since it should return the same value but has a smaller
+        // racing condition.
         if (conversionJob.isDone()) {
             return conversionJob.get();
         } else {
-            throw new TimeoutException(String.format("Waiting timed out after %d milliseconds", millisecondsToWait));
+            throw new TimeoutException(String.format("Waiting timed out after %d milliseconds", unit.toMillis(timeout)));
         }
     }
 }

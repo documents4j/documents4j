@@ -4,6 +4,8 @@ import no.kantega.pdf.conversion.ConversionManager;
 
 import java.io.File;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolean>, Comparable<AbstractWrappingConversionFuture> {
 
@@ -19,7 +21,8 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
 
     private volatile Future<Boolean> underlyingFuture;
 
-    private final Object changeLock;
+    private final Lock lock;
+    private final CountDownLatch pendingCondition;
 
     AbstractWrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, ConversionManager conversionManager) {
         this.createTime = System.currentTimeMillis();
@@ -29,7 +32,8 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
         this.deleteTarget = deleteTarget;
         this.priority = priority;
         this.conversionManager = conversionManager;
-        this.changeLock = new Object();
+        this.lock = new ReentrantLock();
+        this.pendingCondition = new CountDownLatch(1);
         this.underlyingFuture = new PendingConversionFuture(this);
     }
 
@@ -41,29 +45,28 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
             return;
         }
         // Otherwise, run the actual procedure.
-        boolean finished = false;
-        Exception failed = null;
-        synchronized (changeLock) {
+        boolean signalCondition = false;
+        lock.lock();
+        try {
             try {
                 if (!underlyingFuture.isCancelled()) {
+                    signalCondition = true;
                     underlyingFuture = conversionManager.startConversion(source, target);
                     underlyingFuture.get();
                     renameIfVisualBasicAutoAppend();
-                    finished = true;
-                    changeLock.notifyAll();
+                    onConversionFinished();
                 }
             } catch (Exception e) {
+                signalCondition = true;
                 underlyingFuture = new FailedConversionFuture(e);
-                failed = e;
-                // Try-finally-block can be omitted due to calling safe operations only.
-                changeLock.notifyAll();
+                onConversionFailed(e);
             }
-        }
-        // Delay triggering the callback methods until after the lock was released.
-        if (finished) {
-            onConversionFinished();
-        } else if (failed != null) {
-            onConversionFailed(failed);
+        } finally {
+            lock.unlock();
+            // Notify all locks after the callbacks were triggered and after the synchronization was released.
+            if (signalCondition) {
+                pendingCondition.countDown();
+            }
         }
     }
 
@@ -101,20 +104,23 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
             return false;
         }
         // Otherwise, we will try to cancel the job and reflect this change.
-        boolean cancelled;
-        synchronized (changeLock) {
+        boolean cancelled = false;
+        lock.lock();
+        try {
             // If the job was already cancelled, the following call will always return
             // false. Therefore, it is redundant to check for the condition again.
             cancelled = underlyingFuture.cancel(mayInterruptIfRunning);
             if (cancelled) {
                 underlyingFuture = CancelledConversionFuture.getInstance();
-                // Try-finally-block can be omitted due to calling safe operations only.
-                changeLock.notifyAll();
+                onConversionCancelled();
             }
-        }
-        // Delay triggering the callback method until after the lock was released.
-        if (cancelled) {
-            onConversionCancelled();
+        } finally {
+            lock.unlock();
+            if (cancelled) {
+                // Notify all locks after the callbacks were triggered
+                // and after the synchronization was released.
+                pendingCondition.countDown();
+            }
         }
         return cancelled;
     }
@@ -131,29 +137,13 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        if (!isPendingFutureUnderlying()) {
-            return underlyingFuture.get();
-        } else {
-            synchronized (changeLock) {
-                return underlyingFuture.get();
-            }
-        }
+        return underlyingFuture.get();
     }
 
     @Override
     public Boolean get(long timeout, TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException {
-        if (!isPendingFutureUnderlying()) {
-            return underlyingFuture.get();
-        } else {
-            synchronized (changeLock) {
-                return underlyingFuture.get(timeout, unit);
-            }
-        }
-    }
-
-    private boolean isPendingFutureUnderlying() {
-        return underlyingFuture instanceof PendingConversionFuture;
+        return underlyingFuture.get();
     }
 
     protected File getSource() {
@@ -168,8 +158,8 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
         return priority;
     }
 
-    protected Object getChangeLock() {
-        return changeLock;
+    protected CountDownLatch getPendingCondition() {
+        return pendingCondition;
     }
 
     @Override

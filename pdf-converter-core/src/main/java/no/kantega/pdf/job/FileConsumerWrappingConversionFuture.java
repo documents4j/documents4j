@@ -4,11 +4,11 @@ import no.kantega.pdf.conversion.ConversionManager;
 
 import java.io.File;
 
-class FileConsumerWrappingConversionFutureImpl extends AbstractWrappingConversionFuture {
+class FileConsumerWrappingConversionFuture extends AbstractWrappingConversionFuture {
 
     private final IFileConsumer callback;
 
-    FileConsumerWrappingConversionFutureImpl(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, ConversionManager conversionManager, IFileConsumer callback) {
+    FileConsumerWrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, ConversionManager conversionManager, IFileConsumer callback) {
         super(source, target, priority, deleteSource, deleteTarget, conversionManager);
         this.callback = callback;
     }

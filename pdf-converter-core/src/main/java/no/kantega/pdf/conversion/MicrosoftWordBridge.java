@@ -45,16 +45,18 @@ class MicrosoftWordBridge implements ExternalConverter {
         }
     }
 
-    private StartedProcess startProcess(List<String> commands) throws IOException {
-        return new ProcessExecutor()
+    private StartedProcess startProcess(List<String> commands, boolean destroyOnExit) throws IOException {
+        ProcessExecutor processExecutor = new ProcessExecutor()
                 .command(escapeArguments(commands))
                 .redirectOutputAsInfo(LOGGER)
                 .redirectErrorAsInfo(LOGGER)
                 .readOutput(true)
-//                .destroyOnExit()
                 .directory(baseFolder)
-                .timeout(processTimeout, TimeUnit.MILLISECONDS)
-                .start();
+                .exitValueAny()
+                .timeout(processTimeout, TimeUnit.MILLISECONDS);
+        // Minor issue: waiting for pull of bugfix (https://github.com/zeroturnaround/zt-exec/pull/11)
+//        if (destroyOnExit) processExecutor.destroyOnExit();
+        return processExecutor.start();
     }
 
     private List<String> escapeArguments(List<String> list) {
@@ -72,7 +74,8 @@ class MicrosoftWordBridge implements ExternalConverter {
             throw new IllegalStateException(String.format("Converter %s is not ready", toString()));
         }
         try {
-            return startProcess(Arrays.asList(powerShellScript.getAbsolutePath(), visualBasicScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()));
+            return startProcess(Arrays.asList(powerShellScript.getAbsolutePath(), visualBasicScript.getAbsolutePath(),
+                    source.getAbsolutePath(), target.getAbsolutePath()), true);
         } catch (IOException e) {
             String message = String.format("Could not start conversion of '%s' to '%s'", source, target);
             LOGGER.warn(message, e);
@@ -121,7 +124,8 @@ class MicrosoftWordBridge implements ExternalConverter {
         File powerShell = resourceExporter.materializePowerShell(scriptResource);
         File visualBasic = resourceExporter.materializeVisualBasic(scriptResource);
         try {
-            int result = startProcess(Arrays.asList(powerShell.getAbsolutePath(), visualBasic.getAbsolutePath())).future().get().exitValue();
+            int result = startProcess(Arrays.asList(powerShell.getAbsolutePath(), visualBasic.getAbsolutePath()),
+                    false).future().get().exitValue();
             if (result != 0) {
                 throw new RuntimeException(String.format("Timeout after %d milliseconds", processTimeout));
             }

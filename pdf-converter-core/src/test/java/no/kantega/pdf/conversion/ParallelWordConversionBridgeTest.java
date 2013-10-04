@@ -16,8 +16,8 @@ public class ParallelWordConversionBridgeTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelWordConversionBridgeTest.class);
 
-    private static final int NUMBER_OF_INVOCATIONS = 100;
-    private static final int NUMBER_OF_THREADS = 100;
+    private static final int NUMBER_OF_INVOCATIONS = 30;
+    private static final int NUMBER_OF_THREADS = 4;
 
     private MicrosoftWordBridge converter;
 

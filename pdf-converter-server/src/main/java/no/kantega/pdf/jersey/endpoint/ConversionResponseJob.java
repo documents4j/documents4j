@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ConversionResponseJob implements IStreamConsumer {
 
-    private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(100L);
+    private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConversionResponseJob.class);
 

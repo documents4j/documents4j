@@ -5,7 +5,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-class FailedConversionFuture implements Future<Boolean> {
+final class FailedConversionFuture implements Future<Boolean> {
 
     private final Exception exception;
 
@@ -36,5 +36,11 @@ class FailedConversionFuture implements Future<Boolean> {
     @Override
     public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return get();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[exception=%s: %s]", FailedConversionFuture.class.getSimpleName(),
+                exception.getClass().getSimpleName(), exception.getMessage());
     }
 }

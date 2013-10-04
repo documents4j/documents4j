@@ -183,4 +183,14 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
             return priorityDifference;
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%d," +
+                "created=%d,source=%s,target=%s,underlying=%s]",
+                getClass().getSimpleName(),
+                pendingCondition.getCount() == 1L, isCancelled(), isDone(),
+                priority, createTime, source.getAbsolutePath(), target.getAbsolutePath(),
+                underlyingFuture.toString());
+    }
 }

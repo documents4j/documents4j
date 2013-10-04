@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-class CancelledConversionFuture implements Future<Boolean> {
+final class CancelledConversionFuture implements Future<Boolean> {
 
     private static final Future<Boolean> INSTANCE = new CancelledConversionFuture();
 
@@ -38,5 +38,10 @@ class CancelledConversionFuture implements Future<Boolean> {
     @Override
     public Boolean get(long timeout, TimeUnit unit) {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return CancelledConversionFuture.class.getSimpleName();
     }
 }

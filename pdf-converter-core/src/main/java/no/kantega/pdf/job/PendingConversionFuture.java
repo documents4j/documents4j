@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class PendingConversionFuture implements Future<Boolean> {
+final class PendingConversionFuture implements Future<Boolean> {
 
     private final AtomicBoolean cancelled;
 
@@ -62,5 +62,10 @@ class PendingConversionFuture implements Future<Boolean> {
         } else {
             throw new TimeoutException(String.format("Waiting timed out after %d milliseconds", unit.toMillis(timeout)));
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[cancelled=%b]", PendingConversionFuture.class.getSimpleName(), cancelled.get());
     }
 }

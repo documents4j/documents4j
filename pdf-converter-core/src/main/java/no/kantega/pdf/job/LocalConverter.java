@@ -71,7 +71,7 @@ public class LocalConverter implements IConverter {
         conversionExecutorService = new ThreadPoolExecutor(
                 converterCorePoolSize, converterMaximumPoolSize,
                 converterThreadLifeTime, converterThreadLifeTimeUnit,
-                new PriorityBlockingQueue<Runnable>(converterCorePoolSize, JobComparator.getInstance()));
+                new PriorityBlockingQueue<Runnable>(converterCorePoolSize, JobPriorityComparator.getInstance()));
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
         LOGGER.info("Local To-PDF converter is running");
     }

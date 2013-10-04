@@ -4,7 +4,6 @@ import com.google.common.io.ByteStreams;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 class ToFileStreamConsumer implements IStreamConsumer {
@@ -25,7 +24,7 @@ class ToFileStreamConsumer implements IStreamConsumer {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             ByteStreams.copy(inputStream, fileOutputStream);
             fileOutputStream.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             exception = e;
         }
     }

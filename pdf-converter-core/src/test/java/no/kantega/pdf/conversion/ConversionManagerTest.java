@@ -39,7 +39,7 @@ public class ConversionManagerTest {
         WordAssert.assertWordNotRunning();
     }
 
-    @Test(timeOut = WordConversionBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
     public void testStartConversion() throws Exception {
         WordAssert.assertWordRunning();
         assertTrue(docx.exists());

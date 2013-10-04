@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>PDF converter demo</title>
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
+</head>
+<body style="padding: 10px 20px;">
+
+<h1>MS Word to PDF converter demo</h1>
+
+<p>
+    Please upload MS Word files in order to convert them to PDF. Please be aware: This is just a simple demo and
+    files get converted synchronously during your request. If the size of your document is large, this might
+    take a while. In real applications, you would probably implement an asynchronous routine on your web
+    interface. The converter implementation already supports this!
+</p>
+
+<div wicket:id="feedback" class="alert alert-error"></div>
+
+<form wicket:id="form" class="form-horizontal" style="width: 60%;">
+    <fieldset>
+        <legend>Upload a file and try!</legend>
+        <div class="control-group">
+            <label for="upload" class="control-label">Choose a file</label>
+
+            <div class="controls">
+                <input type="file" wicket:id="upload" id="upload"/>
+            </div>
+        </div>
+        <input type="submit" wicket:id="submit" value="Upload" class="btn btn-primary"/>
+    </fieldset>
+</form>
+
+<table wicket:id="results" class="table table-striped" style="width: 80%;"></table>
+
+</body>
+</html>

@@ -20,6 +20,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-exec</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>no.kantega</groupId>
             <artifactId>pdf-converter-api</artifactId>
             <version>${project.version}</version>

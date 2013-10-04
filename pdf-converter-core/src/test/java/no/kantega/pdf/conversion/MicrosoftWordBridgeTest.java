@@ -6,6 +6,7 @@ import no.kantega.pdf.WordAssert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -14,11 +15,11 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @Test(singleThreaded = true)
-public class WordConversionBridgeTest {
+public class MicrosoftWordBridgeTest {
 
     public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
 
-    private WordConversionBridge converter;
+    private MicrosoftWordBridge converter;
     private File folder, docx, pdf;
 
     @BeforeMethod(alwaysRun = true)
@@ -26,7 +27,7 @@ public class WordConversionBridgeTest {
         WordAssert.assertWordNotRunning();
         folder = Files.createTempDir();
         pdf = TestResource.PDF.absoluteTo(folder);
-        converter = new WordConversionBridge(folder, 1L, TimeUnit.MINUTES);
+        converter = new MicrosoftWordBridge(folder, 1L, TimeUnit.MINUTES);
     }
 
     @AfterMethod(alwaysRun = true)
@@ -41,8 +42,8 @@ public class WordConversionBridgeTest {
         docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());
         assertFalse(TestResource.PDF.absoluteTo(folder).exists());
-        Process process = converter.startProcess(docx, pdf);
-        int returnValue = process.waitFor();
+        StartedProcess process = converter.convertNonBlocking(docx, pdf);
+        int returnValue = process.future().get().exitValue();
         assertTrue(returnValue == 0);
         assertTrue(pdf.exists());
     }
@@ -64,7 +65,7 @@ public class WordConversionBridgeTest {
         testConvertBlocking(converter, folder);
     }
 
-    static void testConvertBlocking(WordConversionBridge converter, File folder) throws Exception {
+    static void testConvertBlocking(MicrosoftWordBridge converter, File folder) throws Exception {
         File pdf = TestResource.PDF.absoluteTo(folder);
         File docx = TestResource.DOCX.materializeIn(folder);
         assertTrue(docx.exists());

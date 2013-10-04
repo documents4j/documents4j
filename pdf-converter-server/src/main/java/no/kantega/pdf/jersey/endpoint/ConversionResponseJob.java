@@ -1,4 +1,4 @@
-package no.kantega.pdf.jersey;
+package no.kantega.pdf.jersey.endpoint;
 
 import no.kantega.pdf.job.IStreamConsumer;
 import no.kantega.pdf.mime.CustomMediaType;
@@ -11,16 +11,16 @@ import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ConversionJob implements IStreamConsumer {
+public class ConversionResponseJob implements IStreamConsumer {
 
-    private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(100L);
+    private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionResponseJob.class);
 
     private final AsyncResponse asyncResponse;
     private final CountDownLatch countDownLatch;
 
-    public ConversionJob(AsyncResponse asyncResponse) {
+    public ConversionResponseJob(AsyncResponse asyncResponse) {
         this.asyncResponse = asyncResponse;
         countDownLatch = new CountDownLatch(1);
     }

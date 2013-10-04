@@ -16,6 +16,7 @@
         <module>pdf-converter-api</module>
         <module>pdf-converter-ws</module>
         <module>pdf-converter-server-standalone</module>
+        <module>pdf-converter-core-demo</module>
     </modules>
 
     <properties>
@@ -23,7 +24,9 @@
         <version.java.ws.rs>2.0</version.java.ws.rs>
         <version.javax.inject>1.0.0-PRD</version.javax.inject>
         <version.jersey>2.1</version.jersey>
+        <version.hk2>2.1.96</version.hk2>
         <version.guava>14.0.1</version.guava>
+        <version.zt-exec>1.4</version.zt-exec>
         <version.slf4j>1.7.5</version.slf4j>
         <version.testng>6.8.5</version.testng>
     </properties>
@@ -51,6 +54,12 @@
                 <version>${version.guava}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-exec</artifactId>
+                <version>${version.zt-exec}</version>
+            </dependency>
+
             <!-- Testing / Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -62,7 +71,6 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${version.slf4j}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>

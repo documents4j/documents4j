@@ -1,4 +1,4 @@
-package no.kantega.pdf.jersey;
+package no.kantega.pdf.jersey.endpoint;
 
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;

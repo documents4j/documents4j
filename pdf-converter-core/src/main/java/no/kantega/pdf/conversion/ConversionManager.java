@@ -1,8 +1,8 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.util.ShellTimeoutHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
@@ -12,74 +12,57 @@ import java.util.concurrent.TimeoutException;
 
 public class ConversionManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
+    private static class ProcessFutureWrapper implements Future<Boolean> {
 
-    private class ConversionFuture implements Future<Boolean> {
+        private final StartedProcess startedProcess;
 
-        private final Process process;
-
-        private ConversionFuture(Process process) {
-            this.process = process;
+        private ProcessFutureWrapper(StartedProcess processFuture) {
+            this.startedProcess = processFuture;
         }
 
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            if (!mayInterruptIfRunning) {
-                return false;
-            }
-            process.destroy();
-            return isCancelled();
+            return startedProcess.future().cancel(mayInterruptIfRunning);
         }
 
         @Override
         public boolean isCancelled() {
-            try {
-                return process.exitValue() != 0;
-            } catch (IllegalThreadStateException e) {
-                return false;
-            }
+            return startedProcess.future().isCancelled();
         }
 
         @Override
         public boolean isDone() {
-            try {
-                process.exitValue();
-                return true;
-            } catch (IllegalThreadStateException e) {
-                return false;
-            }
+            return startedProcess.future().isDone();
         }
 
         @Override
         public Boolean get() throws InterruptedException, ExecutionException {
-            return shellTimeoutHelper.waitForOrTerminate(process, processTimeout, TimeUnit.MILLISECONDS) == 0;
+            return startedProcess.future().get().exitValue() == 0;
         }
 
         @Override
         public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return shellTimeoutHelper.waitFor(process, timeout, unit) == 0;
+            return startedProcess.future().get(timeout, unit).exitValue() == 0;
         }
     }
 
-    private final long processTimeout;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
 
-    private final WordConversionBridge conversionBridge;
-    private final ShellTimeoutHelper shellTimeoutHelper;
+    private final ExternalConverter microsoftWordBridge;
 
     public ConversionManager(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        this.conversionBridge = new WordConversionBridge(baseFolder, processTimeout, processTimeoutUnit);
-        this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
-        this.shellTimeoutHelper = new ShellTimeoutHelper();
-        LOGGER.info("Word-To-PDF-Conversion-Manager was started");
-    }
-
-    public Future<Boolean> startConversion(File source, File target) {
-        return new ConversionFuture(conversionBridge.startProcess(source, target));
+        this.microsoftWordBridge = new MicrosoftWordBridge(baseFolder, processTimeout, processTimeoutUnit);
     }
 
     public void shutDown() {
-        conversionBridge.shutDown();
-        shellTimeoutHelper.shutDown();
-        LOGGER.info("Word-To-PDF-Conversion-Manager was shut down");
+        try {
+            microsoftWordBridge.shutDown();
+        } catch (RuntimeException e) {
+            LOGGER.warn("Could not shut down converter {}", microsoftWordBridge, e);
+        }
+    }
+
+    public Future<Boolean> startConversion(File source, File target) {
+        return new ProcessFutureWrapper(microsoftWordBridge.convertNonBlocking(source, target));
     }
 }

@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +16,7 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
 
     private static final String PDF_FILE_EXTENSION = ".pdf";
 
-    private final int priority;
-    private final long createTime;
+    private final Priority priority;
 
     private final File source, target;
     private final boolean deleteSource, deleteTarget;
@@ -29,12 +29,11 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
     private final CountDownLatch pendingCondition;
 
     AbstractWrappingConversionFuture(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, ConversionManager conversionManager) {
-        this.createTime = System.currentTimeMillis();
+        this.priority = new Priority(priority);
         this.source = source;
         this.target = target;
         this.deleteSource = deleteSource;
         this.deleteTarget = deleteTarget;
-        this.priority = priority;
         this.conversionManager = conversionManager;
         this.lock = new ReentrantLock();
         this.pendingCondition = new CountDownLatch(1);
@@ -57,7 +56,15 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
                 if (!underlyingFuture.isCancelled()) {
                     signalCondition = true;
                     underlyingFuture = conversionManager.startConversion(source, target);
-                    underlyingFuture.get();
+                    // Force the thread to wait for the conversion to execute in order to introduce a virtual
+                    // barrier of simultaneously running batch jobs.
+                    boolean successful = underlyingFuture.get();
+                    if (isCancelled()) {
+                        return;
+                    }
+                    if (!successful || !target.exists()) {
+                        throw new ConversionException(String.format("Could not convert input file '%s'. Corrupt file? Wrong input format?", source));
+                    }
                     renameIfVisualBasicAutoAppend();
                     onConversionFinished();
                 }
@@ -159,7 +166,7 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
         return target;
     }
 
-    protected int getPriority() {
+    protected Priority getPriority() {
         return priority;
     }
 
@@ -169,28 +176,16 @@ abstract class AbstractWrappingConversionFuture implements RunnableFuture<Boolea
 
     @Override
     public int compareTo(AbstractWrappingConversionFuture other) {
-        int priorityDifference = priority - other.getPriority();
-        if (priorityDifference == 0) {
-            long timeDifference = createTime - other.createTime;
-            if (timeDifference > Integer.MAX_VALUE) {
-                return Integer.MAX_VALUE;
-            } else if (timeDifference < Integer.MIN_VALUE) {
-                return Integer.MIN_VALUE;
-            } else {
-                return (int) timeDifference;
-            }
-        } else {
-            return priorityDifference;
-        }
+        return priority.compareTo(other.getPriority());
     }
 
     @Override
     public String toString() {
-        return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%d," +
-                "created=%d,source=%s,target=%s,underlying=%s]",
+        return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
+                "source=%s,target=%s,underlying=%s]",
                 getClass().getSimpleName(),
                 pendingCondition.getCount() == 1L, isCancelled(), isDone(),
-                priority, createTime, source.getAbsolutePath(), target.getAbsolutePath(),
+                priority, source.getAbsolutePath(), target.getAbsolutePath(),
                 underlyingFuture.toString());
     }
 }

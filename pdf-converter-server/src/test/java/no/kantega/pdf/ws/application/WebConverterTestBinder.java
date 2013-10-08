@@ -1,4 +1,4 @@
-package no.kantega.pdf.jersey.application;
+package no.kantega.pdf.ws.application;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 

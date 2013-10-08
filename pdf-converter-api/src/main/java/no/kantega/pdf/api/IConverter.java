@@ -1,4 +1,4 @@
-package no.kantega.pdf.job;
+package no.kantega.pdf.api;
 
 import java.io.File;
 import java.io.InputStream;

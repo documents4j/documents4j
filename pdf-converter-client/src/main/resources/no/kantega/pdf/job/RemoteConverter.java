@@ -1,5 +1,10 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.api.IFileConsumer;
+import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.NoopFileConsumer;
+import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

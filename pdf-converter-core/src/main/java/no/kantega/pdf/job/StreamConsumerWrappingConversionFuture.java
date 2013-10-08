@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import com.google.common.io.Closeables;
+import no.kantega.pdf.api.IStreamConsumer;
 import no.kantega.pdf.conversion.ConversionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

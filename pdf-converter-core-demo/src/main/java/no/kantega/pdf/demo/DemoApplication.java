@@ -1,7 +1,7 @@
 package no.kantega.pdf.demo;
 
 import com.google.common.io.Files;
-import no.kantega.pdf.job.IConverter;
+import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.LocalConverter;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;

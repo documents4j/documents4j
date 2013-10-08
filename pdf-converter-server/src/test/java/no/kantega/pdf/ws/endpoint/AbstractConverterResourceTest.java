@@ -1,8 +1,8 @@
-package no.kantega.pdf.jersey.endpoint;
+package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.io.ByteStreams;
-import no.kantega.pdf.jersey.AbstractJerseyTest;
 import no.kantega.pdf.mime.CustomMediaType;
+import no.kantega.pdf.ws.AbstractJerseyTest;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;

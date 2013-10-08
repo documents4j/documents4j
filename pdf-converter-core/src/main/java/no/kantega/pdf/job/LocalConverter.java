@@ -3,7 +3,12 @@ package no.kantega.pdf.job;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.api.IFileConsumer;
+import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.NoopFileConsumer;
 import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,26 +20,36 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LocalConverter implements IConverter {
 
+    public static final int DEFAULT_THREAD_POOL_CORE_SIZE = 10;
+    public static final int DEFAULT_THREAD_POOL_MAXIMUM_SIZE = 15;
+    public static final long DEFAULT_FALLBACK_THREAD_LIFE_TIME = TimeUnit.MINUTES.toMillis(10);
+    public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
+
     public static final class Builder {
 
         private File baseFolder;
-        private int converterCorePoolSize = 10, converterMaximumPoolSize = 15;
-        private long fallbackThreadLifeTime = TimeUnit.MINUTES.toMillis(10);
-        private long processTimeout = TimeUnit.MINUTES.toMillis(5L);
+        private int converterCorePoolSize = DEFAULT_THREAD_POOL_CORE_SIZE;
+        private int converterMaximumPoolSize = DEFAULT_THREAD_POOL_MAXIMUM_SIZE;
+        private long fallbackThreadIdleLifeTime = DEFAULT_FALLBACK_THREAD_LIFE_TIME;
+        private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
 
         public Builder baseFolder(File baseFolder) {
             this.baseFolder = baseFolder;
             return this;
         }
 
-        public Builder converterPoolSize(int constant, int fallback, long fallbackThreadLifeTime, TimeUnit timeUnit) {
-            this.converterCorePoolSize = constant;
-            this.converterMaximumPoolSize = constant + fallback;
-            this.fallbackThreadLifeTime = timeUnit.toMillis(fallbackThreadLifeTime);
+        public Builder converterPoolSize(int coreThreadPoolSize, int fallbackThreadPoolExtraSize, long fallbackThreadIdleLifeTime, TimeUnit timeUnit) {
+            assertNumericArgument(coreThreadPoolSize, false);
+            assertNumericArgument(fallbackThreadPoolExtraSize, true);
+            assertNumericArgument(fallbackThreadIdleLifeTime, false);
+            this.converterCorePoolSize = coreThreadPoolSize;
+            this.converterMaximumPoolSize = coreThreadPoolSize + fallbackThreadPoolExtraSize;
+            this.fallbackThreadIdleLifeTime = timeUnit.toMillis(fallbackThreadIdleLifeTime);
             return this;
         }
 
         public Builder processTimeout(long processTimeout, TimeUnit timeUnit) {
+            assertNumericArgument(processTimeout, false);
             this.processTimeout = timeUnit.toMillis(processTimeout);
             return this;
         }
@@ -42,8 +57,16 @@ public class LocalConverter implements IConverter {
         public LocalConverter build() {
             return new LocalConverter(baseFolder == null ? Files.createTempDir() : baseFolder,
                     converterCorePoolSize, converterMaximumPoolSize,
-                    fallbackThreadLifeTime, TimeUnit.MILLISECONDS,
+                    fallbackThreadIdleLifeTime, TimeUnit.MILLISECONDS,
                     processTimeout, TimeUnit.MILLISECONDS);
+        }
+
+        private static void assertNumericArgument(long number, boolean zeroAllowed) {
+            if (number < 0L) {
+                throw new IllegalArgumentException("Input must not be a negative number");
+            } else if (!zeroAllowed && number == 0L) {
+                throw new IllegalArgumentException("Input must be a positive number");
+            }
         }
 
     }
@@ -61,16 +84,15 @@ public class LocalConverter implements IConverter {
     private final ExecutorService conversionExecutorService;
 
     protected LocalConverter(File baseFolder, int converterCorePoolSize, int converterMaximumPoolSize,
-                             long converterThreadLifeTime, TimeUnit converterThreadLifeTimeUnit,
+                             long converterFallbackThreadLifeTime, TimeUnit converterFallbackThreadLifeTimeUnit,
                              long processTimeout, TimeUnit processTimeoutUnit) {
-
         tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
         tempFileFolder.mkdir();
         uniqueNameMaker = new AtomicLong();
         conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
         conversionExecutorService = new ThreadPoolExecutor(
                 converterCorePoolSize, converterMaximumPoolSize,
-                converterThreadLifeTime, converterThreadLifeTimeUnit,
+                converterFallbackThreadLifeTime, converterFallbackThreadLifeTimeUnit,
                 new PriorityBlockingQueue<Runnable>(converterCorePoolSize, JobPriorityComparator.getInstance()));
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
         LOGGER.info("Local To-PDF converter is running");

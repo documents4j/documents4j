@@ -1,7 +1,7 @@
-package no.kantega.pdf.jersey.application;
+package no.kantega.pdf.ws.application;
 
 import com.google.common.io.Files;
-import no.kantega.pdf.job.IConverter;
+import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.LocalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

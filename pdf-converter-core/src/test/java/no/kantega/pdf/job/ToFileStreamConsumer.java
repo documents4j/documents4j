@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import com.google.common.io.ByteStreams;
+import no.kantega.pdf.api.IStreamConsumer;
 
 import java.io.File;
 import java.io.FileOutputStream;

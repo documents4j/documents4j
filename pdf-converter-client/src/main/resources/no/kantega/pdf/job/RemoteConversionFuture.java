@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IStreamConsumer;
+
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package no.kantega.pdf.jersey.endpoint;
+package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.TestResource;

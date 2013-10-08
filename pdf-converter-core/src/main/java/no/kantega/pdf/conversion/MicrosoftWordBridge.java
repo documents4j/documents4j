@@ -1,6 +1,6 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.job.ConversionException;
+import no.kantega.pdf.throwables.ConversionException;
 import no.kantega.pdf.util.ResourceExporter;
 import no.kantega.pdf.util.ShellResource;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-class MicrosoftWordBridge implements ExternalConverter {
+public class MicrosoftWordBridge implements ExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
 
@@ -77,7 +77,8 @@ class MicrosoftWordBridge implements ExternalConverter {
             return startProcess(Arrays.asList(powerShellScript.getAbsolutePath(), visualBasicScript.getAbsolutePath(),
                     source.getAbsolutePath(), target.getAbsolutePath()), true);
         } catch (IOException e) {
-            String message = String.format("Could not start conversion of '%s' to '%s'", source, target);
+            String message = String.format("Could not start shell script for conversion of '%s' to '%s' ('%s')",
+                    source, target, powerShellScript);
             LOGGER.warn(message, e);
             throw new ConversionException(message, e);
         }
@@ -87,15 +88,15 @@ class MicrosoftWordBridge implements ExternalConverter {
     public boolean convertBlocking(File source, File target) {
         StartedProcess startedProcess = convertNonBlocking(source, target);
         try {
-            return startedProcess.future().get().exitValue() == 0 && target.exists();
+            return startedProcess.future().get().exitValue() == ConversionManager.SUCCESSFUL_CONVERSION_STATUS_CODE;
         } catch (InterruptedException e) {
             String message = String.format("Conversion of '%s' to '%s' was interrupted", source, target);
             LOGGER.info(message, e);
             throw new ConversionException(message, e);
         } catch (ExecutionException e) {
             String message = String.format("Conversion of '%s' to '%s' failed", source, target);
-            LOGGER.info(message, e);
-            throw new ConversionException(message, e);
+            LOGGER.info(message, e.getCause());
+            throw new ConversionException(message, e.getCause());
         }
     }
 
@@ -129,8 +130,16 @@ class MicrosoftWordBridge implements ExternalConverter {
             if (result != 0) {
                 throw new RuntimeException(String.format("Timeout after %d milliseconds", processTimeout));
             }
-        } catch (Exception e) {
-            String message = String.format("Could not run shell script '%s'", powerShell.getAbsolutePath());
+        } catch (InterruptedException e) {
+            String message = String.format("Shell script execution was interrupted ('%s')", powerShell);
+            LOGGER.error(message, e);
+            throw new ConversionException(message, e);
+        } catch (ExecutionException e) {
+            String message = String.format("Error when executing in shell ('%s')", powerShell);
+            LOGGER.error(message, e.getCause());
+            throw new ConversionException(message, e.getCause());
+        } catch (IOException e) {
+            String message = String.format("Could not start shell script ('%s')", powerShell);
             LOGGER.error(message, e);
             throw new ConversionException(message, e);
         } finally {

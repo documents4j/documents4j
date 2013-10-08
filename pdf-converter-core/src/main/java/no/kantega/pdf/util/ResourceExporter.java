@@ -3,7 +3,7 @@ package no.kantega.pdf.util;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import no.kantega.pdf.job.ConversionException;
+import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

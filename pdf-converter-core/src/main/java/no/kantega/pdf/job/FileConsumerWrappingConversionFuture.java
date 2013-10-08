@@ -1,5 +1,6 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.conversion.ConversionManager;
 
 import java.io.File;

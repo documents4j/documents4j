@@ -1,6 +1,6 @@
-package no.kantega.pdf.jersey;
+package no.kantega.pdf.ws;
 
-import no.kantega.pdf.jersey.application.WebConverterTestBinder;
+import no.kantega.pdf.ws.application.WebConverterTestBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.testng.annotations.AfterClass;

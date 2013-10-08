@@ -1,9 +1,9 @@
-package no.kantega.pdf.jersey.endpoint;
+package no.kantega.pdf.ws.endpoint;
 
-import no.kantega.pdf.jersey.application.IWebConverterConfiguration;
-import no.kantega.pdf.job.IConverter;
+import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.InfoConstant;
 import no.kantega.pdf.mime.CustomMediaType;
+import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;

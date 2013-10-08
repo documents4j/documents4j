@@ -1,6 +1,6 @@
-package no.kantega.pdf.jersey.endpoint;
+package no.kantega.pdf.ws.endpoint;
 
-import no.kantega.pdf.job.IStreamConsumer;
+import no.kantega.pdf.api.IStreamConsumer;
 import no.kantega.pdf.mime.CustomMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

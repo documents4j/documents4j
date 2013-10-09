@@ -6,8 +6,8 @@ import com.google.common.io.Files;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IStreamConsumer;
-import no.kantega.pdf.api.NoopFileConsumer;
 import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.defaults.NoopFileConsumer;
 import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +93,7 @@ public class LocalConverter implements IConverter {
         conversionExecutorService = new ThreadPoolExecutor(
                 converterCorePoolSize, converterMaximumPoolSize,
                 converterFallbackThreadLifeTime, converterFallbackThreadLifeTimeUnit,
-                new PriorityBlockingQueue<Runnable>(converterCorePoolSize, JobPriorityComparator.getInstance()));
+                new PriorityBlockingQueue<Runnable>());
         Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
         LOGGER.info("Local To-PDF converter is running");
     }
@@ -161,13 +161,16 @@ public class LocalConverter implements IConverter {
 
     private Future<Boolean> schedule(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, IFileConsumer callback) {
         RunnableFuture<Boolean> job = new FileConsumerWrappingConversionFuture(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
-        conversionExecutorService.submit(job);
+        // Note: Do never call submit on the ExecutorService. The submit method wraps all jobs in another RunnableFuture and breaks the contract of the
+        // PriorityBlockingQueue that backs up the priority ordering.
+        conversionExecutorService.execute(job);
         return job;
     }
 
     private Future<Boolean> schedule(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, IStreamConsumer callback) {
         RunnableFuture<Boolean> job = new StreamConsumerWrappingConversionFuture(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
-        conversionExecutorService.submit(job);
+        // Never use ExecutorService.submit instead of Executor.execute. See comment above.
+        conversionExecutorService.execute(job);
         return job;
     }
 

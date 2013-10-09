@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.channels.FileLock;
 
-public class StreamToFileConsumer implements IStreamConsumer {
+class StreamToFileConsumer implements IStreamConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamToFileConsumer.class);
 

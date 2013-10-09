@@ -10,13 +10,14 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>pdf-converter-api</module>
         <module>pdf-converter-core</module>
+        <module>pdf-converter-core-demo</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
-        <module>pdf-converter-api</module>
-        <module>pdf-converter-ws</module>
         <module>pdf-converter-server-standalone</module>
-        <module>pdf-converter-core-demo</module>
+        <module>pdf-converter-util-commons</module>
+        <module>pdf-converter-util-ws</module>
     </modules>
 
     <properties>

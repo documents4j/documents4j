@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IStreamConsumer;
-import no.kantega.pdf.api.NoopFileConsumer;
+import no.kantega.pdf.defaults.NoopFileConsumer;
 import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.concurrent.Future;
 
 public class RemoteConverter implements IConverter {
@@ -22,9 +23,9 @@ public class RemoteConverter implements IConverter {
 
     private final WebTarget webTarget;
 
-    public RemoteConverter(long requestWaitingTolerance, String host, int port) {
+    public RemoteConverter(URI baseUri, long requestWaitingTolerance) {
+        this.webTarget = ClientBuilder.newClient().target(baseUri);
         this.requestWaitingTolerance = requestWaitingTolerance;
-        this.webTarget = ClientBuilder.newClient().target(String.format("http://%s:%d", host, port));
     }
 
     @Override
@@ -88,7 +89,7 @@ public class RemoteConverter implements IConverter {
     }
 
     private Future<Boolean> schedule(InputStream source, IStreamConsumer target, int priority, long requestWaitingTolerance) {
-        return new RemoteConversionFuture(webTarget, source, target, priority, requestWaitingTolerance);
+        return null;
     }
 
     @Override

@@ -1,4 +1,6 @@
-package no.kantega.pdf.api;
+package no.kantega.pdf.defaults;
+
+import no.kantega.pdf.api.IFileConsumer;
 
 import java.io.File;
 

@@ -10,7 +10,7 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-ws</artifactId>
+    <artifactId>pdf-converter-util-ws</artifactId>
     <packaging>jar</packaging>
 
 </project>

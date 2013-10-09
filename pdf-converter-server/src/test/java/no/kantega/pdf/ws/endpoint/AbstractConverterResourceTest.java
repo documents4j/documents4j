@@ -18,7 +18,7 @@ public abstract class AbstractConverterResourceTest extends AbstractJerseyTest {
 
     protected void testConversion(WebTarget webTarget, File docx, File pdf) throws Exception {
 
-        Response response = webTarget.path(ConverterResource.CONVERSION_PATH)
+        Response response = webTarget.path(ConverterResource.CONVERTER_RESOURCE_PATH)
                 .request(CustomMediaType.APPLICATION_PDF)
                 .post(Entity.entity(docx, CustomMediaType.WORD_DOCX));
 

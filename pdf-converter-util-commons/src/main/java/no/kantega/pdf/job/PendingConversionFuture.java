@@ -9,10 +9,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 final class PendingConversionFuture implements Future<Boolean> {
 
     private final AtomicBoolean cancelled;
+    private final IPendingConditionedFuture<Boolean> conversionJob;
 
-    private final AbstractWrappingConversionFuture conversionJob;
-
-    PendingConversionFuture(AbstractWrappingConversionFuture conversionJob) {
+    PendingConversionFuture(IPendingConditionedFuture<Boolean> conversionJob) {
         this.cancelled = new AtomicBoolean(false);
         this.conversionJob = conversionJob;
     }

@@ -12,10 +12,10 @@ import javax.ws.rs.container.Suspended;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-@Path(ConverterResource.CONVERSION_PATH)
+@Path(ConverterResource.CONVERTER_RESOURCE_PATH)
 public class ConverterResource {
 
-    public static final String CONVERSION_PATH = "convert";
+    public static final String CONVERTER_RESOURCE_PATH = "/";
 
     @Inject
     private IWebConverterConfiguration webConverterConfiguration;

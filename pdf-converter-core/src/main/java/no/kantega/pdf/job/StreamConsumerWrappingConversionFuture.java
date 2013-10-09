@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileLock;
 
-final class StreamConsumerWrappingConversionFuture extends AbstractWrappingConversionFuture {
+final class StreamConsumerWrappingConversionFuture extends AbstractLocalWrappingFuture {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamConsumerWrappingConversionFuture.class);
 

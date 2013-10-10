@@ -23,7 +23,7 @@ public class LocalConverterTest {
     public void setUp() throws Exception {
         WordAssert.assertWordNotRunning();
         folder = Files.createTempDir();
-        localConverter = new LocalConverter.Builder().baseFolder(folder).build();
+        localConverter = LocalConverter.builder().baseFolder(folder).build();
         docx = TestResource.DOCX.materializeIn(folder);
         pdf = TestResource.PDF.absoluteTo(folder);
     }
@@ -38,7 +38,7 @@ public class LocalConverterTest {
     public void testScheduleFileToConsumer() throws Exception {
         WordAssert.assertWordRunning();
         ToFileStreamConsumer toFileStreamConsumer = new ToFileStreamConsumer(pdf);
-        localConverter.schedule(docx, toFileStreamConsumer).get();
+        localConverter.convert(docx).to(toFileStreamConsumer).schedule().get();
         assertTrue(pdf.exists());
         assertFalse(toFileStreamConsumer.isCancelled());
         assertTrue(toFileStreamConsumer.isRun());
@@ -49,7 +49,7 @@ public class LocalConverterTest {
     public void testScheduleFileToFile() throws Exception {
         WordAssert.assertWordRunning();
         FeedbackFileConsumer callback = new FeedbackFileConsumer();
-        localConverter.schedule(docx, pdf, callback).get();
+        localConverter.convert(docx).to(pdf, callback).schedule().get();
         assertTrue(pdf.exists());
         assertTrue(callback.isCompleted());
         assertFalse(callback.isCancelled());
@@ -60,7 +60,7 @@ public class LocalConverterTest {
     public void testScheduleFileToFileNoExtension() throws Exception {
         WordAssert.assertWordRunning();
         pdf = new File(folder, "temp");
-        localConverter.schedule(docx, pdf).get();
+        localConverter.convert(docx).to(pdf).schedule().get();
         assertTrue(pdf.exists());
     }
 }

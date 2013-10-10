@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import java.io.*;
 import java.nio.channels.FileLock;
 
-public class LazyFileInputStream extends InputStream {
+class LazyFileInputStream extends InputStream {
 
     private final File file;
 

@@ -14,6 +14,19 @@
     <packaging>jar</packaging>
 
     <dependencies>
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -22,12 +35,6 @@
         <dependency>
             <groupId>org.zeroturnaround</groupId>
             <artifactId>zt-exec</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-api</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

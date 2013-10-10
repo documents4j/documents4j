@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IFileConsumer;
+
 import java.io.File;
 
 public class FeedbackFileConsumer implements IFileConsumer {

@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8"/>
     <title>PDF converter demo</title>
-    <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 </head>
 <body style="padding: 10px 20px;">
 
@@ -14,6 +13,18 @@
     files get converted synchronously during your request. If the size of your document is large, this might
     take a while. In real applications, you would probably implement an asynchronous routine on your web
     interface. The converter implementation already supports this!
+</p>
+
+<p class="alert alert-warn" wicket:id="localhost">
+    <b>Important!</b><br/>
+    It seems as if this browser is running on the same machine as the converter backend. If you are opening an instance
+    of MS Word (for example by opening MS Word files from this page), this might result in unexpected behavior of this
+    application. Be further aware that killing the JVM that is running this application might not kill the MS Word
+    processes that were opened by this application: MS Windows requires GUI processes such as MS Word to always be
+    started as a child process of a MS Windows specific <em>master GUI process</em>. Therefore, MS Word processes are
+    never child processes of the JVM and will therefore survive a killing of the JVM process. This converter software
+    provides a shut down hook for this purpose, but shut down hooks are not triggered when a process is simply
+    killed instead of shut down regularly.
 </p>
 
 <div wicket:id="feedback" class="alert alert-error"></div>
@@ -28,9 +39,17 @@
                 <input type="file" wicket:id="upload" id="upload"/>
             </div>
         </div>
-        <input type="submit" wicket:id="submit" value="Upload" class="btn btn-primary"/>
+        <input type="submit" wicket:id="submit" value="Upload &amp; convert" class="btn btn-primary"/>
     </fieldset>
 </form>
+
+<h3>Converted files</h3>
+
+<p class="alert alert-info">
+    <b>A note on browser caching!</b><br/>
+    If you restart this application, make sure that you clear your browser's cache before downloading files from
+    this page. Otherwise, your browser might resend you cached files that you downloaded before.
+</p>
 
 <table wicket:id="results" class="table table-striped" style="width: 80%;"></table>
 

@@ -1,200 +1,182 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.adapter.ConversionJobAdapter;
+import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
+import no.kantega.pdf.adapter.ConverterAdapter;
+import no.kantega.pdf.api.*;
+import no.kantega.pdf.builder.AbstractConverterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.io.File;
-import java.io.InputStream;
-import java.util.concurrent.Future;
+import java.net.URI;
+import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class RemoteConverter implements IConverter {
+public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
 
-    private final long requestWaitingTolerance;
+    private static final String TEMP_FILE_PREFIX = "temp";
 
+    public static final class Builder extends AbstractConverterBuilder<Builder> {
+
+        public static final long DEFAULT_NETWORK_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(5L);
+
+        private URI baseUri;
+        private long networkRequestTimeout = DEFAULT_NETWORK_REQUEST_TIMEOUT;
+
+        private Builder() {
+            /* empty */
+        }
+
+        public Builder baseUri(URI baseUri) {
+            this.baseUri = baseUri;
+            return this;
+        }
+
+        public Builder baseUri(String baseUri) {
+            this.baseUri = URI.create(baseUri);
+            return this;
+        }
+
+        public Builder networkRequestTimeout(long timeout, TimeUnit unit) {
+            assertNumericArgument(timeout, true);
+            this.networkRequestTimeout = unit.toMillis(timeout);
+            return this;
+        }
+
+        @Override
+        public IConverter build() {
+            if (baseUri == null) {
+                throw new NullPointerException("The base URI was not set");
+            }
+            return new RemoteConverter(baseUri, normalizedBaseFolder(), networkRequestTimeout,
+                    corePoolSize, maximumPoolSize, keepAliveTime);
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static IConverter make(URI baseUri) {
+        return builder().baseUri(baseUri).build();
+    }
+
+    public static IConverter make(String baseUri) {
+        return builder().baseUri(baseUri).build();
+    }
+
+    private final long networkRequestTimeout;
     private final WebTarget webTarget;
 
-    public RemoteConverter(long requestWaitingTolerance, String host, int port) {
-        this.requestWaitingTolerance = requestWaitingTolerance;
-        this.webTarget = ClientBuilder.newClient().target(String.format("http://%s:%d", host, port));
+    private final ExecutorService executorService;
+
+    private final File tempFileFolder;
+    private final AtomicLong uniqueNameMaker;
+
+    private final Thread shutdownHook;
+
+    protected RemoteConverter(URI baseUri, File baseFolder, long networkRequestTimeout,
+                              int corePoolSize, int maximumPoolSize, long keepAliveTime) {
+        this.webTarget = ClientBuilder.newClient().target(baseUri);
+        this.tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
+        tempFileFolder.mkdir();
+        this.networkRequestTimeout = networkRequestTimeout;
+        this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
+        this.uniqueNameMaker = new AtomicLong(1L);
+        this.shutdownHook = new ConverterShutdownHook();
+        registerShutdownHook();
+        LOGGER.info("Remote To-PDF converter is started ({})", baseUri);
     }
 
-    @Override
-    public Future<Boolean> schedule(File source, IStreamConsumer target) {
-        return schedule(read(source), target, JOB_PRIORITY_NORMAL, requestWaitingTolerance);
+    private class RemoteConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
+
+        private final IInputStreamSource source;
+
+        private RemoteConversionJobSourceSpecified(IInputStreamSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public IConversionJob to(IInputStreamConsumer callback) {
+            return new RemoteConversionJob(source, callback, JOB_PRIORITY_NORMAL);
+        }
+
+        @Override
+        protected File makeTemporaryFile(String suffix) {
+            return RemoteConverter.this.makeTemporaryFile(suffix);
+        }
     }
 
-    @Override
-    public Future<Boolean> schedule(File source, File target) {
-        return schedule(read(source), new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), JOB_PRIORITY_NORMAL, requestWaitingTolerance);
-    }
+    private class RemoteConversionJob extends ConversionJobAdapter {
 
-    @Override
-    public Future<Boolean> schedule(File source, File target, IFileConsumer callback) {
-        return schedule(read(source), new StreamToFileConsumer(target, callback), JOB_PRIORITY_NORMAL, requestWaitingTolerance);
-    }
+        private final IInputStreamSource source;
+        private final IInputStreamConsumer callback;
+        private final int priority;
 
-    @Override
-    public Future<Boolean> schedule(File source, IStreamConsumer target, int priority) {
-        return schedule(read(source), target, priority, requestWaitingTolerance);
-    }
+        private RemoteConversionJob(IInputStreamSource source, IInputStreamConsumer callback, int priority) {
+            this.source = source;
+            this.callback = callback;
+            this.priority = priority;
+        }
 
-    @Override
-    public Future<Boolean> schedule(File source, File target, int priority) {
-        return schedule(read(source), new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), priority, requestWaitingTolerance);
-    }
+        @Override
+        public Future<Boolean> schedule() {
+            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(
+                    webTarget, source, callback, priority, networkRequestTimeout);
+            // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
+            // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
+            executorService.execute(job);
+            return job;
+        }
 
-    @Override
-    public Future<Boolean> schedule(File source, File target, IFileConsumer callback, int priority) {
-        return schedule(read(source), new StreamToFileConsumer(target, callback), priority, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, IStreamConsumer target) {
-        return schedule(source, target, JOB_PRIORITY_NORMAL, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target) {
-        return schedule(source, new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), JOB_PRIORITY_NORMAL, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback) {
-        return schedule(source, new StreamToFileConsumer(target, callback), JOB_PRIORITY_NORMAL, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, IStreamConsumer target, int priority) {
-        return schedule(source, target, priority, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, int priority) {
-        return schedule(source, new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), priority, requestWaitingTolerance);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback, int priority) {
-        return schedule(source, new StreamToFileConsumer(target, callback), priority, requestWaitingTolerance);
-    }
-
-    private Future<Boolean> schedule(InputStream source, IStreamConsumer target, int priority, long requestWaitingTolerance) {
-        return new RemoteConversionFuture(webTarget, source, target, priority, requestWaitingTolerance);
-    }
-
-    @Override
-    public boolean convert(File source, IStreamConsumer target) {
-        try {
-            return schedule(read(source), target, JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s'", source.getAbsolutePath()), e);
+        @Override
+        public IConversionJob prioritizeWith(int priority) {
+            return new RemoteConversionJob(source, callback, priority);
         }
     }
 
     @Override
-    public boolean convert(File source, File target) {
-        try {
-            return schedule(read(source), new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
+    public IConversionJobSourceSpecified convert(IInputStreamSource source) {
+        return new RemoteConversionJobSourceSpecified(source);
     }
 
     @Override
-    public boolean convert(File source, File target, IFileConsumer callback) {
-        try {
-            return schedule(read(source), new StreamToFileConsumer(target, callback), JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
+    protected File makeTemporaryFile(String suffix) {
+        return new File(tempFileFolder, String.format("%s%d%s",
+                TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
     }
 
     @Override
-    public boolean convert(File source, IStreamConsumer target, int priority) {
+    public void shutDown() {
         try {
-            return schedule(read(source), target, priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s'", source.getAbsolutePath()), e);
+            executorService.shutdown();
+        } finally {
+            tempFileFolder.delete();
+            deregisterShutdownHook();
+        }
+        LOGGER.info("Remote To-PDF converter is shut down ({})", webTarget.getUri());
+    }
+
+    private void registerShutdownHook() {
+        try {
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Tried to register shut down hook in shut down period", e);
         }
     }
 
-    @Override
-    public boolean convert(File source, File target, int priority) {
+    private void deregisterShutdownHook() {
         try {
-            return schedule(read(source), new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Tried to deregister shut down hook in shut down period", e);
         }
-    }
-
-    @Override
-    public boolean convert(File source, File target, IFileConsumer callback, int priority) {
-        try {
-            return schedule(read(source), new StreamToFileConsumer(target, callback), priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert from '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, IStreamConsumer target) {
-        try {
-            return schedule(source, target, JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException("Could not convert", e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target) {
-        try {
-            return schedule(source, new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, IFileConsumer callback) {
-        try {
-            return schedule(source, new StreamToFileConsumer(target, callback), JOB_PRIORITY_NORMAL, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, IStreamConsumer target, int priority) {
-        try {
-            return schedule(source, target, priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException("Could not convert", e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, int priority) {
-        try {
-            return schedule(source, new StreamToFileConsumer(target, NoopFileConsumer.INSTANCE), priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, IFileConsumer callback, int priority) {
-        try {
-            return schedule(source, new StreamToFileConsumer(target, callback), priority, 0L).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    private InputStream read(File file) {
-        return new LazyFileInputStream(file);
     }
 }

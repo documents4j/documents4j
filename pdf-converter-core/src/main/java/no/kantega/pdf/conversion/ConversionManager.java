@@ -12,7 +12,10 @@ import java.util.concurrent.TimeoutException;
 
 public class ConversionManager {
 
+    public static final int SUCCESSFUL_CONVERSION_STATUS_CODE = 0;
+
     private static class ProcessFutureWrapper implements Future<Boolean> {
+
 
         private final StartedProcess startedProcess;
 
@@ -37,12 +40,12 @@ public class ConversionManager {
 
         @Override
         public Boolean get() throws InterruptedException, ExecutionException {
-            return startedProcess.future().get().exitValue() == 0;
+            return startedProcess.future().get().exitValue() == SUCCESSFUL_CONVERSION_STATUS_CODE;
         }
 
         @Override
         public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-            return startedProcess.future().get(timeout, unit).exitValue() == 0;
+            return startedProcess.future().get(timeout, unit).exitValue() == SUCCESSFUL_CONVERSION_STATUS_CODE;
         }
     }
 

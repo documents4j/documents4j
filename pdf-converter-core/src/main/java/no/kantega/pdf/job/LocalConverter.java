@@ -3,10 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.adapter.ConversionJobAdapter;
 import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
-import no.kantega.pdf.api.IConversionJob;
-import no.kantega.pdf.api.IConversionJobSourceSpecified;
-import no.kantega.pdf.api.IFileConsumer;
-import no.kantega.pdf.api.IFileSource;
+import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.conversion.ConversionManager;
 import org.slf4j.Logger;
@@ -40,7 +37,7 @@ public class LocalConverter extends ConverterAdapter {
         }
 
         @Override
-        public LocalConverter build() {
+        public IConverter build() {
             return new LocalConverter(normalizedBaseFolder(), corePoolSize, maximumPoolSize,
                     keepAliveTime, processTimeout, TimeUnit.MILLISECONDS);
         }
@@ -48,6 +45,10 @@ public class LocalConverter extends ConverterAdapter {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static IConverter make() {
+        return builder().build();
     }
 
     private final ConversionManager conversionManager;

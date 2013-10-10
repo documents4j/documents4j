@@ -3,10 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.adapter.ConversionJobAdapter;
 import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
-import no.kantega.pdf.api.IConversionJob;
-import no.kantega.pdf.api.IConversionJobSourceSpecified;
-import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.api.IInputStreamSource;
+import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +50,7 @@ public class RemoteConverter extends ConverterAdapter {
         }
 
         @Override
-        public RemoteConverter build() {
+        public IConverter build() {
             if (baseUri == null) {
                 throw new NullPointerException("The base URI was not set");
             }
@@ -64,6 +61,14 @@ public class RemoteConverter extends ConverterAdapter {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static IConverter make(URI baseUri) {
+        return builder().baseUri(baseUri).build();
+    }
+
+    public static IConverter make(String baseUri) {
+        return builder().baseUri(baseUri).build();
     }
 
     private final long networkRequestTimeout;

@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IFileConsumer;
+import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.conversion.ConversionManager;
 import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
@@ -7,25 +9,25 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
-abstract class AbstractLocalWrappingFuture extends AbstractFutureWrappingPriorityFuture {
+class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractLocalWrappingFuture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalFutureWrappingPriorityFuture.class);
 
     private static final String PDF_FILE_EXTENSION = ".pdf";
 
-    private final File source, target;
-    private final boolean deleteSource, deleteTarget;
+    private final IFileSource source;
+    private final File target;
+    private final IFileConsumer callback;
 
     private final ConversionManager conversionManager;
 
-    AbstractLocalWrappingFuture(File source, File target, int priority, boolean deleteSource,
-                                boolean deleteTarget, ConversionManager conversionManager) {
+    LocalFutureWrappingPriorityFuture(ConversionManager conversionManager, IFileSource source,
+                                      File target, IFileConsumer callback, int priority) {
         super(priority);
+        this.conversionManager = conversionManager;
         this.source = source;
         this.target = target;
-        this.deleteSource = deleteSource;
-        this.deleteTarget = deleteTarget;
-        this.conversionManager = conversionManager;
+        this.callback = callback;
     }
 
     @Override
@@ -42,7 +44,7 @@ abstract class AbstractLocalWrappingFuture extends AbstractFutureWrappingPriorit
                     return;
                 }
                 LOGGER.trace("Local converter: Executing conversion");
-                underlyingFuture = conversionManager.startConversion(source, target);
+                underlyingFuture = conversionManager.startConversion(source.getFile(), target);
             }
             // In order to introduce a natural barrier for a maximum number of simultaneous conversions, the worker
             // thread that executes this conversion needs to block until this conversion is complete.
@@ -93,30 +95,17 @@ abstract class AbstractLocalWrappingFuture extends AbstractFutureWrappingPriorit
         }
     }
 
-    protected void onConversionFinished() {
-        removeFiles();
+    private void onConversionFinished() {
+        callback.onComplete(target);
     }
 
     @Override
     protected void onConversionCancelled() {
-        removeFiles();
+        callback.onCancel(target);
     }
 
-    protected void onConversionFailed(Exception e) {
-        removeFiles();
-    }
-
-    private void removeFiles() {
-        if (deleteSource) source.delete();
-        if (deleteTarget) target.delete();
-    }
-
-    protected File getSource() {
-        return source;
-    }
-
-    protected File getTarget() {
-        return target;
+    private void onConversionFailed(Exception e) {
+        callback.onException(target, e);
     }
 
     @Override
@@ -125,7 +114,7 @@ abstract class AbstractLocalWrappingFuture extends AbstractFutureWrappingPriorit
                 "source=%s,target=%s,underlying=%s]",
                 getClass().getSimpleName(),
                 getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), source.getAbsolutePath(), target.getAbsolutePath(),
+                getPriority(), source.getFile(), target.getAbsolutePath(),
                 underlyingFuture.toString());
     }
 }

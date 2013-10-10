@@ -2,7 +2,7 @@ package no.kantega.pdf.api;
 
 import java.io.InputStream;
 
-public interface IStreamConsumer {
+public interface IInputStreamConsumer {
 
     void onComplete(InputStream inputStream);
 

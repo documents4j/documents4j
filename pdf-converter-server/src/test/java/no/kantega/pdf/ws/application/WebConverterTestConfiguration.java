@@ -24,7 +24,7 @@ public class WebConverterTestConfiguration implements IWebConverterConfiguration
         }
     };
 
-    private static final IConverter CONVERTER = new LocalConverter.Builder()
+    private static final IConverter CONVERTER = LocalConverter.builder()
             .baseFolder(Files.createTempDir())
             .processTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
             .build();

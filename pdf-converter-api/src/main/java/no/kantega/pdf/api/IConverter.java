@@ -2,7 +2,6 @@ package no.kantega.pdf.api;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.concurrent.Future;
 
 public interface IConverter {
 
@@ -10,51 +9,13 @@ public interface IConverter {
     int JOB_PRIORITY_NORMAL = JOB_PRIORITY_LOW * 2;
     int JOB_PRIORITY_HIGH = JOB_PRIORITY_LOW * 3;
 
-    Future<Boolean> schedule(File source, IStreamConsumer target);
+    IConversionJobSourceSpecified convert(File source);
 
-    Future<Boolean> schedule(File source, File target);
+    IConversionJobSourceSpecified convert(InputStream source);
 
-    Future<Boolean> schedule(File source, File target, IFileConsumer callback);
+    IConversionJobSourceSpecified convert(IFileSource source);
 
-    Future<Boolean> schedule(File source, IStreamConsumer target, int priority);
+    IConversionJobSourceSpecified convert(IInputStreamSource source);
 
-    Future<Boolean> schedule(File source, File target, int priority);
-
-    Future<Boolean> schedule(File source, File target, IFileConsumer callback, int priority);
-
-    Future<Boolean> schedule(InputStream source, IStreamConsumer target);
-
-    Future<Boolean> schedule(InputStream source, File target);
-
-    Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback);
-
-    Future<Boolean> schedule(InputStream source, IStreamConsumer target, int priority);
-
-    Future<Boolean> schedule(InputStream source, File target, int priority);
-
-    Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback, int priority);
-
-    boolean convert(File source, IStreamConsumer target);
-
-    boolean convert(File source, File target);
-
-    boolean convert(File source, File target, IFileConsumer callback);
-
-    boolean convert(File source, IStreamConsumer target, int priority);
-
-    boolean convert(File source, File target, int priority);
-
-    boolean convert(File source, File target, IFileConsumer callback, int priority);
-
-    boolean convert(InputStream source, IStreamConsumer target);
-
-    boolean convert(InputStream source, File target);
-
-    boolean convert(InputStream source, File target, IFileConsumer callback);
-
-    boolean convert(InputStream source, IStreamConsumer target, int priority);
-
-    boolean convert(InputStream source, File target, int priority);
-
-    boolean convert(InputStream source, File target, IFileConsumer callback, int priority);
+    void shutDown();
 }

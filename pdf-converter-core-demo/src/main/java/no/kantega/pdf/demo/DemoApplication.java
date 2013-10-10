@@ -34,7 +34,7 @@ public class DemoApplication extends WebApplication {
 
         nameSequence = new AtomicInteger();
 
-        converter = new LocalConverter.Builder()
+        converter = LocalConverter.builder()
                 .baseFolder(baseFolder)
                 .processTimeout(2L, TimeUnit.MILLISECONDS)
                 .build();

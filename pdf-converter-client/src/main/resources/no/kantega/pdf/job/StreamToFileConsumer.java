@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileConsumer;
-import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.nio.channels.FileLock;
 
-class StreamToFileConsumer implements IStreamConsumer {
+class StreamToFileConsumer implements IInputStreamConsumer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StreamToFileConsumer.class);
 

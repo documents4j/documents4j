@@ -18,24 +18,24 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
     private final long requestTimeOut;
     private final TimeoutHandler timeoutHandler;
 
-    public StandaloneWebConverterConfiguration(File baseFolder, long processTimeOut,
-                                               int coreThreadPoolSize, int fallbackThreadPoolExtraSize,
-                                               long fallbackThreadIdleLifeTime, long requestTimeOut) {
-        this.converter = new LocalConverter.Builder()
+    private class StandaloneTimeoutHandler implements TimeoutHandler {
+        @Override
+        public void handleTimeout(AsyncResponse asyncResponse) {
+            asyncResponse.cancel();
+            LOGGER.error("Request timeout after {} milliseconds: {}", requestTimeOut, asyncResponse);
+        }
+    }
+
+    public StandaloneWebConverterConfiguration(File baseFolder,
+                                               int corePoolSize, int maximumPoolSize, long keepAliveTime,
+                                               long processTimeOut, long requestTimeOut) {
+        this.converter = LocalConverter.builder()
                 .baseFolder(baseFolder)
                 .processTimeout(processTimeOut, TimeUnit.MILLISECONDS)
-                .converterPoolSize(coreThreadPoolSize, fallbackThreadPoolExtraSize,
-                        fallbackThreadIdleLifeTime, TimeUnit.MILLISECONDS)
+                .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
                 .build();
         this.requestTimeOut = requestTimeOut;
-        this.timeoutHandler = new TimeoutHandler() {
-            @Override
-            public void handleTimeout(AsyncResponse asyncResponse) {
-                LOGGER.error("Request timeout after {} milliseconds: {}",
-                        StandaloneWebConverterConfiguration.this.requestTimeOut, asyncResponse);
-                asyncResponse.cancel();
-            }
-        };
+        this.timeoutHandler = new StandaloneTimeoutHandler();
     }
 
     @Override

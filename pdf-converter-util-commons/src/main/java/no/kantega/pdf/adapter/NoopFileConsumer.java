@@ -1,11 +1,20 @@
-package no.kantega.pdf.defaults;
+package no.kantega.pdf.adapter;
 
 import no.kantega.pdf.api.IFileConsumer;
 
 import java.io.File;
 
-public enum NoopFileConsumer implements IFileConsumer {
-    INSTANCE;
+class NoopFileConsumer implements IFileConsumer {
+
+    private static final NoopFileConsumer INSTANCE = new NoopFileConsumer();
+
+    public static IFileConsumer getInstance() {
+        return INSTANCE;
+    }
+
+    private NoopFileConsumer() {
+        /* empty */
+    }
 
     @Override
     public void onComplete(File file) {

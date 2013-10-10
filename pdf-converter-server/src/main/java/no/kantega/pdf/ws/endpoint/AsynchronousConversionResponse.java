@@ -1,6 +1,6 @@
 package no.kantega.pdf.ws.endpoint;
 
-import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.mime.CustomMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,16 +11,16 @@ import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class ConversionResponseJob implements IStreamConsumer {
+public class AsynchronousConversionResponse implements IInputStreamConsumer {
 
     private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConversionResponseJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsynchronousConversionResponse.class);
 
     private final AsyncResponse asyncResponse;
     private final CountDownLatch countDownLatch;
 
-    public ConversionResponseJob(AsyncResponse asyncResponse) {
+    public AsynchronousConversionResponse(AsyncResponse asyncResponse) {
         this.asyncResponse = asyncResponse;
         countDownLatch = new CountDownLatch(1);
     }

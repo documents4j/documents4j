@@ -29,7 +29,11 @@ public class ConverterResource {
             @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(InfoConstant.JOB_PRIORITY) int priority) {
         asyncResponse.setTimeout(webConverterConfiguration.getTimeout(), TimeUnit.MILLISECONDS);
         asyncResponse.setTimeoutHandler(webConverterConfiguration.getTimeoutHandler());
-        webConverterConfiguration.getConverter().schedule(upload, new ConversionResponseJob(asyncResponse), priority);
+        webConverterConfiguration.getConverter()
+                .convert(upload)
+                .to(new AsynchronousConversionResponse(asyncResponse))
+                .prioritizeWith(priority)
+                .schedule();
     }
 
 }

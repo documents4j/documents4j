@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.api.IInputStreamConsumer;
+import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.mime.CustomMediaType;
 import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
@@ -11,17 +13,23 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.concurrent.Future;
 
-abstract class AbstractRemoteWrappingFuture extends AbstractFutureWrappingPriorityFuture {
+class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractRemoteWrappingFuture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemoteFutureWrappingPriorityFuture.class);
 
     private final WebTarget webTarget;
-    private final InputStream source;
+    private final long networkRequestTimeout; // TODO: Add a scheduler that cancels a network request after the given amount of time.
 
-    AbstractRemoteWrappingFuture(WebTarget webTarget, InputStream source, int priority) {
+    private final IInputStreamSource source;
+    private final IInputStreamConsumer consumer;
+
+    RemoteFutureWrappingPriorityFuture(WebTarget webTarget, IInputStreamSource source, IInputStreamConsumer consumer,
+                                       int priority, long networkRequestTimeout) {
         super(priority);
         this.webTarget = webTarget;
         this.source = source;
+        this.consumer = consumer;
+        this.networkRequestTimeout = networkRequestTimeout;
     }
 
     @Override
@@ -87,26 +95,29 @@ abstract class AbstractRemoteWrappingFuture extends AbstractFutureWrappingPriori
         return webTarget
                 .request(CustomMediaType.APPLICATION_PDF)
                 .async()
-                .post(Entity.entity(source, CustomMediaType.WORD_DOCX));
+                .post(Entity.entity(source.getInputStream(), CustomMediaType.WORD_DOCX));
     }
 
     protected void onConversionFinished(InputStream inputStream) {
+        consumer.onComplete(inputStream);
+    }
+
+    protected void onConversionFailed(Exception e) {
+        consumer.onException(e);
     }
 
     @Override
     protected void onConversionCancelled() {
-    }
-
-    protected void onConversionFailed(Exception e) {
+        consumer.onCancel();
     }
 
     @Override
     public String toString() {
         return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
-                "web-target=%s,underlying=%s]",
+                "web-target=%s,timeout=%d,underlying=%s]",
                 getClass().getSimpleName(),
                 getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), webTarget.getUri(),
+                getPriority(), webTarget.getUri(), networkRequestTimeout,
                 underlyingFuture.toString());
     }
 }

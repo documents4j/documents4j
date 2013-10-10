@@ -1,51 +1,36 @@
 package no.kantega.pdf.job;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
-import com.google.common.io.Files;
-import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.adapter.ConversionJobAdapter;
+import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
+import no.kantega.pdf.adapter.ConverterAdapter;
+import no.kantega.pdf.api.IConversionJob;
+import no.kantega.pdf.api.IConversionJobSourceSpecified;
 import no.kantega.pdf.api.IFileConsumer;
-import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.IFileSource;
+import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.conversion.ConversionManager;
-import no.kantega.pdf.defaults.NoopFileConsumer;
-import no.kantega.pdf.throwables.ConversionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.channels.FileLock;
+import java.io.File;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class LocalConverter implements IConverter {
+public class LocalConverter extends ConverterAdapter {
 
-    public static final int DEFAULT_THREAD_POOL_CORE_SIZE = 10;
-    public static final int DEFAULT_THREAD_POOL_MAXIMUM_SIZE = 15;
-    public static final long DEFAULT_FALLBACK_THREAD_LIFE_TIME = TimeUnit.MINUTES.toMillis(10);
-    public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
 
-    public static final class Builder {
+    private static final String TEMP_FILE_PREFIX = "temp";
 
-        private File baseFolder;
-        private int converterCorePoolSize = DEFAULT_THREAD_POOL_CORE_SIZE;
-        private int converterMaximumPoolSize = DEFAULT_THREAD_POOL_MAXIMUM_SIZE;
-        private long fallbackThreadIdleLifeTime = DEFAULT_FALLBACK_THREAD_LIFE_TIME;
+    public static final class Builder extends AbstractConverterBuilder<Builder> {
+
+        public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
+
         private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
 
-        public Builder baseFolder(File baseFolder) {
-            this.baseFolder = baseFolder;
-            return this;
-        }
-
-        public Builder converterPoolSize(int coreThreadPoolSize, int fallbackThreadPoolExtraSize, long fallbackThreadIdleLifeTime, TimeUnit timeUnit) {
-            assertNumericArgument(coreThreadPoolSize, false);
-            assertNumericArgument(fallbackThreadPoolExtraSize, true);
-            assertNumericArgument(fallbackThreadIdleLifeTime, false);
-            this.converterCorePoolSize = coreThreadPoolSize;
-            this.converterMaximumPoolSize = coreThreadPoolSize + fallbackThreadPoolExtraSize;
-            this.fallbackThreadIdleLifeTime = timeUnit.toMillis(fallbackThreadIdleLifeTime);
-            return this;
+        private Builder() {
+            /* empty */
         }
 
         public Builder processTimeout(long processTimeout, TimeUnit timeUnit) {
@@ -54,286 +39,125 @@ public class LocalConverter implements IConverter {
             return this;
         }
 
+        @Override
         public LocalConverter build() {
-            return new LocalConverter(baseFolder == null ? Files.createTempDir() : baseFolder,
-                    converterCorePoolSize, converterMaximumPoolSize,
-                    fallbackThreadIdleLifeTime, TimeUnit.MILLISECONDS,
-                    processTimeout, TimeUnit.MILLISECONDS);
+            return new LocalConverter(normalizedBaseFolder(), corePoolSize, maximumPoolSize,
+                    keepAliveTime, processTimeout, TimeUnit.MILLISECONDS);
         }
-
-        private static void assertNumericArgument(long number, boolean zeroAllowed) {
-            if (number < 0L) {
-                throw new IllegalArgumentException("Input must not be a negative number");
-            } else if (!zeroAllowed && number == 0L) {
-                throw new IllegalArgumentException("Input must be a positive number");
-            }
-        }
-
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    private static final String TEMP_FILE_PREFIX = "stream";
+    private final ConversionManager conversionManager;
 
-    private final Thread shutdownHook;
+    private final ExecutorService executorService;
 
     private final File tempFileFolder;
     private final AtomicLong uniqueNameMaker;
 
-    private final ConversionManager conversionManager;
-    private final ExecutorService conversionExecutorService;
+    private final Thread shutdownHook;
 
-    protected LocalConverter(File baseFolder, int converterCorePoolSize, int converterMaximumPoolSize,
-                             long converterFallbackThreadLifeTime, TimeUnit converterFallbackThreadLifeTimeUnit,
+    protected LocalConverter(File baseFolder,
+                             int corePoolSize, int maximumPoolSize, long keepAliveTime,
                              long processTimeout, TimeUnit processTimeoutUnit) {
         tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
         tempFileFolder.mkdir();
-        uniqueNameMaker = new AtomicLong();
-        conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-        conversionExecutorService = new ThreadPoolExecutor(
-                converterCorePoolSize, converterMaximumPoolSize,
-                converterFallbackThreadLifeTime, converterFallbackThreadLifeTimeUnit,
-                new PriorityBlockingQueue<Runnable>());
-        Runtime.getRuntime().addShutdownHook(shutdownHook = new LocalConverterShutdownHook());
+        this.conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+        this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
+                keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
+        this.uniqueNameMaker = new AtomicLong(1L);
+        this.shutdownHook = new ConverterShutdownHook();
+        registerShutdownHook();
         LOGGER.info("Local To-PDF converter is running");
     }
 
-    @Override
-    public Future<Boolean> schedule(File source, IStreamConsumer target) {
-        return schedule(source, randomFile(), JOB_PRIORITY_NORMAL, false, true, target);
+    private class LocalConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
+
+        private final IFileSource source;
+
+        private LocalConversionJobSourceSpecified(IFileSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public IConversionJob to(File file, IFileConsumer callback) {
+            return new LocalConversionJob(source, file, callback, JOB_PRIORITY_NORMAL);
+        }
+
+        @Override
+        protected File makeTemporaryFile(String suffix) {
+            return LocalConverter.this.makeTemporaryFile();
+        }
     }
 
-    @Override
-    public Future<Boolean> schedule(File source, File target) {
-        return schedule(source, target, JOB_PRIORITY_NORMAL, false, false, NoopFileConsumer.INSTANCE);
-    }
+    private class LocalConversionJob extends ConversionJobAdapter {
 
+        private final IFileSource source;
+        private final File target;
+        private final IFileConsumer callback;
+        private final int priority;
 
-    @Override
-    public Future<Boolean> schedule(File source, File target, IFileConsumer callback) {
-        return schedule(source, target, JOB_PRIORITY_NORMAL, false, false, callback);
-    }
+        private LocalConversionJob(IFileSource source, File target, IFileConsumer callback, int priority) {
+            this.source = source;
+            this.target = target;
+            this.callback = callback;
+            this.priority = priority;
+        }
 
-    @Override
-    public Future<Boolean> schedule(File source, IStreamConsumer target, int priority) {
-        return schedule(source, randomFile(), priority, true, false, target);
-    }
+        @Override
+        public Future<Boolean> schedule() {
+            RunnableFuture<Boolean> job = new LocalFutureWrappingPriorityFuture(
+                    conversionManager, source, target, callback, priority);
+            // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
+            // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
+            executorService.execute(job);
+            return job;
+        }
 
-    @Override
-    public Future<Boolean> schedule(File source, File target, int priority) {
-        return schedule(source, target, priority, false, false, NoopFileConsumer.INSTANCE);
-    }
-
-    @Override
-    public Future<Boolean> schedule(File source, File target, IFileConsumer callback, int priority) {
-        return schedule(source, target, priority, false, false, callback);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, IStreamConsumer target) {
-        return schedule(store(source), randomFile(), JOB_PRIORITY_NORMAL, true, true, target);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target) {
-        return schedule(store(source), target, JOB_PRIORITY_NORMAL, true, false, NoopFileConsumer.INSTANCE);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback) {
-        return schedule(store(source), target, JOB_PRIORITY_NORMAL, true, false, callback);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, IStreamConsumer target, int priority) {
-        return schedule(store(source), randomFile(), priority, true, true, target);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, int priority) {
-        return schedule(store(source), target, priority, true, false, NoopFileConsumer.INSTANCE);
-    }
-
-    @Override
-    public Future<Boolean> schedule(InputStream source, File target, IFileConsumer callback, int priority) {
-        return schedule(store(source), target, priority, true, false, callback);
-    }
-
-    private Future<Boolean> schedule(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, IFileConsumer callback) {
-        RunnableFuture<Boolean> job = new FileConsumerWrappingConversionFuture(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
-        // Note: Do never call submit on the ExecutorService. The submit method wraps all jobs in another RunnableFuture and breaks the contract of the
-        // PriorityBlockingQueue that backs up the priority ordering.
-        conversionExecutorService.execute(job);
-        return job;
-    }
-
-    private Future<Boolean> schedule(File source, File target, int priority, boolean deleteSource, boolean deleteTarget, IStreamConsumer callback) {
-        RunnableFuture<Boolean> job = new StreamConsumerWrappingConversionFuture(source, target, priority, deleteSource, deleteTarget, conversionManager, callback);
-        // Never use ExecutorService.submit instead of Executor.execute. See comment above.
-        conversionExecutorService.execute(job);
-        return job;
-    }
-
-    @Override
-    public boolean convert(File source, IStreamConsumer target) {
-        try {
-            return schedule(source, target).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to cosumer %s)", source.getAbsolutePath(), target), e);
+        @Override
+        public IConversionJob prioritizeWith(int priority) {
+            return new LocalConversionJob(source, target, callback, priority);
         }
     }
 
     @Override
-    public boolean convert(File source, File target) {
-        try {
-            return schedule(source, target).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
+    public IConversionJobSourceSpecified convert(IFileSource source) {
+        return new LocalConversionJobSourceSpecified(source);
     }
 
     @Override
-    public boolean convert(File source, File target, IFileConsumer callback) {
-        try {
-            return schedule(source, target, callback).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
+    protected File makeTemporaryFile(String suffix) {
+        return new File(tempFileFolder, String.format("%s%d%s",
+                TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
     }
 
     @Override
-    public boolean convert(File source, IStreamConsumer target, int priority) {
-        try {
-            return schedule(source, target, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to consumer %s", source.getAbsolutePath(), target), e);
-        }
-    }
-
-    @Override
-    public boolean convert(File source, File target, int priority) {
-        try {
-            return schedule(source, target, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(File source, File target, IFileConsumer callback, int priority) {
-        try {
-            return schedule(source, target, callback, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert '%s' to '%s'", source.getAbsolutePath(), target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, IStreamConsumer target) {
-        try {
-            return schedule(source, target).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to consumer %s", target), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target) {
-        try {
-            return schedule(source, target).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, IFileConsumer callback) {
-        try {
-            return schedule(source, target, callback).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target.getAbsolutePath()), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, IStreamConsumer target, int priority) {
-        try {
-            return schedule(source, target, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to consumer %s", target), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, int priority) {
-        try {
-            return schedule(source, target, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target), e);
-        }
-    }
-
-    @Override
-    public boolean convert(InputStream source, File target, IFileConsumer callback, int priority) {
-        try {
-            return schedule(source, target, callback, priority).get();
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not convert to '%s'", target), e);
-        }
-    }
-
-    private File randomFile() {
-        // Always add '.pdf' file extension to avoid renaming of result since '.pdf' extension is enforced by Visual Basic.
-        return new File(tempFileFolder, String.format("%s%d.pdf", TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement()));
-    }
-
-    private File store(InputStream inputStream) {
-        File tempFile = randomFile();
-        try {
-            try {
-                FileOutputStream fileOutputStream = new FileOutputStream(tempFile);
-                FileLock fileLock = fileOutputStream.getChannel().lock();
-                try {
-                    ByteStreams.copy(inputStream, fileOutputStream);
-                } finally {
-                    fileLock.release();
-                    Closeables.close(fileOutputStream, true);
-                }
-            } catch (FileNotFoundException e) {
-                throw new ConversionException(String.format("Could not create file '%s'", tempFile.getAbsolutePath()), e);
-            } finally {
-                Closeables.close(inputStream, true);
-            }
-        } catch (IOException e) {
-            throw new ConversionException(String.format("Could not write to temporary file %s", tempFile.getAbsolutePath()), e);
-        }
-        return tempFile;
-    }
-
     public void shutDown() {
         try {
             conversionManager.shutDown();
-            conversionExecutorService.shutdownNow();
-            try {
-                Runtime.getRuntime().removeShutdownHook(shutdownHook);
-            } catch (IllegalStateException e) {
-                /* cannot remove shutdown hook when shut down is in progress - ignore */
-            }
+            executorService.shutdownNow();
         } finally {
             tempFileFolder.delete();
+            deregisterShutdownHook();
         }
         LOGGER.info("Local To-PDF converter is shut down");
     }
 
-    private class LocalConverterShutdownHook extends Thread {
-
-        private LocalConverterShutdownHook() {
-            super(String.format("shutdown hook: %s", LocalConverter.class));
+    private void registerShutdownHook() {
+        try {
+            Runtime.getRuntime().addShutdownHook(shutdownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Tried to register shut down hook in shut down period");
         }
+    }
 
-        @Override
-        public void run() {
-            shutDown();
+    private void deregisterShutdownHook() {
+        try {
+            Runtime.getRuntime().removeShutdownHook(shutdownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.warn("Tried to deregister shut down hook in shut down period");
         }
     }
 }

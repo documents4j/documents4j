@@ -82,10 +82,10 @@ public class DemoPage extends WebPage {
                     properties.setProperty(FileRow.INPUT_NAME_PROPERTY_KEY, fileUpload.getClientFileName());
 
                     FeedbackMessageConductor conductor = new FeedbackMessageConductor(fileUpload.getClientFileName());
-                    long conversionDuration = -1L;
+                    long conversionDuration;
                     try {
                         conversionDuration = System.currentTimeMillis();
-                        DemoApplication.get().getConverter().convert(newFile, target, conductor);
+                        DemoApplication.get().getConverter().convert(newFile).to(target, conductor).execute();
                         conversionDuration = System.currentTimeMillis() - conversionDuration;
                         properties.setProperty(FileRow.CONVERSION_DURATION_PROPERTY_KEY, String.valueOf(conversionDuration));
                         writeProperties(properties, transactionFolder);

@@ -1,13 +1,13 @@
 package no.kantega.pdf.job;
 
 import com.google.common.io.ByteStreams;
-import no.kantega.pdf.api.IStreamConsumer;
+import no.kantega.pdf.api.IInputStreamConsumer;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-class ToFileStreamConsumer implements IStreamConsumer {
+class ToFileStreamConsumer implements IInputStreamConsumer {
 
     private boolean cancelled, run;
     private Exception exception;

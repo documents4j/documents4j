@@ -24,12 +24,12 @@ public abstract class ConverterAdapter implements IConverter {
 
     @Override
     public IConversionJobSourceSpecified convert(IFileSource source) {
-        return convert(new InputStreamSourceFromFile(source.getFile()));
+        return convert(new InputStreamSourceFromFileSource(source));
     }
 
     @Override
     public IConversionJobSourceSpecified convert(IInputStreamSource source) {
-        return convert(new FileSourceFromInputStream(source.getInputStream(), makeTemporaryFile()));
+        return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
     }
 
     protected class ConverterShutdownHook extends Thread {

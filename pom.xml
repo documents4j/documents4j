@@ -31,6 +31,7 @@
         <version.jopt-simple>4.5</version.jopt-simple>
         <version.slf4j>1.7.5</version.slf4j>
         <version.testng>6.8.5</version.testng>
+        <version.mockito>1.9.5</version.mockito>
     </properties>
 
     <dependencyManagement>
@@ -87,6 +88,12 @@
                 <version>${version.testng}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>${version.mockito}</version>
+            </dependency>
+
             <!-- Webservice (Jersey) -->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -115,6 +122,12 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
 

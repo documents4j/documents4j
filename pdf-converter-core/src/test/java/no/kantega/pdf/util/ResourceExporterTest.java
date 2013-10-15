@@ -23,8 +23,8 @@ public class ResourceExporterTest {
 
     @Test
     public void testUnpack() throws Exception {
-        assertFalse(TestResource.DOCX.absoluteTo(folder).exists());
-        File resource = resourceExporter.materialize(TestResource.DOCX.getLocalPath());
+        assertFalse(TestResource.DOCX_VALID.absoluteTo(folder).exists());
+        File resource = resourceExporter.materialize(TestResource.DOCX_VALID.getLocalPath());
         assertTrue(resource.exists());
     }
 }

@@ -38,21 +38,27 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
         }
         boolean releasePendingState = false;
         try {
-            synchronized (getFutureExchangeLock()) {
-                // In order to avoid a racing condition, check if the job was cancelled before acquiring the lock.
-                if (isCancelled()) {
-                    return;
+            File sourceFile = source.getFile();
+            try {
+                synchronized (getFutureExchangeLock()) {
+                    // In order to avoid a racing condition, check if the job was cancelled before acquiring the lock.
+                    if (isCancelled()) {
+                        return;
+                    }
+                    LOGGER.trace("Local converter: Executing conversion");
+                    underlyingFuture = conversionManager.startConversion(source.getFile(), target);
                 }
-                LOGGER.trace("Local converter: Executing conversion");
-                underlyingFuture = conversionManager.startConversion(source.getFile(), target);
+            } finally {
+                // Report that the (generated) source file was consumed.
+                source.onConsumed(sourceFile);
             }
             // In order to introduce a natural barrier for a maximum number of simultaneous conversions, the worker
             // thread that executes this conversion needs to block until this conversion is complete.
             boolean successful = underlyingFuture.get();
             if (isCancelled()) {
                 return;
-            } else if (!successful || !target.exists()) {
-                throw new ConversionException(String.format("Could not convert input file '%s'. Corrupt file? Wrong input format?", source));
+            } else if (!successful) {
+                throw new ConversionException(String.format("Could not convert input file '%s' for an unknown reason", source));
             } // else:
             // If the conversion concluded successfully, rename the resulting file if neccessary, invoke the callback
             // on this event and signal that the pending lock can be released.

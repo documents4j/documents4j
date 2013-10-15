@@ -92,7 +92,7 @@ public class RemoteConverter extends ConverterAdapter {
         this.uniqueNameMaker = new AtomicLong(1L);
         this.shutdownHook = new ConverterShutdownHook();
         registerShutdownHook();
-        LOGGER.info("Remote To-PDF converter is started ({})", baseUri);
+        LOGGER.info("Remote To-PDF converter has started successfully ({})", baseUri);
     }
 
     private class RemoteConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
@@ -161,7 +161,7 @@ public class RemoteConverter extends ConverterAdapter {
             tempFileFolder.delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Remote To-PDF converter is shut down ({})", webTarget.getUri());
+        LOGGER.info("Remote To-PDF converter has successfully shut down ({})", webTarget.getUri());
     }
 
     private void registerShutdownHook() {

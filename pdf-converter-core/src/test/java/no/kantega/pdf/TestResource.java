@@ -6,8 +6,9 @@ import java.io.File;
 
 public enum TestResource {
 
-    DOCX("test.docx"),
-    PDF(DOCX.getLocalPath().concat(".pdf")),
+    DOCX_VALID("valid.docx"),
+    DOCX_CORRUPT("corrupt.docx"),
+    DOCX_INEXISTENT("inexistent.docx"),
     WORD_TEST_SCRIPT("checkword.vbs");
 
     private final String path;

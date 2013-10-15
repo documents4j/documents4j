@@ -16,4 +16,9 @@ class FileSourceFromFile implements IFileSource {
     public File getFile() {
         return file;
     }
+
+    @Override
+    public void onConsumed(File file) {
+        /* do nothing */
+    }
 }

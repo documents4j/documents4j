@@ -6,9 +6,14 @@ import java.io.File;
 
 public interface ExternalConverter {
 
-    StartedProcess convertNonBlocking(File source, File target);
+    // Note: These status codes are duplicated in the VBS scripts.
 
-    boolean convertBlocking(File source, File target);
+    public static final int STATUS_CODE_CONVERSION_SUCCESSFUL = 0;
+    public static final int STATUS_CODE_ILLEGAL_INPUT = -2;
+    public static final int STATUS_CODE_INPUT_NOT_FOUND = -3;
+    public static final int STATUS_CODE_ILLEGAL_CALL = -4;
+
+    StartedProcess startConversion(File source, File target);
 
     boolean isReady();
 

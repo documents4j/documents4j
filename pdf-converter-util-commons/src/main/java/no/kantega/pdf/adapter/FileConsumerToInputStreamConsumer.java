@@ -1,14 +1,15 @@
 package no.kantega.pdf.adapter;
 
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.throwables.ConversionException;
+import no.kantega.pdf.throwables.FileSystemReadWriteException;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.FileLock;
 
 class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
 
@@ -24,14 +25,16 @@ class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
     public void onComplete(InputStream inputStream) {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            FileLock fileLock = fileOutputStream.getChannel().lock();
+            fileOutputStream.getChannel().lock();
             try {
                 ByteStreams.copy(inputStream, fileOutputStream);
             } finally {
-                fileLock.release();
+                Closeables.close(inputStream, true);
+                // Note: This will implicitly release the file lock.
+                Closeables.close(fileOutputStream, false);
             }
-        } catch (Exception e) {
-            throw new ConversionException(String.format("Could not copy result to %s", file), e);
+        } catch (IOException e) {
+            throw new FileSystemReadWriteException(String.format("Could not copy result to %s", file), e);
         }
         fileConsumer.onComplete(file);
     }

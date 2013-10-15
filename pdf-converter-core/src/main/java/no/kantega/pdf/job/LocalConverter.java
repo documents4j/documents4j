@@ -71,7 +71,7 @@ public class LocalConverter extends ConverterAdapter {
         this.uniqueNameMaker = new AtomicLong(1L);
         this.shutdownHook = new ConverterShutdownHook();
         registerShutdownHook();
-        LOGGER.info("Local To-PDF converter is running");
+        LOGGER.info("Local To-PDF converter has successfully running");
     }
 
     private class LocalConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
@@ -143,7 +143,7 @@ public class LocalConverter extends ConverterAdapter {
             tempFileFolder.delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Local To-PDF converter is shut down");
+        LOGGER.info("Local To-PDF converter has successfully shut down");
     }
 
     private void registerShutdownHook() {

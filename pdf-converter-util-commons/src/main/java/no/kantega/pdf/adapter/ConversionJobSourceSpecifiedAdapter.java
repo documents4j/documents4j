@@ -24,12 +24,12 @@ public abstract class ConversionJobSourceSpecifiedAdapter implements IConversion
 
     @Override
     public IConversionJob to(OutputStream target, boolean closeStream) {
-        return to(new InputStreamToOutputStreamConsumer(target, closeStream));
+        return to(new OutputStreamToInputStreamConsumer(target, closeStream));
     }
 
     @Override
     public IConversionJob to(IInputStreamConsumer callback) {
-        return to(makeTemporaryFile(PDF_FILE_EXTENSION), new FileToInputStreamConsumer(callback));
+        return to(makeTemporaryFile(PDF_FILE_EXTENSION), new InputStreamConsumerToFileConsumer(callback));
     }
 
     protected abstract File makeTemporaryFile(String suffix);

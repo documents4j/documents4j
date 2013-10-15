@@ -69,7 +69,7 @@ public class MicrosoftWordBridge implements ExternalConverter {
     }
 
     @Override
-    public StartedProcess convertNonBlocking(File source, File target) {
+    public StartedProcess startConversion(File source, File target) {
         if (!READY) {
             throw new IllegalStateException(String.format("Converter %s is not ready", toString()));
         }
@@ -81,22 +81,6 @@ public class MicrosoftWordBridge implements ExternalConverter {
                     source, target, powerShellScript);
             LOGGER.warn(message, e);
             throw new ConversionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean convertBlocking(File source, File target) {
-        StartedProcess startedProcess = convertNonBlocking(source, target);
-        try {
-            return startedProcess.future().get().exitValue() == ConversionManager.SUCCESSFUL_CONVERSION_STATUS_CODE;
-        } catch (InterruptedException e) {
-            String message = String.format("Conversion of '%s' to '%s' was interrupted", source, target);
-            LOGGER.info(message, e);
-            throw new ConversionException(message, e);
-        } catch (ExecutionException e) {
-            String message = String.format("Conversion of '%s' to '%s' failed", source, target);
-            LOGGER.info(message, e.getCause());
-            throw new ConversionException(message, e.getCause());
         }
     }
 

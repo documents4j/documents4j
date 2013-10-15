@@ -5,6 +5,5 @@ Set wordApplication = GetObject(, "Word.Application")
 ' Shut down
 wordApplication.Quit WdDoNotSaveChanges
 
-' Free local resources and exit
-Set wordApplication = Nothing
+' Exit
 WScript.Quit 0

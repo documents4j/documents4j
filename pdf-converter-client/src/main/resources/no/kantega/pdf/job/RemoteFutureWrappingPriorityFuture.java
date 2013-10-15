@@ -49,6 +49,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
                     return;
                 }
                 LOGGER.trace("Remote converter: Executing conversion");
+                // The consumption callback will be called implicitly when stream is closed.
                 responseFuture = requestConversion();
                 underlyingFuture = JerseyClientFutureWrapper.of(responseFuture);
             }
@@ -95,7 +96,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
         return webTarget
                 .request(CustomMediaType.APPLICATION_PDF)
                 .async()
-                .post(Entity.entity(source.getInputStream(), CustomMediaType.WORD_DOCX));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(source), CustomMediaType.WORD_DOCX));
     }
 
     protected void onConversionFinished(InputStream inputStream) {

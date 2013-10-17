@@ -7,8 +7,7 @@ import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 @Test(singleThreaded = true)
 public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverterTest {
@@ -28,14 +27,29 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
         super.tearDown();
     }
 
+    private void testConversionValid(File pdf) throws Exception {
+        assertFalse(pdf.exists());
+        StartedProcess conversion = getExternalConverter().startConversion(validDocx(), pdf);
+        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL);
+        assertTrue(pdf.exists());
+    }
+
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS,
             invocationCount = CONVERSION_INVOCATIONS)
     public void testConversionValid() throws Exception {
-        File pdf = makePdfTarget();
-        StartedProcess conversion = getExternalConverter().startConversion(validDocx(), pdf);
-        int returnValue = conversion.future().get().exitValue();
-        assertTrue(returnValue == ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL);
-        assertTrue(pdf.exists());
+        testConversionValid(makePdfTarget());
+    }
+
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
+            dependsOnMethods = "testConversionValid")
+    public void testConversionValidOtherFileExtension() throws Exception {
+        testConversionValid(new File(getTemporaryFolder(), "target.test"));
+    }
+
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
+            dependsOnMethods = "testConversionValid")
+    public void testConversionValidNoFileExtension() throws Exception {
+        testConversionValid(new File(getTemporaryFolder(), "target"));
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
@@ -52,8 +66,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
     public void testConversionCorrupt() throws Exception {
         File pdf = makePdfTarget();
         StartedProcess conversion = getExternalConverter().startConversion(corruptDocx(), pdf);
-        int returnValue = conversion.future().get().exitValue();
-        assertTrue(returnValue == ExternalConverter.STATUS_CODE_ILLEGAL_INPUT);
+        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_ILLEGAL_INPUT);
         assertFalse(pdf.exists());
     }
 
@@ -62,8 +75,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
     public void testConversionInexistent() throws Exception {
         File pdf = makePdfTarget();
         StartedProcess conversion = getExternalConverter().startConversion(inexistentDocx(), pdf);
-        int returnValue = conversion.future().get().exitValue();
-        assertTrue(returnValue == ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND);
+        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND);
         assertFalse(pdf.exists());
     }
 

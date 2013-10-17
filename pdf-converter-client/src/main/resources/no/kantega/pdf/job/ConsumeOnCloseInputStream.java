@@ -13,9 +13,9 @@ class ConsumeOnCloseInputStream extends InputStream {
     private final IInputStreamSource inputStreamSource;
     private final AtomicBoolean consumationMark;
 
-    public ConsumeOnCloseInputStream(IInputStreamSource inputStreamSource) {
+    public ConsumeOnCloseInputStream(IInputStreamSource inputStreamSource, InputStream underlyingInputStream) {
         this.inputStreamSource = inputStreamSource;
-        this.underlyingInputStream = inputStreamSource.getInputStream();
+        this.underlyingInputStream = underlyingInputStream;
         this.consumationMark = new AtomicBoolean(false);
     }
 

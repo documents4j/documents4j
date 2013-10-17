@@ -60,4 +60,10 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[outputStream=%s,closeStream=%b]",
+                OutputStreamToInputStreamConsumer.class, outputStream, closeStream);
+    }
 }

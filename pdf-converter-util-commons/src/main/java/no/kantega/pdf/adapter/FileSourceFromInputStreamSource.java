@@ -49,4 +49,10 @@ class FileSourceFromInputStreamSource implements IFileSource {
             inputStreamSource.onConsumed(inputStream);
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[inputStreamSource=%s,temporaryFile=%s]",
+                FileSourceFromInputStreamSource.class.getSimpleName(), inputStream, tempStorage);
+    }
 }

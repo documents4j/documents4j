@@ -48,4 +48,10 @@ class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
     public void onException(Exception e) {
         fileConsumer.onException(file, e);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[file=%s,consumer=%s]",
+                FileConsumerToInputStreamConsumer.class.getSimpleName(), file, fileConsumer);
+    }
 }

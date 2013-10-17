@@ -30,4 +30,9 @@ class NoopFileConsumer implements IFileConsumer {
     public void onException(File file, Exception e) {
         /* do nothing */
     }
+
+    @Override
+    public String toString() {
+        return NoopFileConsumer.class.getSimpleName();
+    }
 }

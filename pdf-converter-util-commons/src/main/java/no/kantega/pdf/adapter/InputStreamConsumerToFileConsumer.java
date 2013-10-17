@@ -41,4 +41,9 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
             file.delete();
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[%s]", InputStreamConsumerToFileConsumer.class.getSimpleName(), inputStreamConsumer);
+    }
 }

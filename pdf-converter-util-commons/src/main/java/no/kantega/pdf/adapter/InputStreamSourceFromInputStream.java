@@ -28,4 +28,9 @@ class InputStreamSourceFromInputStream implements IInputStreamSource {
             throw new FileSystemInteractionException("Could not close input stream", e);
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[inputStream=%s]", InputStreamSourceFromInputStream.class.getSimpleName(), inputStream);
+    }
 }

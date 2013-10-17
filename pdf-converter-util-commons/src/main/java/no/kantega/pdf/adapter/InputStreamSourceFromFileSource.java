@@ -46,4 +46,10 @@ class InputStreamSourceFromFileSource implements IInputStreamSource {
             throw new FileSystemInteractionException(String.format("Could not close stream for file %s", file), e);
         }
     }
+
+    @Override
+    public String toString() {
+        return String.format(String.format("%s[file=%s,fileSource=%s]",
+                InputStreamSourceFromFileSource.class.getSimpleName(), file, fileSource));
+    }
 }

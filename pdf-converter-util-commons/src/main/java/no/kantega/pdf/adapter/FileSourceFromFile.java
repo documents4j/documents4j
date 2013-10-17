@@ -21,4 +21,9 @@ class FileSourceFromFile implements IFileSource {
     public void onConsumed(File file) {
         /* do nothing */
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[file=%s]", FileSourceFromFile.class.getSimpleName(), file);
+    }
 }

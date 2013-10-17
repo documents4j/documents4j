@@ -103,9 +103,10 @@ public class MicrosoftWordBridge implements ExternalConverter {
     @Override
     public StartedProcess startConversion(File source, File target) {
         try {
+            // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
             return makePresetProcessExecutor().command("cmd", "/C",
                     quote(conversionScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()))
-                    .destroyOnExit().start();
+                    .destroyOnExit().addListener(new TargetNameCorrector(target)).start();
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' to '%s' ",
                     conversionScript, source, target);

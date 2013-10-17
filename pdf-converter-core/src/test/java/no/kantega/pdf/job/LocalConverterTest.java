@@ -4,73 +4,31 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.File;
-
-import static org.testng.Assert.assertTrue;
-
 @Test(singleThreaded = true)
-public class LocalConverterTest extends AbstractLocalConverterTest {
+public class LocalConverterTest extends AbstractConverterTest {
 
-    @BeforeClass
+    private static class LocalConverterTestAdapter extends AbstractLocalConverterTest implements IConverterTestDelegate {
+        /* empty */
+    }
+
+    private final LocalConverterTestAdapter converterTestAdapter;
+
+    public LocalConverterTest() {
+        this.converterTestAdapter = new LocalConverterTestAdapter();
+    }
+
     @Override
+    protected IConverterTestDelegate getConverterTestDelegate() {
+        return converterTestAdapter;
+    }
+
+    @BeforeClass(alwaysRun = true)
     public void setUp() throws Exception {
-        super.setUp();
+        converterTestAdapter.setUp();
     }
 
-    @AfterClass
-    @Override
+    @AfterClass(alwaysRun = true)
     public void tearDown() throws Exception {
-        super.tearDown();
+        converterTestAdapter.tearDown();
     }
-
-    @Test
-    public void testFileToFile() throws Exception {
-        File docx = validDocx(), pdf = makePdfTarget();
-        assertTrue(getConverter().convert(docx).to(pdf).execute());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
-    }
-
-    @Test
-    public void testFileToOutputStream() throws Exception {
-
-
-    }
-
-    //    @Test
-//    public void testFileToFile() throws Exception {
-//        AssertionFileSource source = new AssertionFileSource(validDocx());
-//
-//    }
-
-    //
-//    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
-//    public void testScheduleFileToConsumer() throws Exception {
-//        WordAssert.assertWordRunning();
-//        ToFileStreamConsumer toFileStreamConsumer = new ToFileStreamConsumer(pdf);
-//        localConverter.convert(validDocx).to(toFileStreamConsumer).schedule().get();
-//        assertTrue(pdf.exists());
-//        assertFalse(toFileStreamConsumer.isCancelled());
-//        assertTrue(toFileStreamConsumer.isRun());
-//        toFileStreamConsumer.rethrow();
-//    }
-//
-//    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
-//    public void testScheduleFileToFile() throws Exception {
-//        WordAssert.assertWordRunning();
-//        FeedbackFileConsumer callback = new FeedbackFileConsumer();
-//        localConverter.convert(validDocx).to(pdf, callback).schedule().get();
-//        assertTrue(pdf.exists());
-//        assertTrue(callback.isCompleted());
-//        assertFalse(callback.isCancelled());
-//        callback.rethrow();
-//    }
-//
-//    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)
-//    public void testScheduleFileToFileNoExtension() throws Exception {
-//        WordAssert.assertWordRunning();
-//        pdf = new File(folder, "temp");
-//        localConverter.convert(validDocx).to(pdf).schedule().get();
-//        assertTrue(pdf.exists());
-//    }
 }

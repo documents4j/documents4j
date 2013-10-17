@@ -23,6 +23,11 @@ public abstract class ConversionJobWithSourceSpecifiedAdapter implements IConver
     }
 
     @Override
+    public IConversionJobWithPriorityUnspecified to(OutputStream target) {
+        return to(target, true);
+    }
+
+    @Override
     public IConversionJobWithPriorityUnspecified to(OutputStream target, boolean closeStream) {
         return to(new OutputStreamToInputStreamConsumer(target, closeStream));
     }

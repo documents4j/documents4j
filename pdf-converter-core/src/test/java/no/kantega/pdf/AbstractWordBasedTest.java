@@ -57,19 +57,19 @@ public abstract class AbstractWordBasedTest {
 
     protected abstract void shutDownConverter();
 
-    protected File getTemporaryFolder() {
+    public File getTemporaryFolder() {
         return temporaryFolder;
     }
 
-    protected File validDocx() throws IOException {
+    public File validDocx() throws IOException {
         return makeCopy(validDocx);
     }
 
-    protected File corruptDocx() throws IOException {
+    public File corruptDocx() throws IOException {
         return makeCopy(corruptDocx);
     }
 
-    protected File inexistentDocx() throws IOException {
+    public File inexistentDocx() throws IOException {
         return inexitentDocx;
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractWordBasedTest {
         return copy;
     }
 
-    protected File makePdfTarget() {
+    public File makePdfTarget() {
         File target = new File(temporaryFolder,
                 String.format("%s-%d.pdf", validDocx.getName(), nameGenerator.getAndIncrement()));
         assertFalse(target.exists(), String.format("%s is not supposed to exist", target));

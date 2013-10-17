@@ -16,17 +16,13 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
     private final Object futureExchangeLock;
     private final CountDownLatch pendingCondition;
 
-    protected volatile Future<Boolean> underlyingFuture;
+    private volatile Future<Boolean> underlyingFuture;
 
     protected AbstractFutureWrappingPriorityFuture(int priority) {
         this.priority = new Priority(priority);
         this.futureExchangeLock = new Object();
         this.pendingCondition = new CountDownLatch(1);
         this.underlyingFuture = new PendingConversionFuture(this);
-    }
-
-    protected Object getFutureExchangeLock() {
-        return futureExchangeLock;
     }
 
     @Override
@@ -58,8 +54,9 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             T source = fetchSource();
             LOGGER.trace("Source fetched: {}", source);
             S conversionContext;
+            boolean conversionSuccessful;
             try {
-                synchronized (getFutureExchangeLock()) {
+                synchronized (futureExchangeLock) {
                     // In order to avoid a racing condition, check if the job was cancelled before acquiring the lock.
                     if (isCancelled()) {
                         return;
@@ -69,18 +66,20 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                     underlyingFuture = conversionContext.asFuture();
                     LOGGER.trace("Underlying future created: {}", underlyingFuture);
                 }
+                // In order to introduce a natural barrier for a maximum number of simultaneous conversions, the
+                // worker thread that executes this conversion needs to block until this conversion is complete.
+                LOGGER.trace("Blocking during external conversion: {}", underlyingFuture);
+                conversionSuccessful = underlyingFuture.get();
+                LOGGER.trace("Blocking during external conversion is over, result: {}, {}", conversionSuccessful, underlyingFuture);
             } finally {
-                // Report that the (generated) source file was consumed.
-                sourceConsumed(source);
+                // Report that the (generated) source file was consumed. In general, this is possible only after the
+                // conversion returned. If a consumption can be reported earlier, the implementing class needs to assure
+                // that multiple calls of this callback are handle correctly.
+                onSourceConsumed(source);
             }
-            // In order to introduce a natural barrier for a maximum number of simultaneous conversions, the worker
-            // thread that executes this conversion needs to block until this conversion is complete.
-            LOGGER.trace("Blocking during external conversion: {}", underlyingFuture);
-            boolean successful = underlyingFuture.get();
-            LOGGER.trace("Conversion was successful conversion: {}, {}", successful, underlyingFuture);
             if (isCancelled()) {
                 return;
-            } else if (!successful) {
+            } else if (!conversionSuccessful) {
                 throw new ConverterException("Conversion failed for an unknown reason");
             } // else:
             // If the conversion concluded successfully, rename the resulting file if neccessary, invoke the callback
@@ -88,13 +87,19 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             onConversionFinished(conversionContext);
             releasePendingState = true;
         } catch (Exception e) {
+            e = unwrapException(e);
             // An exception might also have occurred because a conversion was cancelled. In this case, error
             // processing is not necessary.
             if (isCancelled()) {
                 return;
             }
-            LOGGER.trace("Conversion caused an error", e);
-            underlyingFuture = new FailedConversionFuture(e);
+            synchronized (futureExchangeLock) {
+                if (isCancelled()) {
+                    return;
+                }
+                LOGGER.trace("Conversion caused an error", e);
+                underlyingFuture = new FailedConversionFuture(e);
+            }
             // If the conversion concluded without success, signal that the pending lock can be unlocked
             // and invoke the callback on this event. In order to make sure that the lock is always released
             // signal the condition before the callback is called.
@@ -110,6 +115,18 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                 LOGGER.trace("Threads waiting for the conversion to finish are released");
                 getPendingCondition().countDown();
             }
+        }
+    }
+
+    private Exception unwrapException(Exception e) {
+        if (e instanceof ExecutionException) {
+            return unwrapException((Exception) e.getCause());
+        } else if (e instanceof InterruptedException) {
+            return new ConverterException("The conversion did not complete in time", e);
+        } else if (!(e instanceof RuntimeException)) {
+            return new ConverterException("The conversion failed for an unexpected reason", e);
+        } else {
+            return e;
         }
     }
 
@@ -145,7 +162,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
 
     protected abstract T fetchSource();
 
-    protected abstract void sourceConsumed(T fetchedSource);
+    protected abstract void onSourceConsumed(T fetchedSource);
 
     protected abstract S startConversion(T fetchedSource);
 

@@ -17,7 +17,7 @@ public abstract class AbstractLocalConverterTest extends AbstractWordBasedTest {
         converter.shutDown();
     }
 
-    protected IConverter getConverter() {
+    public IConverter getConverter() {
         return converter;
     }
 }

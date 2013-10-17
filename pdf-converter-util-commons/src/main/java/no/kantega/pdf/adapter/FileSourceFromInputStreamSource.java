@@ -18,9 +18,9 @@ class FileSourceFromInputStreamSource implements IFileSource {
 
     private InputStream inputStream;
 
-    public FileSourceFromInputStreamSource(IInputStreamSource inputStreamSource, File storage) {
+    public FileSourceFromInputStreamSource(IInputStreamSource inputStreamSource, File tempStorage) {
         this.inputStreamSource = inputStreamSource;
-        this.tempStorage = storage;
+        this.tempStorage = new File("C:\\Users\\rafwin\\mytest.docx");
     }
 
     @Override

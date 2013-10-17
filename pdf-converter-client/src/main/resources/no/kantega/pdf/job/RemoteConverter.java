@@ -168,7 +168,7 @@ public class RemoteConverter extends ConverterAdapter {
             tempFileFolder.delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Remote To-PDF converter has successfully shut down ({})", webTarget.getUri());
+        LOGGER.info("Remote To-PDF converter has shut down successfully ({})", webTarget.getUri());
     }
 
     private void registerShutdownHook() {

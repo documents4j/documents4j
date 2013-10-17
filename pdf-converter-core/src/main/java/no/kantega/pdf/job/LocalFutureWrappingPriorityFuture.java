@@ -29,7 +29,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
     }
 
     @Override
-    protected void sourceConsumed(File fetchedSource) {
+    protected void onSourceConsumed(File fetchedSource) {
         source.onConsumed(fetchedSource);
     }
 
@@ -56,10 +56,9 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
     @Override
     public String toString() {
         return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
-                "source=%s,target=%s,underlying=%s]",
+                "source=%s,target=%s]",
                 getClass().getSimpleName(),
                 getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), source, target.getAbsolutePath(),
-                underlyingFuture.toString());
+                getPriority(), source, target.getAbsolutePath());
     }
 }

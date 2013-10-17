@@ -9,6 +9,8 @@ public interface IConversionJobWithSourceSpecified {
 
     IConversionJobWithPriorityUnspecified to(File target, IFileConsumer callback);
 
+    IConversionJobWithPriorityUnspecified to(OutputStream target);
+
     IConversionJobWithPriorityUnspecified to(OutputStream target, boolean closeStream);
 
     IConversionJobWithPriorityUnspecified to(IInputStreamConsumer callback);

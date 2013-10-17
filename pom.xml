@@ -10,10 +10,12 @@
     <packaging>pom</packaging>
 
     <!--
-    Note: This project can be built on any machine. However, most test cases require:
-     (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
-     (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
-    On a machine without these requirements, this project must be built without running the supplied unit tests.
+     Note: This project can be built on any machine. However, most test cases require:
+      (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
+      (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
+      (3) Microsoft Word is not running when the built is started and is neither started manually while the
+          tests are running
+     On a machine without these requirements, this project must be built without running the supplied unit tests.
     -->
 
     <modules>
@@ -39,6 +41,7 @@
         <version.slf4j>1.7.5</version.slf4j>
         <version.testng>6.8.5</version.testng>
         <version.mockito>1.9.5</version.mockito>
+        <version.thread-weaver>0.1</version.thread-weaver>
     </properties>
 
     <dependencyManagement>
@@ -100,6 +103,12 @@
                 <version>${version.mockito}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.googlecode.thread-weaver</groupId>
+                <artifactId>threadweaver</artifactId>
+                <version>${version.thread-weaver}</version>
+            </dependency>
+
             <!-- Webservice (Jersey) -->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
@@ -114,27 +123,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!-- Testing / Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>

@@ -4,19 +4,16 @@ import no.kantega.pdf.api.IInputStreamSource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 class ConsumeOnCloseInputStream extends InputStream {
 
     private final InputStream underlyingInputStream;
 
     private final IInputStreamSource inputStreamSource;
-    private final AtomicBoolean consumationMark;
 
     public ConsumeOnCloseInputStream(IInputStreamSource inputStreamSource, InputStream underlyingInputStream) {
         this.inputStreamSource = inputStreamSource;
         this.underlyingInputStream = underlyingInputStream;
-        this.consumationMark = new AtomicBoolean(false);
     }
 
     @Override
@@ -49,9 +46,7 @@ class ConsumeOnCloseInputStream extends InputStream {
         try {
             underlyingInputStream.close();
         } finally {
-            if (consumationMark.compareAndSet(false, true)) {
-                inputStreamSource.onConsumed(underlyingInputStream);
-            }
+            inputStreamSource.onConsumed(underlyingInputStream);
         }
     }
 

@@ -27,9 +27,10 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
         super.tearDown();
     }
 
-    private void testConversionValid(File pdf) throws Exception {
+    private void testConversionValid(File docx, File pdf) throws Exception {
+        assertTrue(docx.exists());
         assertFalse(pdf.exists());
-        StartedProcess conversion = getExternalConverter().startConversion(validDocx(), pdf);
+        StartedProcess conversion = getExternalConverter().startConversion(docx, pdf);
         assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL);
         assertTrue(pdf.exists());
     }
@@ -37,19 +38,37 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS,
             invocationCount = CONVERSION_INVOCATIONS)
     public void testConversionValid() throws Exception {
-        testConversionValid(makePdfTarget());
+        testConversionValid(validDocx(), makePdfTarget());
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
             dependsOnMethods = "testConversionValid")
-    public void testConversionValidOtherFileExtension() throws Exception {
-        testConversionValid(new File(getTemporaryFolder(), "target.test"));
+    public void testConversionValidTargetOtherFileExtension() throws Exception {
+        testConversionValid(validDocx(), new File(getTemporaryFolder(), "target.file"));
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
             dependsOnMethods = "testConversionValid")
-    public void testConversionValidNoFileExtension() throws Exception {
-        testConversionValid(new File(getTemporaryFolder(), "target"));
+    public void testConversionValidTargetNoFileExtension() throws Exception {
+        testConversionValid(validDocx(), new File(getTemporaryFolder(), "target"));
+    }
+
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
+            dependsOnMethods = "testConversionValid")
+    public void testConversionValidSourceNoFileExtension() throws Exception {
+        File docx = new File(getTemporaryFolder(), "source");
+        assertFalse(docx.exists());
+        assertTrue(validDocx().renameTo(docx));
+        testConversionValid(docx, makePdfTarget());
+    }
+
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,
+            dependsOnMethods = "testConversionValid")
+    public void testConversionValidSourceOtherFileExtension() throws Exception {
+        File docx = new File(getTemporaryFolder(), "source.file");
+        assertFalse(docx.exists());
+        assertTrue(validDocx().renameTo(docx));
+        testConversionValid(docx, makePdfTarget());
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT,

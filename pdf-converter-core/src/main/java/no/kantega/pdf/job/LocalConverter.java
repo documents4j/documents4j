@@ -74,7 +74,7 @@ public class LocalConverter extends ConverterAdapter {
         } finally {
             registerShutdownHook();
         }
-        LOGGER.info("Local To-PDF converter has successfully running");
+        LOGGER.info("Local To-PDF converter has started successfully");
     }
 
     private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -153,7 +153,7 @@ public class LocalConverter extends ConverterAdapter {
             tempFileFolder.delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Local To-PDF converter has successfully shut down");
+        LOGGER.info("Local To-PDF converter has shut down successfully");
     }
 
     private void registerShutdownHook() {

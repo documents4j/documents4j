@@ -7,9 +7,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static org.testng.Assert.*;
 
@@ -80,7 +80,7 @@ public class ConversionManagerTest extends AbstractWordBasedTest {
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
-    public void testConversionTargetInaccessible() throws Exception {
+    public void testConversionTargetInvalid() throws Exception {
         File pdf = makePdfTarget();
         assertTrue(pdf.mkdir());
         try {
@@ -93,14 +93,21 @@ public class ConversionManagerTest extends AbstractWordBasedTest {
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TimeoutException.class)
-    public void testConversionTimeout() throws Exception {
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    public void testConversionTargetInaccessible() throws Exception {
         File pdf = makePdfTarget();
+        assertTrue(pdf.createNewFile());
+        FileOutputStream outputStream = new FileOutputStream(pdf);
+        outputStream.getChannel().lock();
         try {
-            getConversionManager().startConversion(validDocx(), pdf).get(1L, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            assertFalse(pdf.exists());
-            throw e;
+            getConversionManager().startConversion(validDocx(), pdf).get();
+        } catch (ExecutionException e) {
+            assertTrue(pdf.isFile());
+            ShellScriptException exception = (ShellScriptException) e.getCause();
+            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_TARGET_INACCESSIBLE);
+            throw exception;
+        } finally {
+            outputStream.close();
         }
     }
 }

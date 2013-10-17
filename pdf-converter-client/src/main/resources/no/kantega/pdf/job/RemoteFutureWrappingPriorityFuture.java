@@ -7,6 +7,7 @@ import no.kantega.pdf.mime.CustomMediaType;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture<InputStream, RemoteConversionContext> {
 
@@ -16,6 +17,8 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     private final IInputStreamSource source;
     private final IInputStreamConsumer consumer;
 
+    private final AtomicBoolean consumptionMark;
+
     RemoteFutureWrappingPriorityFuture(WebTarget webTarget,
                                        IInputStreamSource source, IInputStreamConsumer consumer,
                                        int priority, long networkRequestTimeout) {
@@ -24,6 +27,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
         this.source = source;
         this.consumer = consumer;
         this.networkRequestTimeout = networkRequestTimeout;
+        this.consumptionMark = new AtomicBoolean(false);
     }
 
     @Override
@@ -32,8 +36,10 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     }
 
     @Override
-    protected void sourceConsumed(InputStream fetchedSource) {
-        source.onConsumed(fetchedSource);
+    protected void onSourceConsumed(InputStream fetchedSource) {
+        if (consumptionMark.compareAndSet(false, true)) {
+            source.onConsumed(fetchedSource);
+        }
     }
 
     @Override
@@ -62,10 +68,9 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     @Override
     public String toString() {
         return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
-                "web-target=%s,timeout=%d,underlying=%s]",
+                "web-target=%s,timeout=%d]",
                 getClass().getSimpleName(),
                 getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), webTarget.getUri(), networkRequestTimeout,
-                underlyingFuture.toString());
+                getPriority(), webTarget.getUri(), networkRequestTimeout);
     }
 }

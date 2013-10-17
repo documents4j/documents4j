@@ -3,7 +3,7 @@ package no.kantega.pdf.adapter;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +27,7 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
         try {
             ByteStreams.copy(inputStream, outputStream);
         } catch (IOException e) {
-            throw new FileSystemReadWriteException("Could not write result to output stream", e);
+            throw new FileSystemInteractionException("Could not write result to output stream", e);
         } finally {
             try {
                 closeStreamIfApplicable();
@@ -56,7 +56,7 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
             try {
                 Closeables.close(outputStream, false);
             } catch (IOException e) {
-                throw new FileSystemReadWriteException("Could not close output stream", e);
+                throw new FileSystemInteractionException("Could not close output stream", e);
             }
         }
     }

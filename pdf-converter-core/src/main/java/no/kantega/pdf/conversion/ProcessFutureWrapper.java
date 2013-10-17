@@ -1,8 +1,6 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.throwables.ConversionBatchException;
-import no.kantega.pdf.throwables.IllegalSourceBatchException;
-import no.kantega.pdf.throwables.SourceNotFoundBatchException;
+import no.kantega.pdf.throwables.ShellScriptException;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.util.concurrent.ExecutionException;
@@ -11,6 +9,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 class ProcessFutureWrapper implements Future<Boolean> {
+
+    private static final String ERROR_MESSAGE_INPUT_NOT_FOUND = "The input file could not be found";
+    private static final String ERROR_MESSAGE_ILLEGAL_INPUT = "The input file seems to be corrupted or in use by another application";
+    private static final String ERROR_MESSAGE_TARGET_INACCESSIBLE = "It was not possible to write to the target location";
+    private static final String ERROR_MESSAGE_ILLEGAL_CALL = "The script was run with an illegal number of input parameters";
+    private static final String ERROR_MESSAGE_WORD_INACCESSIBLE = "It appears that MS Word is not running";
+    private static final String ERROR_MESSAGE_UNKNOWN = "The conversion script returned with an unknown error code";
 
     private final StartedProcess startedProcess;
 
@@ -43,22 +48,26 @@ class ProcessFutureWrapper implements Future<Boolean> {
         return evaluateExitValue(startedProcess.future().get(timeout, unit).exitValue());
     }
 
-    private boolean evaluateExitValue(int exitValue) throws ExecutionException {
+    private boolean evaluateExitValue(int exitCode) throws ExecutionException {
         try {
-            switch (exitValue) {
+            switch (exitCode) {
                 case ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL:
                     return true;
                 case ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND:
-                    throw new SourceNotFoundBatchException(exitValue);
+                    throw new ShellScriptException(ERROR_MESSAGE_INPUT_NOT_FOUND, exitCode);
+                case ExternalConverter.STATUS_CODE_TARGET_INACCESSIBLE:
+                    throw new ShellScriptException(ERROR_MESSAGE_TARGET_INACCESSIBLE, exitCode);
                 case ExternalConverter.STATUS_CODE_ILLEGAL_INPUT:
-                    throw new IllegalSourceBatchException(exitValue);
+                    throw new ShellScriptException(ERROR_MESSAGE_ILLEGAL_INPUT, exitCode);
                 case ExternalConverter.STATUS_CODE_ILLEGAL_CALL:
-                    throw new ConversionBatchException(exitValue, "The conversion script is missing input parameters");
+                    throw new ShellScriptException(ERROR_MESSAGE_ILLEGAL_CALL, exitCode);
+                case ExternalConverter.STATUS_CODE_WORD_INACCESSIBLE:
+                    throw new ShellScriptException(ERROR_MESSAGE_WORD_INACCESSIBLE, exitCode);
                 default:
-                    throw new ConversionBatchException(exitValue, "An unknown error occurred");
+                    throw new ShellScriptException(ERROR_MESSAGE_UNKNOWN, exitCode);
             }
-        } catch (ConversionBatchException e) {
-            throw new ExecutionException(e);
+        } catch (ShellScriptException e) {
+            throw new ExecutionException("The conversion script returned with an error", e);
         }
     }
 }

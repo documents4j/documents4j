@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.conversion.ConversionManager;
-import no.kantega.pdf.throwables.ConversionException;
+import no.kantega.pdf.throwables.ConverterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
             if (isCancelled()) {
                 return;
             } else if (!successful) {
-                throw new ConversionException(String.format("Could not convert input file '%s' for an unknown reason", source));
+                throw new ConverterException(String.format("Could not convert input file '%s' for an unknown reason", source));
             } // else:
             // If the conversion concluded successfully, rename the resulting file if neccessary, invoke the callback
             // on this event and signal that the pending lock can be released.

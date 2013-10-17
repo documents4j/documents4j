@@ -4,6 +4,10 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
+
+import static org.testng.Assert.assertTrue;
+
 @Test(singleThreaded = true)
 public class LocalConverterTest extends AbstractLocalConverterTest {
 
@@ -21,9 +25,23 @@ public class LocalConverterTest extends AbstractLocalConverterTest {
 
     @Test
     public void testFileToFile() throws Exception {
-        AssertionFileSource source = new AssertionFileSource(validDocx());
+        File docx = validDocx(), pdf = makePdfTarget();
+        assertTrue(getConverter().convert(docx).to(pdf).execute());
+        assertTrue(docx.exists());
+        assertTrue(pdf.exists());
+    }
+
+    @Test
+    public void testFileToOutputStream() throws Exception {
+
 
     }
+
+    //    @Test
+//    public void testFileToFile() throws Exception {
+//        AssertionFileSource source = new AssertionFileSource(validDocx());
+//
+//    }
 
     //
 //    @Test(timeOut = MicrosoftWordBridgeTest.DEFAULT_CONVERSION_TIMEOUT)

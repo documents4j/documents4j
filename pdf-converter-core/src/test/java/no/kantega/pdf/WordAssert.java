@@ -20,10 +20,10 @@ public final class WordAssert {
     private static final int STATUS_CODE_WORD_RUNNING = 10;
     private static final int STATUS_CODE_WORD_NOT_RUNNING = -10;
 
-    private final File wordTestScript;
+    private final File wordAssertScript;
 
     public WordAssert(File temporaryFolder) {
-        wordTestScript = TestResource.WORD_TEST_SCRIPT.materializeIn(temporaryFolder);
+        wordAssertScript = TestResource.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
     }
 
     public void assertWordRunning() throws Exception {
@@ -37,9 +37,9 @@ public final class WordAssert {
     }
 
     private int runWordCheckScript() throws Exception {
-        assertTrue(wordTestScript.exists());
+        assertTrue(wordAssertScript.exists());
         return new ProcessExecutor()
-                .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordTestScript.getAbsolutePath())))
+                .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordAssertScript.getAbsolutePath())))
                 .redirectErrorAsInfo(LOGGER)
                 .redirectOutputAsInfo(LOGGER)
                 .timeout(1L, TimeUnit.MINUTES)

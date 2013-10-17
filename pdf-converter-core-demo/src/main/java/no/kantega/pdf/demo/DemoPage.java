@@ -1,7 +1,7 @@
 package no.kantega.pdf.demo;
 
 import no.kantega.pdf.api.IFileConsumer;
-import no.kantega.pdf.throwables.ConversionException;
+import no.kantega.pdf.throwables.ConverterException;
 import org.apache.wicket.Component;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
@@ -89,7 +89,7 @@ public class DemoPage extends WebPage {
                         conversionDuration = System.currentTimeMillis() - conversionDuration;
                         properties.setProperty(FileRow.CONVERSION_DURATION_PROPERTY_KEY, String.valueOf(conversionDuration));
                         writeProperties(properties, transactionFolder);
-                    } catch (ConversionException e) {
+                    } catch (ConverterException e) {
                         transactionFolder.delete();
                         /* other than this, this exception is already handled by the callback (FeedbackMessageConductor) */
                     }

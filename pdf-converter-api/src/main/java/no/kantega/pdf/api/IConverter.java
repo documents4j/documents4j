@@ -9,13 +9,13 @@ public interface IConverter {
     int JOB_PRIORITY_NORMAL = JOB_PRIORITY_LOW * 2;
     int JOB_PRIORITY_HIGH = JOB_PRIORITY_LOW * 3;
 
-    IConversionJobSourceSpecified convert(File source);
+    IConversionJobWithSourceSpecified convert(File source);
 
-    IConversionJobSourceSpecified convert(InputStream source);
+    IConversionJobWithSourceSpecified convert(InputStream source);
 
-    IConversionJobSourceSpecified convert(IFileSource source);
+    IConversionJobWithSourceSpecified convert(IFileSource source);
 
-    IConversionJobSourceSpecified convert(IInputStreamSource source);
+    IConversionJobWithSourceSpecified convert(IInputStreamSource source);
 
     void shutDown();
 }

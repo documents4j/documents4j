@@ -2,7 +2,7 @@ package no.kantega.pdf.adapter;
 
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
         try {
             inputStreamConsumer.onComplete(new DeleteFileOnCloseInputStream(file));
         } catch (IOException e) {
-            throw new FileSystemReadWriteException(String.format("Could not process file: %s", file), e);
+            throw new FileSystemInteractionException(String.format("Could not process file: %s", file), e);
         }
     }
 

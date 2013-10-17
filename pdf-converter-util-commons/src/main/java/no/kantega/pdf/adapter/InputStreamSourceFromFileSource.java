@@ -3,7 +3,7 @@ package no.kantega.pdf.adapter;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.*;
 
@@ -24,9 +24,9 @@ class InputStreamSourceFromFileSource implements IInputStreamSource {
             fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);
             return fileInputStream;
         } catch (FileNotFoundException e) {
-            throw new FileSystemReadWriteException(String.format("Could not find file %s", file), e);
+            throw new FileSystemInteractionException(String.format("Could not find file %s", file), e);
         } catch (IOException e) {
-            throw new FileSystemReadWriteException(String.format("Could not read file %s", file), e);
+            throw new FileSystemInteractionException(String.format("Could not read file %s", file), e);
         }
     }
 
@@ -43,7 +43,7 @@ class InputStreamSourceFromFileSource implements IInputStreamSource {
         try {
             Closeables.close(inputStream, false);
         } catch (IOException e) {
-            throw new FileSystemReadWriteException(String.format("Could not close stream for file %s", file), e);
+            throw new FileSystemInteractionException(String.format("Could not close stream for file %s", file), e);
         }
     }
 }

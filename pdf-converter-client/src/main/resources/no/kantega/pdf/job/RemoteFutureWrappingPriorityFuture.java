@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.mime.CustomMediaType;
-import no.kantega.pdf.throwables.ConversionException;
+import no.kantega.pdf.throwables.ConverterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
             if (isCancelled()) {
                 return;
             } else if (!successful) {
-                throw new ConversionException("Could not convert input");
+                throw new ConverterException("Could not convert input");
             } // else:
             // If the conversion concluded successfully, invoke the callback on this event and signal
             // that the pending lock can be released.

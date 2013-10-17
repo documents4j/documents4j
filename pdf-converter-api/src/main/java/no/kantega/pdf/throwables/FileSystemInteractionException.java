@@ -2,9 +2,9 @@ package no.kantega.pdf.throwables;
 
 import java.io.IOException;
 
-public class FileSystemReadWriteException extends ConversionException {
+public class FileSystemInteractionException extends ConverterException {
 
-    public FileSystemReadWriteException(String message, IOException cause) {
+    public FileSystemInteractionException(String message, IOException cause) {
         super(message, cause);
     }
 

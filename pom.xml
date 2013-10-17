@@ -27,7 +27,7 @@
         <version.jersey>2.1</version.jersey>
         <version.hk2>2.1.96</version.hk2>
         <version.guava>14.0.1</version.guava>
-        <version.zt-exec>1.4</version.zt-exec>
+        <version.zt-exec>1.5</version.zt-exec>
         <version.jopt-simple>4.5</version.jopt-simple>
         <version.slf4j>1.7.5</version.slf4j>
         <version.testng>6.8.5</version.testng>

@@ -9,13 +9,12 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import static org.testng.Assert.assertNotNull;
-
 @Test(singleThreaded = true)
 public class MicrosoftWordBridgeStartStopTest {
 
     private static final long START_SHUTDOWN_TIMEOUT = 5000L;
     private static final int START_SHUTDOWN_INVOCATIONS = 3;
+    private static final long SCRIPT_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
 
     private File folder;
     private WordAssert wordAssert;
@@ -36,10 +35,9 @@ public class MicrosoftWordBridgeStartStopTest {
         wordAssert.assertWordNotRunning();
         MicrosoftWordBridge microsoftWordBridge = null;
         try {
-            microsoftWordBridge = new MicrosoftWordBridge(folder, 2L, TimeUnit.MINUTES);
+            microsoftWordBridge = new MicrosoftWordBridge(folder, SCRIPT_TIMEOUT, TimeUnit.MILLISECONDS);
             wordAssert.assertWordRunning();
         } finally {
-            assertNotNull(microsoftWordBridge, "Could not create MS Word bridge");
             microsoftWordBridge.shutDown();
         }
         wordAssert.assertWordNotRunning();

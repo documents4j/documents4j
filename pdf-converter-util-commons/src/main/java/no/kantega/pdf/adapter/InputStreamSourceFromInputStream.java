@@ -2,7 +2,7 @@ package no.kantega.pdf.adapter;
 
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ class InputStreamSourceFromInputStream implements IInputStreamSource {
         try {
             Closeables.close(inputStream, false);
         } catch (IOException e) {
-            throw new FileSystemReadWriteException("Could not close input stream", e);
+            throw new FileSystemInteractionException("Could not close input stream", e);
         }
     }
 }

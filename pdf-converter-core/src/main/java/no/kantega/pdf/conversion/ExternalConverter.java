@@ -8,14 +8,14 @@ public interface ExternalConverter {
 
     // Note: These status codes are duplicated in the VBS scripts.
 
-    public static final int STATUS_CODE_CONVERSION_SUCCESSFUL = 0;
-    public static final int STATUS_CODE_ILLEGAL_INPUT = -2;
-    public static final int STATUS_CODE_INPUT_NOT_FOUND = -3;
-    public static final int STATUS_CODE_ILLEGAL_CALL = -4;
-
-    StartedProcess startConversion(File source, File target);
-
-    boolean isReady();
+    static final int STATUS_CODE_CONVERSION_SUCCESSFUL = 1;
+    static final int STATUS_CODE_ILLEGAL_INPUT = -2;
+    static final int STATUS_CODE_TARGET_INACCESSIBLE = -3;
+    static final int STATUS_CODE_INPUT_NOT_FOUND = -4;
+    static final int STATUS_CODE_ILLEGAL_CALL = -5;
+    static final int STATUS_CODE_WORD_INACCESSIBLE = -6;
 
     void shutDown();
+
+    StartedProcess startConversion(File source, File target);
 }

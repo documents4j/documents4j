@@ -4,7 +4,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +37,7 @@ class FileSourceFromInputStreamSource implements IFileSource {
                 Closeables.close(fileOutputStream, true);
             }
         } catch (IOException e) {
-            throw new FileSystemReadWriteException(String.format("Could not write stream to file %s", tempStorage), e);
+            throw new FileSystemInteractionException(String.format("Could not write stream to file %s", tempStorage), e);
         }
     }
 

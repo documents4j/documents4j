@@ -1,8 +1,7 @@
 package no.kantega.pdf.conversion;
 
 import no.kantega.pdf.AbstractWordBasedTest;
-import no.kantega.pdf.throwables.IllegalSourceBatchException;
-import no.kantega.pdf.throwables.SourceNotFoundBatchException;
+import no.kantega.pdf.throwables.ShellScriptException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -12,8 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 @Test(singleThreaded = true)
 public class ConversionManagerTest extends AbstractWordBasedTest {
@@ -55,25 +53,43 @@ public class ConversionManagerTest extends AbstractWordBasedTest {
         assertTrue(pdf.exists());
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = IllegalSourceBatchException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
     public void testConversionCorrupt() throws Exception {
         File pdf = makePdfTarget();
         try {
             getConversionManager().startConversion(corruptDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertFalse(pdf.exists());
-            throw (Exception) e.getCause();
+            ShellScriptException exception = (ShellScriptException) e.getCause();
+            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_ILLEGAL_INPUT);
+            throw exception;
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = SourceNotFoundBatchException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
     public void testConversionInexistent() throws Exception {
         File pdf = makePdfTarget();
         try {
             getConversionManager().startConversion(inexistentDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertFalse(pdf.exists());
-            throw (Exception) e.getCause();
+            ShellScriptException exception = (ShellScriptException) e.getCause();
+            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND);
+            throw exception;
+        }
+    }
+
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    public void testConversionTargetInaccessible() throws Exception {
+        File pdf = makePdfTarget();
+        assertTrue(pdf.mkdir());
+        try {
+            getConversionManager().startConversion(validDocx(), pdf).get();
+        } catch (ExecutionException e) {
+            assertFalse(pdf.isFile());
+            ShellScriptException exception = (ShellScriptException) e.getCause();
+            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_TARGET_INACCESSIBLE);
+            throw exception;
         }
     }
 

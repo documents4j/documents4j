@@ -4,7 +4,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.throwables.FileSystemReadWriteException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +34,7 @@ class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
                 Closeables.close(fileOutputStream, false);
             }
         } catch (IOException e) {
-            throw new FileSystemReadWriteException(String.format("Could not copy result to %s", file), e);
+            throw new FileSystemInteractionException(String.format("Could not copy result to %s", file), e);
         }
         fileConsumer.onComplete(file);
     }

@@ -1,7 +1,7 @@
 package no.kantega.pdf.job;
 
 import no.kantega.pdf.adapter.ConversionJobAdapter;
-import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
+import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
@@ -65,26 +65,29 @@ public class LocalConverter extends ConverterAdapter {
                              long processTimeout, TimeUnit processTimeoutUnit) {
         tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
         tempFileFolder.mkdir();
-        this.conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-        this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
-                keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
-        this.uniqueNameMaker = new AtomicLong(1L);
-        this.shutdownHook = new ConverterShutdownHook();
-        registerShutdownHook();
+        try {
+            this.conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+            this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
+                    keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
+            this.uniqueNameMaker = new AtomicLong(1L);
+            this.shutdownHook = new ConverterShutdownHook();
+        } finally {
+            registerShutdownHook();
+        }
         LOGGER.info("Local To-PDF converter has successfully running");
     }
 
-    private class LocalConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
+    private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IFileSource source;
 
-        private LocalConversionJobSourceSpecified(IFileSource source) {
+        private LocalConversionJobWithSourceSpecified(IFileSource source) {
             this.source = source;
         }
 
         @Override
-        public IConversionJob to(File file, IFileConsumer callback) {
-            return new LocalConversionJob(source, file, callback, JOB_PRIORITY_NORMAL);
+        public IConversionJobWithPriorityUnspecified to(File file, IFileConsumer callback) {
+            return new LocalConversionJobWithPriorityUnspecified(source, file, callback);
         }
 
         @Override
@@ -95,9 +98,9 @@ public class LocalConverter extends ConverterAdapter {
 
     private class LocalConversionJob extends ConversionJobAdapter {
 
-        private final IFileSource source;
-        private final File target;
-        private final IFileConsumer callback;
+        protected final IFileSource source;
+        protected final File target;
+        protected final IFileConsumer callback;
         private final int priority;
 
         private LocalConversionJob(IFileSource source, File target, IFileConsumer callback, int priority) {
@@ -116,6 +119,13 @@ public class LocalConverter extends ConverterAdapter {
             executorService.execute(job);
             return job;
         }
+    }
+
+    private class LocalConversionJobWithPriorityUnspecified extends LocalConversionJob implements IConversionJobWithPriorityUnspecified {
+
+        private LocalConversionJobWithPriorityUnspecified(IFileSource source, File target, IFileConsumer callback) {
+            super(source, target, callback, JOB_PRIORITY_NORMAL);
+        }
 
         @Override
         public IConversionJob prioritizeWith(int priority) {
@@ -124,8 +134,8 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     @Override
-    public IConversionJobSourceSpecified convert(IFileSource source) {
-        return new LocalConversionJobSourceSpecified(source);
+    public IConversionJobWithSourceSpecified convert(IFileSource source) {
+        return new LocalConversionJobWithSourceSpecified(source);
     }
 
     @Override
@@ -151,6 +161,7 @@ public class LocalConverter extends ConverterAdapter {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
         } catch (IllegalStateException e) {
             LOGGER.warn("Tried to register shut down hook in shut down period");
+            shutDown();
         }
     }
 

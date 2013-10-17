@@ -14,7 +14,6 @@
     <packaging>jar</packaging>
 
     <dependencies>
-
         <dependency>
             <groupId>no.kantega</groupId>
             <artifactId>pdf-converter-api</artifactId>
@@ -40,6 +39,15 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <!-- This is required for gaining access to abstract test classes -->
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-commons</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

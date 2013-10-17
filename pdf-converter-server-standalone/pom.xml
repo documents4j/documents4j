@@ -37,7 +37,6 @@
 
     <build>
         <plugins>
-
             <!-- Shade plugin: Allow all dependencies to be packed into a single jar file -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

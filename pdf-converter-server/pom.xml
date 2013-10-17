@@ -13,7 +13,6 @@
     <artifactId>pdf-converter-server</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>inject-api</artifactId>
@@ -61,7 +60,6 @@
             <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

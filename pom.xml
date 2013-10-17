@@ -9,6 +9,13 @@
     <version>0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <!--
+    Note: This project can be built on any machine. However, most test cases require:
+     (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
+     (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
+    On a machine without these requirements, this project must be built without running the supplied unit tests.
+    -->
+
     <modules>
         <module>pdf-converter-api</module>
         <module>pdf-converter-core</module>
@@ -36,7 +43,6 @@
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
@@ -106,12 +112,10 @@
                 <artifactId>jersey-client</artifactId>
                 <version>${version.jersey}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-
         <!-- Testing / Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -130,7 +134,6 @@
             <artifactId>mockito-all</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

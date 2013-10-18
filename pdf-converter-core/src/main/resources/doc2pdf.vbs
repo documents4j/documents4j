@@ -7,15 +7,14 @@ Const WdDoNotSaveChanges = 0
 Dim arguments
 Set arguments = WScript.Arguments
 
-' Make sure that there are one or two arguments
+' Make sure that there are two arguments given.
 Function CheckUserArguments()
-  If arguments.Unnamed.Count < 1 Or arguments.Unnamed.Count > 2 Then
-    WScript.Quit -1
+  If arguments.Unnamed.Count <> 2 Then
+    WScript.Quit -5
   End If
 End Function
 
-
-' Transforms a doc to a pdf
+' Transforms a MS Word file into PDF.
 Function DocToPdf( docInputFile, pdfOutputFile )
 
   Dim fileSystemObject
@@ -23,39 +22,53 @@ Function DocToPdf( docInputFile, pdfOutputFile )
   Dim wordDocument
   Dim wordDocuments
 
-  ' Get existing instance of word
+  ' Get the running instance of MS Word. If Word is not running, exit the conversion.
+  On Error Resume Next
   Set wordApplication = GetObject(, "Word.Application")
+  If Err <> 0 then
+    WScript.Quit -6
+  End If
   Set wordDocuments = wordApplication.Documents
+  On Error GoTo 0
 
-  ' Find files
+  ' Find the Word file on the file system.
   Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
   docInputFile = fileSystemObject.GetAbsolutePathName(docInputFile)
 
-  ' Open word document
-  Set wordDocument = wordDocuments.Open(docInputFile, false, true, false)
+  ' Convert the Word file only if it exists.
+  If (fileSystemObject.FileExists(docInputFile)) Then
 
-  ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
-  wordDocument.SaveAs pdfOutputFile, wdFormatPDF
+    ' Open the MS Word document.
+    On Error Resume Next
+    Set wordDocument = wordDocuments.Open(docInputFile, false, true, false)
+    If Err <> 0 then
+        WScript.Quit -2
+    End If
+    On Error GoTo 0
 
-  ' Close word document
-  wordDocument.Close WdDoNotSaveChanges
+    ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
+    On Error Resume Next
+    wordDocument.SaveAs pdfOutputFile, wdFormatPDF
+    If Err <> 0 then
+        WScript.Quit -3
+    End If
+    On Error GoTo 0
 
-  ' Free local resources
-  Set fileSystemObject = Nothing
-  Set wordApplication = Nothing
-  Set wordDocument = Nothing
-  Set wordDocuments = Nothing
+    ' Close the MS Word document.
+    wordDocument.Close WdDoNotSaveChanges
+
+    ' Signal that the conversion was successful.
+    WScript.Quit 1
+
+  Else
+
+    ' Files does not exist, could not convert
+    WScript.Quit -4
+
+  End If
 
 End Function
 
 ' Execute script
 Call CheckUserArguments()
-If arguments.Unnamed.Count = 2 Then
- Call DocToPdf( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1) )
-Else
- Call DocToPdf( arguments.Unnamed.Item(0), "" )
-End If
-
-' Free local resources and quit
-Set arguments = Nothing
-WScript.Quit 0
+Call DocToPdf( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1) )

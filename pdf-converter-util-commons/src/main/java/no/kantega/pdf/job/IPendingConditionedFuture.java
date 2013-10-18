@@ -6,5 +6,4 @@ import java.util.concurrent.Future;
 interface IPendingConditionedFuture<T> extends Future<T> {
 
     CountDownLatch getPendingCondition();
-
 }

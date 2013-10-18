@@ -1,6 +1,6 @@
 package no.kantega.pdf;
 
-import no.kantega.pdf.util.ResourceExporter;
+import no.kantega.pdf.util.ExportAid;
 
 import java.io.File;
 
@@ -21,7 +21,7 @@ public enum TestResource {
     }
 
     public File materializeIn(File folder) {
-        return ResourceExporter.materialize(folder, getLocalPath());
+        return ExportAid.materialize(folder, getLocalPath());
     }
 
     public File absoluteTo(File folder) {

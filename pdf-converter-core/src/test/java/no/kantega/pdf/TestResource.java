@@ -1,14 +1,15 @@
 package no.kantega.pdf;
 
-import no.kantega.pdf.util.ResourceExporter;
+import no.kantega.pdf.util.ExportAid;
 
 import java.io.File;
 
 public enum TestResource {
 
-    DOCX("test.docx"),
-    PDF(DOCX.getLocalPath().concat(".pdf")),
-    WORD_TEST_SCRIPT("checkword.vbs");
+    DOCX_VALID("valid.docx"),
+    DOCX_CORRUPT("corrupt.docx"),
+    DOCX_INEXISTENT("inexistent.docx"),
+    WORD_ASSERT_SCRIPT("word_assert.vbs");
 
     private final String path;
 
@@ -21,7 +22,7 @@ public enum TestResource {
     }
 
     public File materializeIn(File folder) {
-        return ResourceExporter.materialize(folder, getLocalPath());
+        return ExportAid.materialize(folder, getLocalPath());
     }
 
     public File absoluteTo(File folder) {

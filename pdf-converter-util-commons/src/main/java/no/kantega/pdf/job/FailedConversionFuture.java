@@ -9,7 +9,7 @@ final class FailedConversionFuture implements Future<Boolean> {
 
     private final Exception exception;
 
-    FailedConversionFuture(Exception exception) {
+    FailedConversionFuture(RuntimeException exception) {
         this.exception = exception;
     }
 
@@ -30,7 +30,7 @@ final class FailedConversionFuture implements Future<Boolean> {
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        throw new ConversionExecutionException("Could not complete conversion", exception);
+        throw new ExecutionException("Could not complete conversion", exception);
     }
 
     @Override

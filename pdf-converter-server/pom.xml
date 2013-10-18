@@ -13,7 +13,6 @@
     <artifactId>pdf-converter-server</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>inject-api</artifactId>
@@ -39,7 +38,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-ws</artifactId>
+            <artifactId>pdf-converter-util-ws</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -55,13 +54,24 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Webservice (Testing) -->
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.glassfish.jersey.test-framework.providers</groupId>
             <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

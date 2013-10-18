@@ -1,7 +1,7 @@
 package no.kantega.pdf.job;
 
 import no.kantega.pdf.adapter.ConversionJobAdapter;
-import no.kantega.pdf.adapter.ConversionJobSourceSpecifiedAdapter;
+import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
@@ -92,20 +92,20 @@ public class RemoteConverter extends ConverterAdapter {
         this.uniqueNameMaker = new AtomicLong(1L);
         this.shutdownHook = new ConverterShutdownHook();
         registerShutdownHook();
-        LOGGER.info("Remote To-PDF converter is started ({})", baseUri);
+        LOGGER.info("Remote To-PDF converter has started successfully ({})", baseUri);
     }
 
-    private class RemoteConversionJobSourceSpecified extends ConversionJobSourceSpecifiedAdapter {
+    private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IInputStreamSource source;
 
-        private RemoteConversionJobSourceSpecified(IInputStreamSource source) {
+        private RemoteConversionWithJobSourceSpecified(IInputStreamSource source) {
             this.source = source;
         }
 
         @Override
-        public IConversionJob to(IInputStreamConsumer callback) {
-            return new RemoteConversionJob(source, callback, JOB_PRIORITY_NORMAL);
+        public IConversionJobWithPriorityUnspecified to(IInputStreamConsumer callback) {
+            return new RemoteConversionJobWithPriorityUnspecified(source, callback);
         }
 
         @Override
@@ -116,8 +116,8 @@ public class RemoteConverter extends ConverterAdapter {
 
     private class RemoteConversionJob extends ConversionJobAdapter {
 
-        private final IInputStreamSource source;
-        private final IInputStreamConsumer callback;
+        protected final IInputStreamSource source;
+        protected final IInputStreamConsumer callback;
         private final int priority;
 
         private RemoteConversionJob(IInputStreamSource source, IInputStreamConsumer callback, int priority) {
@@ -135,6 +135,13 @@ public class RemoteConverter extends ConverterAdapter {
             executorService.execute(job);
             return job;
         }
+    }
+
+    private class RemoteConversionJobWithPriorityUnspecified extends RemoteConversionJob implements IConversionJobWithPriorityUnspecified {
+
+        private RemoteConversionJobWithPriorityUnspecified(IInputStreamSource source, IInputStreamConsumer callback) {
+            super(source, callback, JOB_PRIORITY_NORMAL);
+        }
 
         @Override
         public IConversionJob prioritizeWith(int priority) {
@@ -143,8 +150,8 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     @Override
-    public IConversionJobSourceSpecified convert(IInputStreamSource source) {
-        return new RemoteConversionJobSourceSpecified(source);
+    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
+        return new RemoteConversionWithJobSourceSpecified(source);
     }
 
     @Override
@@ -161,7 +168,7 @@ public class RemoteConverter extends ConverterAdapter {
             tempFileFolder.delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Remote To-PDF converter is shut down ({})", webTarget.getUri());
+        LOGGER.info("Remote To-PDF converter has shut down successfully ({})", webTarget.getUri());
     }
 
     private void registerShutdownHook() {

@@ -1,6 +1,6 @@
 package no.kantega.pdf.adapter;
 
-import no.kantega.pdf.api.IConversionJobSourceSpecified;
+import no.kantega.pdf.api.IConversionJobWithSourceSpecified;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
@@ -13,23 +13,23 @@ public abstract class ConverterAdapter implements IConverter {
     private static final String NO_EXTENSION = "";
 
     @Override
-    public IConversionJobSourceSpecified convert(File source) {
+    public IConversionJobWithSourceSpecified convert(File source) {
         return convert(new FileSourceFromFile(source));
     }
 
     @Override
-    public IConversionJobSourceSpecified convert(InputStream source) {
+    public IConversionJobWithSourceSpecified convert(InputStream source) {
         return convert(new InputStreamSourceFromInputStream(source));
     }
 
     @Override
-    public IConversionJobSourceSpecified convert(IFileSource source) {
-        return convert(new InputStreamSourceFromFile(source.getFile()));
+    public IConversionJobWithSourceSpecified convert(IFileSource source) {
+        return convert(new InputStreamSourceFromFileSource(source));
     }
 
     @Override
-    public IConversionJobSourceSpecified convert(IInputStreamSource source) {
-        return convert(new FileSourceFromInputStream(source.getInputStream(), makeTemporaryFile()));
+    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
+        return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
     }
 
     protected class ConverterShutdownHook extends Thread {

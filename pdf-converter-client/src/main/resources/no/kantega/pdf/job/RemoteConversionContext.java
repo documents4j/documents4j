@@ -13,7 +13,7 @@ class RemoteConversionContext implements IConversionContext {
 
     @Override
     public Future<Boolean> asFuture() {
-        return JerseyClientFutureWrapper.of(webResponse);
+        return new JerseyClientFutureWrapper(webResponse);
     }
 
     public Future<Response> getWebResponse() {

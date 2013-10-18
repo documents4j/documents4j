@@ -1,6 +1,5 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.AbstractWordBasedTest;
 import no.kantega.pdf.throwables.ShellScriptException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -9,16 +8,11 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.*;
 
 @Test(singleThreaded = true)
-public class ConversionManagerTest extends AbstractWordBasedTest {
-
-    private static final long PROCESS_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
-
-    private ConversionManager conversionManager;
+public class ConversionManagerTest extends AbstractConversionManagerTest {
 
     @BeforeClass
     @Override
@@ -30,20 +24,6 @@ public class ConversionManagerTest extends AbstractWordBasedTest {
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
-    }
-
-    @Override
-    protected void startConverter() {
-        conversionManager = new ConversionManager(getTemporaryFolder(), PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    protected void shutDownConverter() {
-        conversionManager.shutDown();
-    }
-
-    protected ConversionManager getConversionManager() {
-        return conversionManager;
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)

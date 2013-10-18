@@ -9,7 +9,7 @@ final class FailedConversionFuture implements Future<Boolean> {
 
     private final Exception exception;
 
-    FailedConversionFuture(Exception exception) {
+    FailedConversionFuture(RuntimeException exception) {
         this.exception = exception;
     }
 

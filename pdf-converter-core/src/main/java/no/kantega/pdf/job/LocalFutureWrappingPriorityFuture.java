@@ -49,7 +49,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
     }
 
     @Override
-    protected void onConversionFailed(Exception e) {
+    protected void onConversionFailed(RuntimeException e) {
         callback.onException(target, e);
     }
 

@@ -13,6 +13,17 @@
     <artifactId>pdf-converter-core</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <main_version>0.2</main_version>
+        <extensions_version>0.2</extensions_version>
+        <javassist_version>3.18.0-GA</javassist_version>
+        <objenesis_version>1.4</objenesis_version>
+        <cglib_version>2.2.2</cglib_version>
+        <asm_version>4.1</asm_version>
+        <easymock_version>3.2</easymock_version>
+        <junit_version>4.11</junit_version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>no.kantega</groupId>
@@ -54,7 +65,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- This following dependencies are required for using generic test classes of another module -->
+        <!--
+             The following dependencies are required for using
+             generic test classes of the "pdf-converter-util-commons"
+             module.
+        -->
+
         <dependency>
             <groupId>no.kantega</groupId>
             <artifactId>pdf-converter-util-commons</artifactId>

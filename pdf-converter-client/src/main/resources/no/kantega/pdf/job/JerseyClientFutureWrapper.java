@@ -12,10 +12,6 @@ class JerseyClientFutureWrapper implements Future<Boolean> {
 
     private final Future<Response> jerseyResponse;
 
-    public static Future<Boolean> of(Future<Response> jerseyResponse) {
-        return new JerseyClientFutureWrapper(jerseyResponse);
-    }
-
     public JerseyClientFutureWrapper(Future<Response> jerseyResponse) {
         this.jerseyResponse = jerseyResponse;
     }

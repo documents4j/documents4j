@@ -11,7 +11,7 @@ import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public abstract class AbstractConverterTest {
+abstract class AbstractConverterTest {
 
     private static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
 

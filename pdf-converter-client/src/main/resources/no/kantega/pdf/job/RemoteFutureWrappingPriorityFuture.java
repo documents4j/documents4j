@@ -56,7 +56,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     }
 
     @Override
-    protected void onConversionFailed(Exception e) {
+    protected void onConversionFailed(RuntimeException e) {
         consumer.onException(e);
     }
 

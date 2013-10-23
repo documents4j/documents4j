@@ -1,7 +1,7 @@
 package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.io.ByteStreams;
-import no.kantega.pdf.mime.CustomMediaType;
+import no.kantega.pdf.mime.MimeType;
 import no.kantega.pdf.ws.AbstractJerseyTest;
 
 import javax.ws.rs.client.Entity;
@@ -19,8 +19,8 @@ public abstract class AbstractConverterResourceTest extends AbstractJerseyTest {
     protected void testConversion(WebTarget webTarget, File docx, File pdf) throws Exception {
 
         Response response = webTarget.path(ConverterResource.CONVERTER_RESOURCE_PATH)
-                .request(CustomMediaType.APPLICATION_PDF)
-                .post(Entity.entity(docx, CustomMediaType.WORD_DOCX));
+                .request(MimeType.APPLICATION_PDF)
+                .post(Entity.entity(docx, MimeType.WORD_DOCX));
 
         assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
 

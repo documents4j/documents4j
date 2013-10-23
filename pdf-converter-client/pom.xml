@@ -27,7 +27,7 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-util-commons</artifactId>
+            <artifactId>pdf-converter-util-conversion</artifactId>
             <version>${project.version}</version>
         </dependency>
 

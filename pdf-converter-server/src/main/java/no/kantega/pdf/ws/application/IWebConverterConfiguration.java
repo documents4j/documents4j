@@ -2,7 +2,6 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 
-import javax.ws.rs.container.TimeoutHandler;
 import java.util.concurrent.TimeUnit;
 
 public interface IWebConverterConfiguration {
@@ -12,6 +11,4 @@ public interface IWebConverterConfiguration {
     IConverter getConverter();
 
     long getTimeout();
-
-    TimeoutHandler getTimeoutHandler();
 }

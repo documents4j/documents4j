@@ -16,16 +16,21 @@
       (3) Microsoft Word is not running when the built is started and is neither started manually while the
           tests are running
      On a machine without these requirements, this project must be built without running the supplied unit tests.
+
+     Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
+     running this program exits abnormally (for example by a user interrupt causing a TerminateProcess signal), the
+     application cannot run any shut down hooks to terminate MS Word. The MS Word process will therefore leak.
+     When developing and testing this application, always keep an eye on your machine's task manager.
     -->
 
     <modules>
         <module>pdf-converter-api</module>
-        <module>pdf-converter-core</module>
-        <module>pdf-converter-core-demo</module>
+        <module>pdf-converter-local</module>
+        <module>pdf-converter-local-demo</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>
-        <module>pdf-converter-util-commons</module>
+        <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
     </modules>
 

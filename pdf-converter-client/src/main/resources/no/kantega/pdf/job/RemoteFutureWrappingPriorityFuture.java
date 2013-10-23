@@ -2,7 +2,7 @@ package no.kantega.pdf.job;
 
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.mime.CustomMediaType;
+import no.kantega.pdf.mime.MimeType;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -45,9 +45,9 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     @Override
     protected RemoteConversionContext startConversion(InputStream fetchedSource) {
         return new RemoteConversionContext(webTarget
-                .request(CustomMediaType.APPLICATION_PDF)
+                .request(MimeType.APPLICATION_PDF)
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(source, fetchedSource), CustomMediaType.WORD_DOCX)));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(source, fetchedSource), MimeType.WORD_DOCX)));
     }
 
     @Override

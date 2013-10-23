@@ -10,13 +10,14 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-server</artifactId>
+    <artifactId>pdf-converter-util-conversion</artifactId>
+    <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>inject-api</artifactId>
-            <scope>provided</scope>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>pdf-converter-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -25,27 +26,8 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-util-ws</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Webservice -->
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Testing -->
@@ -67,19 +49,31 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Required for a creating a rich mock converter -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-util-conversion</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+            <groupId>com.googlecode.thread-weaver</groupId>
+            <artifactId>threadweaver</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!-- This bundle contains abstract test classes for converter implementations.
+     In order to make these classes available in other Maven modules, they need to be
+     bundled together in a test-jar. -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

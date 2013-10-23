@@ -1,38 +1,71 @@
 package no.kantega.pdf.ws.endpoint;
 
-import com.google.common.io.Files;
-import no.kantega.pdf.TestResource;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import no.kantega.pdf.job.ConversionStrategy;
+import no.kantega.pdf.mime.MimeType;
+import no.kantega.pdf.ws.AbstractJerseyTest;
+import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
-import java.io.File;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Response;
 
-@Test(singleThreaded = true)
-public class ConverterResourceTest extends AbstractConverterResourceTest {
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
-    private static final long CONVERSION_TIMEOUT = 10000L;
+@Test
+public class ConverterResourceTest extends AbstractJerseyTest {
 
-    private File docx, pdf;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConverterResourceTest.class);
 
-    @BeforeMethod(alwaysRun = true)
-    public void setUpMethod() throws Exception {
-        File folder = Files.createTempDir();
-        docx = TestResource.DOCX.materializeIn(folder);
-        pdf = TestResource.PDF.absoluteTo(folder);
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void tearDownMethod() throws Exception {
-    }
+    private static final String MESSAGE = "Hello converter!";
+    private static final long ADDITIONAL_TIMEOUT = 5000L;
 
     @Override
     protected Class<?> getComponent() {
         return ConverterResource.class;
     }
 
-    @Test(timeOut = CONVERSION_TIMEOUT)
-    public void testSingleConversion() throws Exception {
-        testConversion(target(), docx, pdf);
+    @Test(timeOut = WebConverterTestConfiguration.TEST_TIMEOUT)
+    public void testConversionSuccess() throws Exception {
+        Response response = target()
+                .request(MimeType.APPLICATION_PDF)
+                .post(Entity.entity(ConversionStrategy.SUCCESS.encode(MESSAGE), MimeType.WORD_DOC));
+        assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
+        assertEquals(response.getMediaType().toString(), MimeType.APPLICATION_PDF);
+        assertEquals(response.readEntity(String.class), ConversionStrategy.SUCCESS.asReply(MESSAGE));
+    }
+
+    @Test(timeOut = WebConverterTestConfiguration.TEST_TIMEOUT)
+    public void testConversionCancel() throws Exception {
+        Response response = target()
+                .request(MimeType.APPLICATION_PDF)
+                .post(Entity.entity(ConversionStrategy.CANCEL.encode(MESSAGE), MimeType.WORD_DOC));
+        assertEquals(response.getStatus(), Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        assertNull(response.getMediaType());
+        assertNull(response.readEntity(Object.class));
+    }
+
+    @Test(timeOut = WebConverterTestConfiguration.TEST_TIMEOUT)
+    public void testConversionError() throws Exception {
+        Response response = target()
+                .request(MimeType.APPLICATION_PDF)
+                .post(Entity.entity(ConversionStrategy.ERROR.encode(MESSAGE), MimeType.WORD_DOC));
+        assertEquals(response.getStatus(), Response.Status.INTERNAL_SERVER_ERROR.getStatusCode());
+        assertNull(response.getMediaType());
+        assertNull(response.readEntity(Object.class));
+    }
+
+    @Test(timeOut = WebConverterTestConfiguration.TEST_TIMEOUT + ADDITIONAL_TIMEOUT)
+    public void testConversionTimeout() throws Exception {
+        LOGGER.info("Testing timeout handling: waiting for maximal {} milliseconds",
+                WebConverterTestConfiguration.TEST_TIMEOUT + ADDITIONAL_TIMEOUT);
+        Response response = target()
+                .request(MimeType.APPLICATION_PDF)
+                .post(Entity.entity(ConversionStrategy.TIMEOUT.encode(MESSAGE), MimeType.WORD_DOC));
+        assertEquals(response.getStatus(), Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+        assertNull(response.getMediaType());
+        assertNull(response.readEntity(Object.class));
     }
 }

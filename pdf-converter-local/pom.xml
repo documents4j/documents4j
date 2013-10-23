@@ -10,13 +10,31 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-server</artifactId>
+    <artifactId>pdf-converter-local</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <main_version>0.2</main_version>
+        <extensions_version>0.2</extensions_version>
+        <javassist_version>3.18.0-GA</javassist_version>
+        <objenesis_version>1.4</objenesis_version>
+        <cglib_version>2.2.2</cglib_version>
+        <asm_version>4.1</asm_version>
+        <easymock_version>3.2</easymock_version>
+        <junit_version>4.11</junit_version>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>inject-api</artifactId>
-            <scope>provided</scope>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-conversion</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -25,27 +43,13 @@
         </dependency>
 
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-util-ws</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.zeroturnaround</groupId>
+            <artifactId>zt-exec</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Webservice -->
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Testing -->
@@ -61,23 +65,23 @@
             <scope>test</scope>
         </dependency>
 
+        <!--
+             The following dependencies are required for using
+             generic test classes of the "pdf-converter-util-conversion"
+             module.
+        -->
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-conversion</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Required for a creating a rich mock converter -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-util-conversion</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-            <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

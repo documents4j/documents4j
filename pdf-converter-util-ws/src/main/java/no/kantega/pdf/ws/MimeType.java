@@ -1,4 +1,4 @@
-package no.kantega.pdf.mime;
+package no.kantega.pdf.ws;
 
 public final class MimeType {
 

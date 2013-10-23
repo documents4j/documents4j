@@ -6,6 +6,8 @@ import no.kantega.pdf.api.IConverter;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilder<T>> {
 
     public static final int DEFAULT_CORE_POOL_SIZE = 15;
@@ -26,7 +28,8 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     @SuppressWarnings("unchecked")
     public T workerPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         assertNumericArgument(corePoolSize, true);
-        assertNumericArgument(maximumPoolSize, false);
+        assertNumericArgument(maximumPoolSize, true);
+        assertNumericArgument(corePoolSize + maximumPoolSize, false);
         assertNumericArgument(keepAliveTime, true);
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -39,12 +42,24 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     }
 
     protected static void assertNumericArgument(long number, boolean zeroAllowed) {
-        if (number < 0L) {
-            throw new IllegalArgumentException("Input must not be a negative number");
-        } else if (!zeroAllowed && number == 0L) {
-            throw new IllegalArgumentException("Input must be a positive number");
-        }
+        checkArgument((zeroAllowed && number == 0L) || number > 0L);
     }
 
     public abstract IConverter build();
+
+    public File getBaseFolder() {
+        return baseFolder;
+    }
+
+    public int getCorePoolSize() {
+        return corePoolSize;
+    }
+
+    public int getMaximumPoolSize() {
+        return maximumPoolSize;
+    }
+
+    public long getKeepAliveTime() {
+        return keepAliveTime;
+    }
 }

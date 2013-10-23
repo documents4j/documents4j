@@ -1,5 +1,8 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
+
 class Priority implements Comparable<Priority> {
 
     private final int value;
@@ -20,24 +23,31 @@ class Priority implements Comparable<Priority> {
 
     @Override
     public int compareTo(Priority other) {
-        int priorityDifference = value - other.getValue();
-        if (priorityDifference == 0) {
-            long timeDifference = creationTime - other.getCreationTime();
-            if (timeDifference > Integer.MAX_VALUE) {
-                return Integer.MAX_VALUE;
-            } else if (timeDifference < Integer.MIN_VALUE) {
-                return Integer.MIN_VALUE;
-            } else {
-                return (int) timeDifference;
-            }
-        } else {
-            return priorityDifference;
+        return ComparisonChain.start()
+                .compare(value, other.getValue())
+                .compare(creationTime, other.getCreationTime())
+                .result();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(value, creationTime);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Priority)) {
+            return false;
         }
+        Priority other = (Priority) obj;
+        return Objects.equal(value, other.getValue()) && Objects.equal(creationTime, other.getCreationTime());
     }
 
     @Override
     public String toString() {
-        return String.format("%s[value=%d,creationTime=%d]",
-                Priority.class.getSimpleName(), value, creationTime);
+        return Objects.toStringHelper(this)
+                .add("value", value)
+                .add("creationTime", creationTime)
+                .toString();
     }
 }

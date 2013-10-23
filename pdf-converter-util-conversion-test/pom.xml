@@ -5,13 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>no.kantega</groupId>
         <artifactId>pdf-converter-parent</artifactId>
+        <groupId>no.kantega</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-util-conversion</artifactId>
-    <packaging>jar</packaging>
+    <artifactId>pdf-converter-util-conversion-test</artifactId>
 
     <dependencies>
         <dependency>
@@ -21,39 +20,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.googlecode.thread-weaver</groupId>
-            <artifactId>threadweaver</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

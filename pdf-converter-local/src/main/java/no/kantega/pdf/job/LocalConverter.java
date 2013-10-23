@@ -31,7 +31,7 @@ public class LocalConverter extends ConverterAdapter {
         }
 
         public Builder processTimeout(long processTimeout, TimeUnit timeUnit) {
-            assertNumericArgument(processTimeout, false);
+            assertNumericArgument(processTimeout, true);
             this.processTimeout = timeUnit.toMillis(processTimeout);
             return this;
         }
@@ -40,6 +40,10 @@ public class LocalConverter extends ConverterAdapter {
         public IConverter build() {
             return new LocalConverter(normalizedBaseFolder(), corePoolSize, maximumPoolSize,
                     keepAliveTime, processTimeout, TimeUnit.MILLISECONDS);
+        }
+
+        public long getProcessTimeout() {
+            return processTimeout;
         }
     }
 

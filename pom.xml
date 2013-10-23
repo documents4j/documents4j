@@ -15,6 +15,7 @@
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
       (3) Microsoft Word is not running when the built is started and is neither started manually while the
           tests are running
+      (4) Port 57379 on localhost is available and can be bound.
      On a machine without these requirements, this project must be built without running the supplied unit tests.
 
      Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
@@ -31,7 +32,9 @@
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>
         <module>pdf-converter-util-conversion</module>
+        <module>pdf-converter-util-conversion-test</module>
         <module>pdf-converter-util-ws</module>
+        <module>pdf-converter-util-ws-test</module>
     </modules>
 
     <properties>

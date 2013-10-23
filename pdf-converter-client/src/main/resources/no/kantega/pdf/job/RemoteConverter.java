@@ -16,6 +16,8 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
@@ -24,10 +26,10 @@ public class RemoteConverter extends ConverterAdapter {
 
     public static final class Builder extends AbstractConverterBuilder<Builder> {
 
-        public static final long DEFAULT_NETWORK_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(5L);
+        public static final long DEFAULT_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(5L);
 
         private URI baseUri;
-        private long networkRequestTimeout = DEFAULT_NETWORK_REQUEST_TIMEOUT;
+        private long requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
         private Builder() {
             /* empty */
@@ -43,19 +45,25 @@ public class RemoteConverter extends ConverterAdapter {
             return this;
         }
 
-        public Builder networkRequestTimeout(long timeout, TimeUnit unit) {
+        public Builder requestTimeout(long timeout, TimeUnit unit) {
             assertNumericArgument(timeout, true);
-            this.networkRequestTimeout = unit.toMillis(timeout);
+            this.requestTimeout = unit.toMillis(timeout);
             return this;
         }
 
         @Override
         public IConverter build() {
-            if (baseUri == null) {
-                throw new NullPointerException("The base URI was not set");
-            }
-            return new RemoteConverter(baseUri, normalizedBaseFolder(), networkRequestTimeout,
+            checkNotNull(baseUri, "The base URI was not set");
+            return new RemoteConverter(baseUri, normalizedBaseFolder(), requestTimeout,
                     corePoolSize, maximumPoolSize, keepAliveTime);
+        }
+
+        public URI getBaseUri() {
+            return baseUri;
+        }
+
+        public long getRequestTimeout() {
+            return requestTimeout;
         }
     }
 
@@ -71,7 +79,7 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-    private final long networkRequestTimeout;
+    private final long requestTimeout;
     private final WebTarget webTarget;
 
     private final ExecutorService executorService;
@@ -81,12 +89,12 @@ public class RemoteConverter extends ConverterAdapter {
 
     private final Thread shutdownHook;
 
-    protected RemoteConverter(URI baseUri, File baseFolder, long networkRequestTimeout,
+    protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime) {
         this.webTarget = ClientBuilder.newClient().target(baseUri);
         this.tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
         tempFileFolder.mkdir();
-        this.networkRequestTimeout = networkRequestTimeout;
+        this.requestTimeout = requestTimeout;
         this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
                 TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
         this.uniqueNameMaker = new AtomicLong(1L);
@@ -129,7 +137,7 @@ public class RemoteConverter extends ConverterAdapter {
         @Override
         public Future<Boolean> schedule() {
             RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(
-                    webTarget, source, callback, priority, networkRequestTimeout);
+                    webTarget, source, callback, priority, requestTimeout);
             // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
             // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
             executorService.execute(job);

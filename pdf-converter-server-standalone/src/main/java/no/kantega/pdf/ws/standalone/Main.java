@@ -1,6 +1,7 @@
 package no.kantega.pdf.ws.standalone;
 
 import joptsimple.*;
+import no.kantega.pdf.builder.ConverterServerBuilder;
 import no.kantega.pdf.job.LocalConverter;
 import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -12,6 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class Main {
 
@@ -19,14 +23,13 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            UserConfiguration userConfiguration = readConfiguration(args);
-            HttpServer httpServer = userConfiguration.makeServer();
+            ConverterServerBuilder builder = asBuilder(args);
+            HttpServer httpServer = builder.build();
             try {
-                sayHello(userConfiguration);
-                userConfiguration.pretty(System.out);
+                sayHello(builder);
                 System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
                 System.in.read();
-                sayGoodbye(userConfiguration);
+                sayGoodbye(builder);
             } catch (IOException e) {
                 LOGGER.error("Error when reading from the console", e);
                 throw new RuntimeException("A console error occurred", e);
@@ -41,20 +44,20 @@ public class Main {
         }
     }
 
-    private static UserConfiguration readConfiguration(String[] args) throws IOException {
+    private static ConverterServerBuilder asBuilder(String[] args) throws IOException {
 
         OptionParser optionParser = new OptionParser();
 
         OptionSpec<?> helpSpec = makeHelpSpec(optionParser);
 
-        NonOptionArgumentSpec<URI> serverBaseUriSpec = makeServerBaseUriSpec(optionParser);
+        NonOptionArgumentSpec<URI> baseUriSpec = makeBaseUriSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<File> baseFolderSpec = makeBaseFolderSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> corePoolSizeSpec = makeCorePoolSizeSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> fallbackPoolSizeSpc = makeFallbackPoolSizeSpec(optionParser);
         ArgumentAcceptingOptionSpec<Long> keepAliveTimeSpec = makeKeepAliveTimeSpec(optionParser);
-        ArgumentAcceptingOptionSpec<Long> processTimeOutSpec = makeProcessTimeOutSpec(optionParser);
-        ArgumentAcceptingOptionSpec<Long> requestTimeOutSpec = makeRequestTimeOutSpec(optionParser);
+        ArgumentAcceptingOptionSpec<Long> processTimeoutSpec = makeProcessTimeoutSpec(optionParser);
+        ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
 
@@ -65,23 +68,34 @@ public class Main {
             System.exit(0);
         }
 
-        URI serverBaseUri = serverBaseUriSpec.value(optionSet);
-        if (serverBaseUri == null) {
+        URI baseUri = baseUriSpec.value(optionSet);
+        if (baseUri == null) {
             throw new NullPointerException("No base URI parameter specified. (Use: <command> <base URI>)");
         }
 
         File baseFolder = baseFolderSpec.value(optionSet);
+        checkArgument(baseFolder == null || baseFolder.exists(), "The specified base folder cannot be located on the file system");
         int corePoolSize = corePoolSizeSpec.value(optionSet);
+        checkArgument(corePoolSize >= 0, "The number of core worker threads must not be negative");
         int fallbackPoolSize = fallbackPoolSizeSpc.value(optionSet);
+        checkArgument(fallbackPoolSize >= 0, "The number of fallback worker threads must not be negative");
+        checkArgument(corePoolSize + fallbackPoolSize > 0, "The number of worker threads must be positive");
         long keepAliveTime = keepAliveTimeSpec.value(optionSet);
-        long processTimeOut = processTimeOutSpec.value(optionSet);
-        long requestTimeOut = requestTimeOutSpec.value(optionSet);
+        checkArgument(keepAliveTime >= 0L, "The worker thread keep alive time must not be negative");
+        long processTimeout = processTimeoutSpec.value(optionSet);
+        checkArgument(processTimeout >= 0L, "The process timeout timeout must not be negative");
+        long requestTimeout = requestTimeoutSpec.value(optionSet);
+        checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
         File logFile = logFileSpec.value(optionSet);
         configureLogging(logFile);
 
-        return new UserConfiguration(serverBaseUri, baseFolder, corePoolSize, fallbackPoolSize,
-                keepAliveTime, processTimeOut, requestTimeOut);
+        return ConverterServerBuilder.builder()
+                .baseUri(baseUri)
+                .baseFolder(baseFolder)
+                .workerPool(corePoolSize, corePoolSize + fallbackPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
+                .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
+                .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS);
     }
 
     private static void configureLogging(File logFile) {
@@ -103,7 +117,7 @@ public class Main {
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_BASE_FOLDER)
                 .ofType(File.class);
-        // defaults to null such that builder will create a random temporary folder
+        // Defaults to null such that the builder will create a random temporary folder.
     }
 
     private static ArgumentAcceptingOptionSpec<Integer> makeCorePoolSizeSpec(OptionParser optionParser) {
@@ -142,7 +156,7 @@ public class Main {
                 .defaultsTo(LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME);
     }
 
-    private static ArgumentAcceptingOptionSpec<Long> makeProcessTimeOutSpec(OptionParser optionParser) {
+    private static ArgumentAcceptingOptionSpec<Long> makeProcessTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
                         CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
@@ -154,7 +168,7 @@ public class Main {
                 .defaultsTo(LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT);
     }
 
-    private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeOutSpec(OptionParser optionParser) {
+    private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
                         CommandDescription.ARGUMENT_LONG_REQUEST_TIME_OUT,
@@ -178,7 +192,7 @@ public class Main {
         // defaults to null such that all log information is written to the console
     }
 
-    private static NonOptionArgumentSpec<URI> makeServerBaseUriSpec(OptionParser optionParser) {
+    private static NonOptionArgumentSpec<URI> makeBaseUriSpec(OptionParser optionParser) {
         return optionParser.nonOptions(CommandDescription.DESCRIPTION_BASE_URI).ofType(URI.class);
     }
 
@@ -191,18 +205,29 @@ public class Main {
                 .forHelp();
     }
 
-    private static void sayHello(UserConfiguration userConfiguration) {
-        String serverStartupMessage = String.format("%tc: Started server on '%s'", System.currentTimeMillis(),
-                userConfiguration.getServerBaseUri());
+    private static void sayHello(ConverterServerBuilder builder) {
+        String serverStartupMessage = String.format("%tc: Started server on '%s'",
+                System.currentTimeMillis(), builder.getBaseUri());
         LOGGER.info(serverStartupMessage);
+        logServerInfo(builder);
         System.out.println(serverStartupMessage);
     }
 
-    private static void sayGoodbye(UserConfiguration userConfiguration) {
-        String serverShutdownMessage = String.format("%tc: Shutting down server on '%s'", System.currentTimeMillis(),
-                userConfiguration.getServerBaseUri());
+    private static void logServerInfo(ConverterServerBuilder builder) {
+        LOGGER.info(" --------- Server configuration --------- ");
+        LOGGER.info("Listening at: {}", builder.getBaseUri());
+        LOGGER.info("All files are written to: {}", builder.getBaseFolder());
+        LOGGER.info("Worker threads: {} (+{]) - timeout: {} ms", builder.getCorePoolSize(),
+                builder.getMaximumPoolSize(), builder.getKeepAliveTime());
+        LOGGER.info("Process timeout: {}", builder.getProcessTimeout());
+        LOGGER.info("Request timeout: {}", builder.getRequestTimeout());
+        LOGGER.info(" ---------------------------------------- ");
+    }
+
+    private static void sayGoodbye(ConverterServerBuilder builder) {
+        String serverShutdownMessage = String.format("%tc: Shutting down server on '%s'",
+                System.currentTimeMillis(), builder.getBaseUri());
         LOGGER.info(serverShutdownMessage);
         System.out.println(serverShutdownMessage);
     }
-
 }

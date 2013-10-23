@@ -1,8 +1,8 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.job.ConversionStrategy;
-import no.kantega.pdf.mime.MimeType;
 import no.kantega.pdf.ws.AbstractJerseyTest;
+import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

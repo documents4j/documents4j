@@ -1,10 +1,10 @@
-package no.kantega.pdf.job;
+package no.kantega.pdf.ws;
 
-public final class ConverterProtocol {
+public final class WebServiceProtocol {
 
     public static final String JOB_PRIORITY = "Converter-Job-Priority";
 
-    private ConverterProtocol() {
+    private WebServiceProtocol() {
         throw new AssertionError();
     }
 

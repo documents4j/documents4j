@@ -2,6 +2,7 @@ package no.kantega.pdf.job;
 
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.throwables.ShellScriptException;
+import org.mockito.Matchers;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -143,11 +144,11 @@ abstract class AbstractConverterTest {
         assertFalse(pdf.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
-        verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
+        verify(inputStreamSource, times(1)).onConsumed(Matchers.any(InputStream.class));
         verify(inputStream, never()).close();
         inputStream.close();
 
-        verify(inputStreamConsumer, times(1)).onComplete(any(InputStream.class));
+        verify(inputStreamConsumer, times(1)).onComplete(Matchers.any(InputStream.class));
         verifyNoMoreInteractions(inputStreamConsumer);
         verify(outputStream, never()).close();
     }
@@ -168,11 +169,11 @@ abstract class AbstractConverterTest {
         assertFalse(pdf.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
-        verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
+        verify(inputStreamSource, times(1)).onConsumed(Matchers.any(InputStream.class));
         verify(inputStream, never()).close();
         inputStream.close();
 
-        verify(inputStreamConsumer, times(1)).onComplete(any(InputStream.class));
+        verify(inputStreamConsumer, times(1)).onComplete(Matchers.any(InputStream.class));
         verifyNoMoreInteractions(inputStreamConsumer);
         verify(outputStream, never()).close();
     }

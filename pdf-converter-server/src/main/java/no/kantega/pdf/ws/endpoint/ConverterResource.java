@@ -1,8 +1,8 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.api.IConverter;
-import no.kantega.pdf.job.ConverterProtocol;
-import no.kantega.pdf.mime.MimeType;
+import no.kantega.pdf.ws.MimeType;
+import no.kantega.pdf.ws.WebServiceProtocol;
 import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 
 import javax.inject.Inject;
@@ -25,7 +25,7 @@ public class ConverterResource {
     public void convertWordToPdf(
             InputStream upload,
             @Suspended AsyncResponse asyncResponse,
-            @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(ConverterProtocol.JOB_PRIORITY) int priority) {
+            @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(WebServiceProtocol.JOB_PRIORITY) int priority) {
         webConverterConfiguration.getConverter()
                 .convert(upload)
                 .to(new AsynchronousConversionResponse(asyncResponse, webConverterConfiguration.getTimeout()))

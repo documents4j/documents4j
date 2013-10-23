@@ -1,8 +1,9 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.mime.MimeType;
+import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -67,10 +68,13 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
 
     @Override
     public String toString() {
-        return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
-                "web-target=%s,timeout=%d]",
-                getClass().getSimpleName(),
-                getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), webTarget.getUri(), networkRequestTimeout);
+        return Objects.toStringHelper("RemoteConversion")
+                .add("pending", !(getPendingCondition().getCount() == 0L))
+                .add("cancelled", isCancelled())
+                .add("done", isDone())
+                .add("priority", getPriority())
+                .add("web-target", webTarget.getUri())
+                .add("request-timeout", networkRequestTimeout)
+                .toString();
     }
 }

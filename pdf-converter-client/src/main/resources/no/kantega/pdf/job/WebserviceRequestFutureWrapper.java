@@ -6,13 +6,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-class JerseyClientFutureWrapper implements Future<Boolean> {
+class WebserviceRequestFutureWrapper implements Future<Boolean> {
 
     private static final int STATUS_CODE_OK = Response.Status.OK.getStatusCode();
 
     private final Future<Response> jerseyResponse;
 
-    public JerseyClientFutureWrapper(Future<Response> jerseyResponse) {
+    public WebserviceRequestFutureWrapper(Future<Response> jerseyResponse) {
         this.jerseyResponse = jerseyResponse;
     }
 

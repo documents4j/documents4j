@@ -1,5 +1,6 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.conversion.ConversionManager;
@@ -55,10 +56,12 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
 
     @Override
     public String toString() {
-        return String.format("%s[pending=%b,cancelled=%b,done=%b,priority=%s," +
-                "source=%s,target=%s]",
-                getClass().getSimpleName(),
-                getPendingCondition().getCount() == 1L, isCancelled(), isDone(),
-                getPriority(), source, target.getAbsolutePath());
+        return Objects.toStringHelper("LocalConversion")
+                .add("pending", !(getPendingCondition().getCount() == 0L))
+                .add("cancelled", isCancelled())
+                .add("done", isDone())
+                .add("priority", getPriority())
+                .add("file-system-target", target)
+                .toString();
     }
 }

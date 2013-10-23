@@ -1,8 +1,8 @@
 package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.io.ByteStreams;
-import no.kantega.pdf.mime.MimeType;
 import no.kantega.pdf.ws.AbstractJerseyTest;
+import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;

@@ -1,10 +1,13 @@
 package no.kantega.pdf.job;
 
+import com.google.common.primitives.Ints;
 import no.kantega.pdf.adapter.ConversionJobAdapter;
 import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
+import no.kantega.pdf.ws.WebServiceProtocol;
+import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,17 +15,16 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import java.io.File;
 import java.net.URI;
-import java.util.UUID;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
-
-    private static final String TEMP_FILE_PREFIX = "temp";
 
     public static final class Builder extends AbstractConverterBuilder<Builder> {
 
@@ -46,7 +48,7 @@ public class RemoteConverter extends ConverterAdapter {
         }
 
         public Builder requestTimeout(long timeout, TimeUnit unit) {
-            assertNumericArgument(timeout, true);
+            assertNumericArgument(timeout, true, Integer.MAX_VALUE);
             this.requestTimeout = unit.toMillis(timeout);
             return this;
         }
@@ -79,28 +81,30 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-    private final long requestTimeout;
     private final WebTarget webTarget;
 
     private final ExecutorService executorService;
-
-    private final File tempFileFolder;
-    private final AtomicLong uniqueNameMaker;
 
     private final Thread shutdownHook;
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime) {
-        this.webTarget = ClientBuilder.newClient().target(baseUri);
-        this.tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
-        tempFileFolder.mkdir();
-        this.requestTimeout = requestTimeout;
-        this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
-                TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
-        this.uniqueNameMaker = new AtomicLong(1L);
-        this.shutdownHook = new ConverterShutdownHook();
-        registerShutdownHook();
-        LOGGER.info("Remote To-PDF converter has started successfully ({})", baseUri);
+        super(baseFolder);
+        this.webTarget = makeWebTarget(baseUri, requestTimeout);
+        try {
+            this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        } finally {
+            this.shutdownHook = new ConverterShutdownHook();
+            registerShutdownHook();
+        }
+        LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
+    }
+
+    private static WebTarget makeWebTarget(URI baseUri, long requestTimeout) {
+        ClientBuilder clientBuilder = ClientBuilder.newBuilder();
+        clientBuilder.getConfiguration().getProperties()
+                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
+        return clientBuilder.build().target(baseUri).path(WebServiceProtocol.RESOURCE_PATH);
     }
 
     private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -136,8 +140,7 @@ public class RemoteConverter extends ConverterAdapter {
 
         @Override
         public Future<Boolean> schedule() {
-            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(
-                    webTarget, source, callback, priority, requestTimeout);
+            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(webTarget, source, callback, priority);
             // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
             // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
             executorService.execute(job);
@@ -163,27 +166,21 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     @Override
-    protected File makeTemporaryFile(String suffix) {
-        return new File(tempFileFolder, String.format("%s%d%s",
-                TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
-    }
-
-    @Override
     public void shutDown() {
         try {
             executorService.shutdown();
         } finally {
-            tempFileFolder.delete();
+            getTempFileFolder().delete();
             deregisterShutdownHook();
         }
-        LOGGER.info("Remote To-PDF converter has shut down successfully ({})", webTarget.getUri());
+        LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", webTarget.getUri());
     }
 
     private void registerShutdownHook() {
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
         } catch (IllegalStateException e) {
-            LOGGER.warn("Tried to register shut down hook in shut down period", e);
+            LOGGER.info("Tried to register shut down hook in shut down period", e);
         }
     }
 
@@ -191,7 +188,7 @@ public class RemoteConverter extends ConverterAdapter {
         try {
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
         } catch (IllegalStateException e) {
-            LOGGER.warn("Tried to deregister shut down hook in shut down period", e);
+            LOGGER.info("Tried to deregister shut down hook in shut down period", e);
         }
     }
 }

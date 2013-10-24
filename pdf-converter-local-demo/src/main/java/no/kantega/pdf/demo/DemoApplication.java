@@ -32,7 +32,7 @@ public class DemoApplication extends WebApplication {
         uploadFolder = Files.createTempDir();
         baseFolder = Files.createTempDir();
 
-        nameSequence = new AtomicInteger();
+        nameSequence = new AtomicInteger(1);
 
         converter = LocalConverter.builder()
                 .baseFolder(baseFolder)

@@ -7,10 +7,27 @@ import no.kantega.pdf.api.IInputStreamSource;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class ConverterAdapter implements IConverter {
 
     private static final String NO_EXTENSION = "";
+    private static final String TEMP_FILE_PREFIX = "temp";
+
+    private final File tempFileFolder;
+    private final AtomicLong uniqueNameMaker;
+
+    protected ConverterAdapter(File tempFileFolder) {
+        this.tempFileFolder = makeTemporaryFolder(tempFileFolder);
+        this.uniqueNameMaker = new AtomicLong(1L);
+    }
 
     @Override
     public IConversionJobWithSourceSpecified convert(File source) {
@@ -47,5 +64,23 @@ public abstract class ConverterAdapter implements IConverter {
         return makeTemporaryFile(NO_EXTENSION);
     }
 
-    protected abstract File makeTemporaryFile(String suffix);
+    public File getTempFileFolder() {
+        return tempFileFolder;
+    }
+
+    protected File makeTemporaryFile(String suffix) {
+        return new File(tempFileFolder, String.format("%s%d%s",
+                TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
+    }
+
+    protected static ExecutorService makeExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime) {
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
+                keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
+    }
+
+    private static File makeTemporaryFolder(File baseFolder) {
+        File tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
+        checkState(tempFileFolder.mkdir(), String.format("Cannot create folder: %s", tempFileFolder));
+        return tempFileFolder;
+    }
 }

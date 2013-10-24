@@ -8,36 +8,34 @@ import java.util.concurrent.TimeoutException;
 
 class WebserviceRequestFutureWrapper implements Future<Boolean> {
 
-    private static final int STATUS_CODE_OK = Response.Status.OK.getStatusCode();
+    private final Future<Response> futureResponse;
 
-    private final Future<Response> jerseyResponse;
-
-    public WebserviceRequestFutureWrapper(Future<Response> jerseyResponse) {
-        this.jerseyResponse = jerseyResponse;
+    public WebserviceRequestFutureWrapper(Future<Response> futureResponse) {
+        this.futureResponse = futureResponse;
     }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return jerseyResponse.cancel(mayInterruptIfRunning);
+        return futureResponse.cancel(mayInterruptIfRunning);
     }
 
     @Override
     public boolean isCancelled() {
-        return jerseyResponse.isCancelled();
+        return futureResponse.isCancelled();
     }
 
     @Override
     public boolean isDone() {
-        return jerseyResponse.isDone();
+        return futureResponse.isDone();
     }
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        return jerseyResponse.get().getStatus() == STATUS_CODE_OK;
+        return futureResponse.get().getStatus() == RemoteConverterResult.OK.getStatus().getStatusCode();
     }
 
     @Override
     public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return jerseyResponse.get(timeout, unit).getStatus() == STATUS_CODE_OK;
+        return futureResponse.get(timeout, unit).getStatus() == RemoteConverterResult.OK.getStatus().getStatusCode();
     }
 }

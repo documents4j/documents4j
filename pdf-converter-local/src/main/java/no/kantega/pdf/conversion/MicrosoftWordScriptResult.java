@@ -3,6 +3,8 @@ package no.kantega.pdf.conversion;
 import com.google.common.base.Objects;
 import no.kantega.pdf.throwables.TransformationNativeException;
 
+import java.util.EnumSet;
+
 enum MicrosoftWordScriptResult {
 
     CONVERSION_SUCCESSFUL(2, null),
@@ -12,7 +14,7 @@ enum MicrosoftWordScriptResult {
     INPUT_NOT_FOUND(-4, TransformationNativeException.Reason.INPUT_NOT_FOUND),
     ILLEGAL_CALL(-5, TransformationNativeException.Reason.ILLEGAL_CALL),
     CONVERTER_INACCESSIBLE(-6, TransformationNativeException.Reason.CONVERTER_INACCESSIBLE),
-    UNKNOWN(null, TransformationNativeException.Reason.UNKNOWN);
+    UNKNOWN(null, TransformationNativeException.Reason.OTHER);
 
     public static MicrosoftWordScriptResult from(int exitCode) {
         for (MicrosoftWordScriptResult shellResult : MicrosoftWordScriptResult.values()) {

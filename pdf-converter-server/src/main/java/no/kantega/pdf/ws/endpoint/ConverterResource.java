@@ -11,10 +11,8 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import java.io.InputStream;
 
-@Path(ConverterResource.CONVERTER_RESOURCE_PATH)
+@Path(WebServiceProtocol.RESOURCE_PATH)
 public class ConverterResource {
-
-    public static final String CONVERTER_RESOURCE_PATH = "/";
 
     @Inject
     private IWebConverterConfiguration webConverterConfiguration;

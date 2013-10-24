@@ -9,20 +9,13 @@ import no.kantega.pdf.api.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.mockito.Mockito.mock;
 
 public class PseudoConverter extends ConverterAdapter {
 
-    private static final String TEMP_FILE_NAME_PREFIX = "temp";
-
-    private final File folder;
-    private final AtomicInteger nameGenerator;
-
     public PseudoConverter() {
-        this.folder = Files.createTempDir();
-        this.nameGenerator = new AtomicInteger(0);
+        super(Files.createTempDir());
     }
 
     private class PseudoConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -87,12 +80,7 @@ public class PseudoConverter extends ConverterAdapter {
     }
 
     @Override
-    protected File makeTemporaryFile(String suffix) {
-        return new File(folder, String.format("%s%d%s", TEMP_FILE_NAME_PREFIX, nameGenerator.incrementAndGet(), suffix));
-    }
-
-    @Override
     public void shutDown() {
-        folder.delete();
+        new File(getTempFileFolder().getParent()).delete();
     }
 }

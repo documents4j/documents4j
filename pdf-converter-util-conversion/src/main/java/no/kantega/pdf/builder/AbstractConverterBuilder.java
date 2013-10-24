@@ -42,6 +42,10 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     }
 
     protected static void assertNumericArgument(long number, boolean zeroAllowed) {
+        assertNumericArgument(number, zeroAllowed, Long.MAX_VALUE);
+    }
+
+    protected static void assertNumericArgument(long number, boolean zeroAllowed, long maximum) {
         checkArgument((zeroAllowed && number == 0L) || number > 0L);
     }
 

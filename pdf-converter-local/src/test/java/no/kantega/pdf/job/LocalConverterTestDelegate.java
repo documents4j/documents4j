@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import no.kantega.pdf.AbstractWordBasedTest;
 import no.kantega.pdf.api.IConverter;
 
-class LocalConverterTestAdapter extends AbstractWordBasedTest implements IConverterTestDelegate {
+class LocalConverterTestDelegate extends AbstractWordBasedTest implements IConverterTestDelegate {
 
     private IConverter converter;
 

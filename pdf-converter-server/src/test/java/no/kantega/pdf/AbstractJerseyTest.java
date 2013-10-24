@@ -1,4 +1,4 @@
-package no.kantega.pdf.ws;
+package no.kantega.pdf;
 
 import no.kantega.pdf.ws.application.WebConverterTestBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -18,13 +18,13 @@ public abstract class AbstractJerseyTest extends JerseyTest {
     }
 
     @Override
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDown() throws Exception {
         super.tearDown();
     }

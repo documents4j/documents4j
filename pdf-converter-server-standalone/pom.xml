@@ -45,13 +45,6 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-util-ws-test</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>

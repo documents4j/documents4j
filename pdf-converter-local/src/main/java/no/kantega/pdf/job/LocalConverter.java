@@ -10,15 +10,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class LocalConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
-
-    private static final String TEMP_FILE_PREFIX = "temp";
 
     public static final class Builder extends AbstractConverterBuilder<Builder> {
 
@@ -59,23 +59,17 @@ public class LocalConverter extends ConverterAdapter {
 
     private final ExecutorService executorService;
 
-    private final File tempFileFolder;
-    private final AtomicLong uniqueNameMaker;
-
     private final Thread shutdownHook;
 
     protected LocalConverter(File baseFolder,
                              int corePoolSize, int maximumPoolSize, long keepAliveTime,
                              long processTimeout, TimeUnit processTimeoutUnit) {
-        tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
-        tempFileFolder.mkdir();
+        super(baseFolder);
         try {
             this.conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-            this.executorService = new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
-                    keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
-            this.uniqueNameMaker = new AtomicLong(1L);
-            this.shutdownHook = new ConverterShutdownHook();
+            this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         } finally {
+            this.shutdownHook = new ConverterShutdownHook();
             registerShutdownHook();
         }
         LOGGER.info("Local To-PDF converter has started successfully");
@@ -143,18 +137,12 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     @Override
-    protected File makeTemporaryFile(String suffix) {
-        return new File(tempFileFolder, String.format("%s%d%s",
-                TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
-    }
-
-    @Override
     public void shutDown() {
         try {
             conversionManager.shutDown();
             executorService.shutdownNow();
         } finally {
-            tempFileFolder.delete();
+            getTempFileFolder().delete();
             deregisterShutdownHook();
         }
         LOGGER.info("Local To-PDF converter has shut down successfully");
@@ -164,7 +152,7 @@ public class LocalConverter extends ConverterAdapter {
         try {
             Runtime.getRuntime().addShutdownHook(shutdownHook);
         } catch (IllegalStateException e) {
-            LOGGER.warn("Tried to register shut down hook in shut down period");
+            LOGGER.info("Tried to register shut down hook in shut down period");
             shutDown();
         }
     }
@@ -173,7 +161,7 @@ public class LocalConverter extends ConverterAdapter {
         try {
             Runtime.getRuntime().removeShutdownHook(shutdownHook);
         } catch (IllegalStateException e) {
-            LOGGER.warn("Tried to deregister shut down hook in shut down period");
+            LOGGER.info("Tried to deregister shut down hook in shut down period");
         }
     }
 }

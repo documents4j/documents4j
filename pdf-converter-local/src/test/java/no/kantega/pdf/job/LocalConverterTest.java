@@ -7,10 +7,10 @@ import org.testng.annotations.Test;
 @Test(singleThreaded = true)
 public class LocalConverterTest extends AbstractConverterTest {
 
-    private final LocalConverterTestAdapter converterTestAdapter;
+    private final LocalConverterTestDelegate converterTestAdapter;
 
     public LocalConverterTest() {
-        this.converterTestAdapter = new LocalConverterTestAdapter();
+        this.converterTestAdapter = new LocalConverterTestDelegate();
     }
 
     @Override

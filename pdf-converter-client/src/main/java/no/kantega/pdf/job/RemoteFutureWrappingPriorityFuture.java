@@ -3,7 +3,6 @@ package no.kantega.pdf.job;
 import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
-import no.kantega.pdf.throwables.ConverterException;
 import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.client.Entity;
@@ -15,7 +14,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture<InputStream, RemoteConversionContext> {
 
     private final WebTarget webTarget;
-    private final long networkRequestTimeout; // TODO: Add a scheduler that cancels a network request after the given amount of time.
 
     private final IInputStreamSource source;
     private final IInputStreamConsumer consumer;
@@ -24,12 +22,11 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
 
     RemoteFutureWrappingPriorityFuture(WebTarget webTarget,
                                        IInputStreamSource source, IInputStreamConsumer consumer,
-                                       int priority, long networkRequestTimeout) {
+                                       int priority) {
         super(priority);
         this.webTarget = webTarget;
         this.source = source;
         this.consumer = consumer;
-        this.networkRequestTimeout = networkRequestTimeout;
         this.consumptionMark = new AtomicBoolean(false);
     }
 
@@ -50,21 +47,14 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
         return new RemoteConversionContext(webTarget
                 .request(MimeType.APPLICATION_PDF)
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(source, fetchedSource), MimeType.WORD_DOCX)));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), MimeType.WORD_DOCX)));
     }
 
     @Override
     protected void onConversionFinished(RemoteConversionContext conversionContext) throws Exception {
         Response response = conversionContext.getWebResponse().get();
-        switch (response.getStatus()) {
-            case StatusCode.OK:
-                consumer.onComplete(conversionContext.getWebResponse().get().readEntity(InputStream.class));
-                break;
-            case StatusCode.SERVICE_UNAVAILABLE:
-            case StatusCode.INTERNAL_SERVER_ERROR:
-            default:
-                throw new ConverterException(String.format("Unknown error - conversion returned status code %d", response.getStatus()));
-        }
+        RemoteConverterResult.from(response.getStatus()).escalateIfNot(RemoteConverterResult.OK);
+        consumer.onComplete(response.readEntity(InputStream.class));
     }
 
     @Override
@@ -85,7 +75,6 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
                 .add("done", isDone())
                 .add("priority", getPriority())
                 .add("web-target", webTarget.getUri())
-                .add("request-timeout", networkRequestTimeout)
                 .toString();
     }
 }

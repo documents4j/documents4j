@@ -1,18 +1,16 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.api.IInputStreamSource;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 class ConsumeOnCloseInputStream extends InputStream {
 
     private final InputStream underlyingInputStream;
+    private final AbstractFutureWrappingPriorityFuture<InputStream, ?> underlyingFuture;
 
-    private final IInputStreamSource inputStreamSource;
-
-    public ConsumeOnCloseInputStream(IInputStreamSource inputStreamSource, InputStream underlyingInputStream) {
-        this.inputStreamSource = inputStreamSource;
+    public ConsumeOnCloseInputStream(AbstractFutureWrappingPriorityFuture<InputStream, ?> underlyingFuture,
+                                     InputStream underlyingInputStream) {
+        this.underlyingFuture = underlyingFuture;
         this.underlyingInputStream = underlyingInputStream;
     }
 
@@ -46,7 +44,7 @@ class ConsumeOnCloseInputStream extends InputStream {
         try {
             underlyingInputStream.close();
         } finally {
-            inputStreamSource.onConsumed(underlyingInputStream);
+            underlyingFuture.onSourceConsumed(underlyingInputStream);
         }
     }
 

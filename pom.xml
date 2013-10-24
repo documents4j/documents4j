@@ -38,7 +38,6 @@
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-conversion-test</module>
         <module>pdf-converter-util-ws</module>
-        <module>pdf-converter-util-ws-test</module>
     </modules>
 
     <properties>

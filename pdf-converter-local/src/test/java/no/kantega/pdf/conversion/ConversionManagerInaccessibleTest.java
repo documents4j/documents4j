@@ -1,48 +1,47 @@
 package no.kantega.pdf.conversion;
 
 import com.google.common.io.Files;
-import no.kantega.pdf.TestResource;
-import no.kantega.pdf.throwables.ShellScriptException;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import no.kantega.pdf.throwables.TransformationNativeException;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
-public class ConversionManagerInaccessibleTest {
+@Test(singleThreaded = true)
+public class ConversionManagerInaccessibleTest extends AbstractConversionManagerTest {
 
-    private static final String TARGET_FILE_NAME = "target.pdf";
-
-    private File folder, docx, pdf;
-    private ConversionManager conversionManager;
-
-    @BeforeMethod(alwaysRun = true)
+    @BeforeClass(alwaysRun = true)
+    @Override
     public void setUp() throws Exception {
-        folder = Files.createTempDir();
-        docx = TestResource.DOCX_VALID.materializeIn(folder);
-        assertTrue(docx.exists());
-        pdf = new File(folder, TARGET_FILE_NAME);
-        assertFalse(pdf.exists());
-        conversionManager = new ConversionManager(folder,
-                AbstractExternalConverterTest.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS);
-        conversionManager.shutDown();
+        super.setUp();
     }
 
-    @AfterMethod(alwaysRun = true)
+    @AfterClass(alwaysRun = true)
+    @Override
     public void tearDown() throws Exception {
-        folder.delete();
+        super.tearDown();
     }
 
-    @Test(expectedExceptions = ShellScriptException.class)
+    @Override
+    protected boolean converterRunsOnExit() {
+        return false;
+    }
+
+    @Test(expectedExceptions = TransformationNativeException.class, timeOut = DEFAULT_CONVERSION_TIMEOUT)
     public void testInaccessible() throws Exception {
+        // Start another converter to emulate an external shut down of MS Word.
+        File otherFolder = Files.createTempDir();
+        new MicrosoftWordBridge(otherFolder,
+                AbstractExternalConverterTest.PROCESS_TIMEOUT, TimeUnit.MILLISECONDS).shutDown();
+        getWordAssert().assertWordNotRunning();
+        File pdf = makePdfTarget();
         try {
-            conversionManager.startConversion(docx, pdf).get();
+            getConversionManager().startConversion(validDocx(), pdf).get();
         } catch (ExecutionException e) {
+            assertFalse(pdf.exists());
             throw (Exception) e.getCause();
         }
     }

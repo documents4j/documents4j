@@ -21,4 +21,9 @@ class LocalConverterTestAdapter extends AbstractWordBasedTest implements IConver
     public IConverter getConverter() {
         return converter;
     }
+
+    @Override
+    protected boolean converterRunsOnExit() {
+        return true;
+    }
 }

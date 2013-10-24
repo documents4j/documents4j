@@ -4,13 +4,20 @@ Const WdDoNotSaveChanges = 0
 On Error Resume Next
 Dim wordApplication
 Set wordApplication = GetObject(, "Word.Application")
+
+' If no such instance can be found, MS Word is already shut down.
 If Err <> 0 Then
-  WScript.Quit 1
+  WScript.Quit 3
 End If
-On Error GoTo 0
 
 ' Try to shut down MS Word.
 wordApplication.Quit WdDoNotSaveChanges
 
-' If Word cannot be shut down, exit and signal the error.
-WScript.Quit 1
+' If this was impossible, exit with an error.
+If Err <> 0 Then
+  WScript.Quit -6
+End If
+On Error GoTo 0
+
+' MS Word was shut down successfully.
+WScript.Quit 3

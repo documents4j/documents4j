@@ -8,38 +8,31 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-public abstract class AbstractWordBasedTest {
+public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
 
-    public static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
+    public static final long DEFAULT_CONVERSION_TIMEOUT = 20000L;
 
-    private final AtomicInteger nameGenerator;
+    private AtomicInteger nameGenerator;
 
-    private File temporaryFolder, validDocx, corruptDocx, inexitentDocx;
-
-    private WordAssert wordAssert;
-
-    protected AbstractWordBasedTest() {
-        this.nameGenerator = new AtomicInteger(1);
-    }
+    private File validDocx, corruptDocx, inexitentDocx;
 
     @BeforeClass(alwaysRun = true)
     public void setUp() throws Exception {
-        temporaryFolder = Files.createTempDir();
-        wordAssert = new WordAssert(temporaryFolder);
-
-        wordAssert.assertWordNotRunning();
+        super.setUp();
+        nameGenerator = new AtomicInteger(1);
         startConverter();
-        wordAssert.assertWordRunning();
-
-        validDocx = TestResource.DOCX_VALID.materializeIn(temporaryFolder);
-        corruptDocx = TestResource.DOCX_CORRUPT.materializeIn(temporaryFolder);
-        inexitentDocx = TestResource.DOCX_INEXISTENT.absoluteTo(temporaryFolder);
-        assertTrue(validDocx.exists(), String.format("%s is supposed to exist", validDocx));
-        assertTrue(corruptDocx.exists(), String.format("%s is supposed to exist", corruptDocx));
-        assertFalse(inexitentDocx.exists(), String.format("%s is not supposed to exist", inexitentDocx));
+        getWordAssert().assertWordRunning();
+        validDocx = TestResource.DOCX_VALID.materializeIn(getTemporaryFolder());
+        corruptDocx = TestResource.DOCX_CORRUPT.materializeIn(getTemporaryFolder());
+        inexitentDocx = TestResource.DOCX_INEXISTENT.absoluteTo(getTemporaryFolder());
+        assertTrue(String.format("%s is supposed to exist", validDocx), validDocx.exists());
+        assertTrue(String.format("%s is supposed to exist", corruptDocx), corruptDocx.exists());
+        assertFalse(String.format("%s is not supposed to exist", inexitentDocx), inexitentDocx.exists());
     }
 
     protected abstract void startConverter();
@@ -47,19 +40,21 @@ public abstract class AbstractWordBasedTest {
     @AfterClass(alwaysRun = true)
     public void tearDown() throws Exception {
         try {
-            wordAssert.assertWordRunning();
-            shutDownConverter();
-            wordAssert.assertWordNotRunning();
+            if (converterRunsOnExit()) {
+                try {
+                    getWordAssert().assertWordRunning();
+                } finally {
+                    shutDownConverter();
+                }
+            }
         } finally {
-            temporaryFolder.delete();
+            super.tearDown();
         }
     }
 
     protected abstract void shutDownConverter();
 
-    public File getTemporaryFolder() {
-        return temporaryFolder;
-    }
+    protected abstract boolean converterRunsOnExit();
 
     public File validDocx() throws IOException {
         return makeCopy(validDocx);
@@ -84,14 +79,14 @@ public abstract class AbstractWordBasedTest {
          * will however use a defensive copy.
          */
         assertTrue(file.exists(), String.format("%s is supposed to exist", file));
-        File copy = new File(temporaryFolder, String.format("%s.%d", file.getName(), nameGenerator.getAndIncrement()));
+        File copy = new File(getTemporaryFolder(), String.format("%s.%d", file.getName(), nameGenerator.getAndIncrement()));
         assertFalse(copy.exists(), String.format("%s is not supposed to exist", copy));
         Files.copy(file, copy);
         return copy;
     }
 
     public File makePdfTarget() {
-        File target = new File(temporaryFolder,
+        File target = new File(getTemporaryFolder(),
                 String.format("%s-%d.pdf", validDocx.getName(), nameGenerator.getAndIncrement()));
         assertFalse(target.exists(), String.format("%s is not supposed to exist", target));
         return target;

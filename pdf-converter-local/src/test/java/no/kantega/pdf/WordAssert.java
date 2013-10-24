@@ -1,5 +1,7 @@
 package no.kantega.pdf;
 
+import no.kantega.pdf.util.ExportAid;
+import no.kantega.pdf.util.ShellScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -20,10 +22,11 @@ public final class WordAssert {
     private static final int STATUS_CODE_WORD_RUNNING = 10;
     private static final int STATUS_CODE_WORD_NOT_RUNNING = -10;
 
-    private final File wordAssertScript;
+    private final File wordAssertScript, wordShutdownScript;
 
     public WordAssert(File temporaryFolder) {
         wordAssertScript = TestResource.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
+        wordShutdownScript = ExportAid.materialize(temporaryFolder, ShellScript.WORD_SHUTDOWN_SCRIPT.getScriptName());
     }
 
     public void assertWordRunning() throws Exception {
@@ -40,6 +43,17 @@ public final class WordAssert {
         assertTrue(wordAssertScript.exists());
         return new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordAssertScript.getAbsolutePath())))
+                .redirectErrorAsInfo(LOGGER)
+                .redirectOutputAsInfo(LOGGER)
+                .timeout(1L, TimeUnit.MINUTES)
+                .exitValueAny()
+                .execute()
+                .exitValue();
+    }
+
+    public void killWord() throws Exception {
+        new ProcessExecutor()
+                .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))
                 .redirectErrorAsInfo(LOGGER)
                 .redirectOutputAsInfo(LOGGER)
                 .timeout(1L, TimeUnit.MINUTES)

@@ -1,18 +1,17 @@
 package no.kantega.pdf.job;
 
 import no.kantega.pdf.api.*;
-import no.kantega.pdf.throwables.ShellScriptException;
+import no.kantega.pdf.throwables.TransformationNativeException;
 import org.mockito.Matchers;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.util.concurrent.ExecutionException;
-
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-abstract class AbstractConverterTest {
+public abstract class AbstractConverterTest {
 
     private static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
 
@@ -178,13 +177,13 @@ abstract class AbstractConverterTest {
         verify(outputStream, never()).close();
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testCorruptInputFileExecute() throws Exception {
         File docx = corruptDocx(), pdf = makePdfTarget();
         getConverter().convert(docx).to(pdf).execute();
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testCorruptInputFileFuture() throws Exception {
         File docx = corruptDocx(), pdf = makePdfTarget();
         try {
@@ -194,13 +193,13 @@ abstract class AbstractConverterTest {
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testInexistentInputFileExecute() throws Exception {
         File docx = inexistentDocx(), pdf = makePdfTarget();
         getConverter().convert(docx).to(pdf).execute();
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testInexistentInputFileFuture() throws Exception {
         File docx = inexistentDocx(), pdf = makePdfTarget();
         try {

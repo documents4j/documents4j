@@ -27,11 +27,17 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
         super.tearDown();
     }
 
+    @Override
+    protected boolean converterRunsOnExit() {
+        return true;
+    }
+
     private void testConversionValid(File docx, File pdf) throws Exception {
         assertTrue(docx.exists());
         assertFalse(pdf.exists());
         StartedProcess conversion = getExternalConverter().startConversion(docx, pdf);
-        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL);
+        assertEquals(conversion.future().get().exitValue(),
+                MicrosoftWordScriptResult.CONVERSION_SUCCESSFUL.getExitCode().intValue());
         assertTrue(pdf.exists());
     }
 
@@ -85,7 +91,8 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
     public void testConversionCorrupt() throws Exception {
         File pdf = makePdfTarget();
         StartedProcess conversion = getExternalConverter().startConversion(corruptDocx(), pdf);
-        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_ILLEGAL_INPUT);
+        assertEquals(conversion.future().get().exitValue(),
+                MicrosoftWordScriptResult.ILLEGAL_INPUT.getExitCode().intValue());
         assertFalse(pdf.exists());
     }
 
@@ -94,7 +101,8 @@ public class MicrosoftWordBridgeConversionTest extends AbstractExternalConverter
     public void testConversionInexistent() throws Exception {
         File pdf = makePdfTarget();
         StartedProcess conversion = getExternalConverter().startConversion(inexistentDocx(), pdf);
-        assertEquals(conversion.future().get().exitValue(), ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND);
+        assertEquals(conversion.future().get().exitValue(),
+                MicrosoftWordScriptResult.INPUT_NOT_FOUND.getExitCode().intValue());
         assertFalse(pdf.exists());
     }
 

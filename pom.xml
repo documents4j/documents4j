@@ -18,6 +18,10 @@
       (4) Port 57379 on localhost is available and can be bound.
      On a machine without these requirements, this project must be built without running the supplied unit tests.
 
+     In general, unit tests for the converters are hard to run since MS Word was not built for constant restarting.
+     They might therefore fail even though this application works correctly. In the current release, I also experience
+     that tests will fail if all test cases are run at once. I suspect TestNG to be the reason behind this behavior.
+
      Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
      running this program exits abnormally (for example by a user interrupt causing a TerminateProcess signal), the
      application cannot run any shut down hooks to terminate MS Word. The MS Word process will therefore leak.

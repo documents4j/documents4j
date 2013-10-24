@@ -1,8 +1,7 @@
 package no.kantega.pdf.conversion;
 
 import com.google.common.base.Joiner;
-import no.kantega.pdf.throwables.ShellInteractionException;
-import no.kantega.pdf.throwables.ShellScriptException;
+import no.kantega.pdf.throwables.TransformationInteractionException;
 import no.kantega.pdf.util.ExportAid;
 import no.kantega.pdf.util.ShellScript;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import java.util.concurrent.TimeoutException;
 
 public class MicrosoftWordBridge implements ExternalConverter {
 
-    private static final int WORD_SCRIPT_SUCCESSFUL = 1;
     private static final String WORD_STARTUP_ERROR_MESSAGE = "Could not start external converter";
     private static final String WORD_SHUTDOWN_ERROR_MESSAGE = "Could not shut external converter down";
 
@@ -78,23 +76,24 @@ public class MicrosoftWordBridge implements ExternalConverter {
             // would typically be triggered from a shut down hook. Therefore, the shut down process
             // should never be killed during JVM shut down. In order to avoid an incomplete start up
             // procedure, start up processes will never be killed either.
-            int exitCode = makePresetProcessExecutor().command("cmd", "/C", quote(script.getAbsolutePath()))
+            int exitCode = makePresetProcessExecutor()
+                    .command("cmd", "/C", quote(script.getAbsolutePath()))
                     .execute().exitValue();
-            if (exitCode != WORD_SCRIPT_SUCCESSFUL) {
-                throw new ShellScriptException(errorMessage, exitCode);
-            }
+            MicrosoftWordScriptResult
+                    .from(exitCode)
+                    .escalateIfNot(MicrosoftWordScriptResult.CONVERTER_INTERACTION_SUCCESSFUL);
         } catch (IOException e) {
             String message = String.format("Unable to run script for starting MS Word: %s", script);
             LOGGER.error(message, e);
-            throw new ShellInteractionException(message, e, script);
+            throw new TransformationInteractionException(message, e);
         } catch (InterruptedException e) {
             String message = String.format("Thread responsible for monitoring MS Word startup was interrupted: %s", script);
             LOGGER.error(message, e);
-            throw new ShellInteractionException(message, e, script);
+            throw new TransformationInteractionException(message, e);
         } catch (TimeoutException e) {
             String message = String.format("Thread responsible for monitoring MS Word startup timed out: %s", script);
             LOGGER.error(message, e);
-            throw new ShellInteractionException(message, e, script);
+            throw new TransformationInteractionException(message, e);
         } finally {
             script.delete();
         }
@@ -111,7 +110,7 @@ public class MicrosoftWordBridge implements ExternalConverter {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' to '%s' ",
                     conversionScript, source, target);
             LOGGER.error(message, e);
-            throw new ShellInteractionException(message, e, conversionScript);
+            throw new TransformationInteractionException(message, e);
         }
     }
 

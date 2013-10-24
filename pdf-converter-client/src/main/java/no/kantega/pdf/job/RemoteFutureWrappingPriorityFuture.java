@@ -3,10 +3,12 @@ package no.kantega.pdf.job;
 import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
+import no.kantega.pdf.throwables.ConverterException;
 import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -53,7 +55,16 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
 
     @Override
     protected void onConversionFinished(RemoteConversionContext conversionContext) throws Exception {
-        consumer.onComplete(conversionContext.getWebResponse().get().readEntity(InputStream.class));
+        Response response = conversionContext.getWebResponse().get();
+        switch (response.getStatus()) {
+            case StatusCode.OK:
+                consumer.onComplete(conversionContext.getWebResponse().get().readEntity(InputStream.class));
+                break;
+            case StatusCode.SERVICE_UNAVAILABLE:
+            case StatusCode.INTERNAL_SERVER_ERROR:
+            default:
+                throw new ConverterException(String.format("Unknown error - conversion returned status code %d", response.getStatus()));
+        }
     }
 
     @Override

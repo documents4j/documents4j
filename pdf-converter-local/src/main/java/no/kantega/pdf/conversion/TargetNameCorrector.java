@@ -27,6 +27,6 @@ class TargetNameCorrector extends ProcessListener {
     }
 
     private boolean conversionSuccessful(Process process) {
-        return process.exitValue() == ExternalConverter.STATUS_CODE_CONVERSION_SUCCESSFUL;
+        return process.exitValue() == MicrosoftWordScriptResult.CONVERSION_SUCCESSFUL.getExitCode();
     }
 }

@@ -58,7 +58,7 @@ Function DocToPdf( docInputFile, pdfOutputFile )
     wordDocument.Close WdDoNotSaveChanges
 
     ' Signal that the conversion was successful.
-    WScript.Quit 1
+    WScript.Quit 2
 
   Else
 

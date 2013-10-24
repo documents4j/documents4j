@@ -1,6 +1,6 @@
 package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.throwables.ShellScriptException;
+import no.kantega.pdf.throwables.TransformationNativeException;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -14,16 +14,21 @@ import static org.testng.Assert.*;
 @Test(singleThreaded = true)
 public class ConversionManagerTest extends AbstractConversionManagerTest {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     @Override
     public void setUp() throws Exception {
         super.setUp();
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     @Override
     public void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    @Override
+    protected boolean converterRunsOnExit() {
+        return true;
     }
 
     @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT)
@@ -33,33 +38,33 @@ public class ConversionManagerTest extends AbstractConversionManagerTest {
         assertTrue(pdf.exists());
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testConversionCorrupt() throws Exception {
         File pdf = makePdfTarget();
         try {
             getConversionManager().startConversion(corruptDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertFalse(pdf.exists());
-            ShellScriptException exception = (ShellScriptException) e.getCause();
-            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_ILLEGAL_INPUT);
+            TransformationNativeException exception = (TransformationNativeException) e.getCause();
+            assertEquals(exception.getReason(), TransformationNativeException.Reason.ILLEGAL_INPUT);
             throw exception;
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testConversionInexistent() throws Exception {
         File pdf = makePdfTarget();
         try {
             getConversionManager().startConversion(inexistentDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertFalse(pdf.exists());
-            ShellScriptException exception = (ShellScriptException) e.getCause();
-            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_INPUT_NOT_FOUND);
+            TransformationNativeException exception = (TransformationNativeException) e.getCause();
+            assertEquals(exception.getReason(), TransformationNativeException.Reason.INPUT_NOT_FOUND);
             throw exception;
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testConversionTargetInvalid() throws Exception {
         File pdf = makePdfTarget();
         assertTrue(pdf.mkdir());
@@ -67,13 +72,13 @@ public class ConversionManagerTest extends AbstractConversionManagerTest {
             getConversionManager().startConversion(validDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertFalse(pdf.isFile());
-            ShellScriptException exception = (ShellScriptException) e.getCause();
-            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_TARGET_INACCESSIBLE);
+            TransformationNativeException exception = (TransformationNativeException) e.getCause();
+            assertEquals(exception.getReason(), TransformationNativeException.Reason.TARGET_INACCESSIBLE);
             throw exception;
         }
     }
 
-    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = ShellScriptException.class)
+    @Test(timeOut = DEFAULT_CONVERSION_TIMEOUT, expectedExceptions = TransformationNativeException.class)
     public void testConversionTargetInaccessible() throws Exception {
         File pdf = makePdfTarget();
         assertTrue(pdf.createNewFile());
@@ -83,8 +88,8 @@ public class ConversionManagerTest extends AbstractConversionManagerTest {
             getConversionManager().startConversion(validDocx(), pdf).get();
         } catch (ExecutionException e) {
             assertTrue(pdf.isFile());
-            ShellScriptException exception = (ShellScriptException) e.getCause();
-            assertEquals(exception.getExitCode(), ExternalConverter.STATUS_CODE_TARGET_INACCESSIBLE);
+            TransformationNativeException exception = (TransformationNativeException) e.getCause();
+            assertEquals(exception.getReason(), TransformationNativeException.Reason.TARGET_INACCESSIBLE);
             throw exception;
         } finally {
             outputStream.close();

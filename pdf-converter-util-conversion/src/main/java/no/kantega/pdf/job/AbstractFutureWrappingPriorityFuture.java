@@ -102,18 +102,25 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             if (isCancelled()) {
                 return;
             }
+            Future<Boolean> formerUnderlyingFuture;
             synchronized (futureExchangeLock) {
                 if (isCancelled()) {
                     return;
                 }
                 LOGGER.trace("Conversion caused an error", e);
+                // The underlying future might require external resources and should be canceled.
+                formerUnderlyingFuture = underlyingFuture;
                 underlyingFuture = new FailedConversionFuture(runtimeException);
             }
             // If the conversion concluded without success, signal that the pending lock can be unlocked
             // and invoke the callback on this event. In order to make sure that the lock is always released
             // signal the condition before the callback is called.
             releasePendingState = true;
-            onConversionFailed(runtimeException);
+            try {
+                formerUnderlyingFuture.cancel(true);
+            } finally {
+                onConversionFailed(runtimeException);
+            }
         } finally {
             // Make sure that all threads that are awaiting the conversion to leave its pending state are
             // notified about the change of events. The lock may only be released after all the callbacks

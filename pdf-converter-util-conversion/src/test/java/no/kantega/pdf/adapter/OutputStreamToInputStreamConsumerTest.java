@@ -1,18 +1,17 @@
 package no.kantega.pdf.adapter;
 
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.OngoingStubbing;
-import org.testng.annotations.Test;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
 
-@Test
 public class OutputStreamToInputStreamConsumerTest {
 
     private static final Integer[] PSEUDO_VALUES = {7, 16, 9, 64, 14, 9, 8};
@@ -40,7 +39,7 @@ public class OutputStreamToInputStreamConsumerTest {
 
         ArgumentCaptor<Integer> outputStreamCaptor = ArgumentCaptor.forClass(Integer.class);
         verify(outputStream, times(PSEUDO_VALUES.length)).write(outputStreamCaptor.capture());
-        assertEquals(outputStreamCaptor.getAllValues().toArray(new Integer[PSEUDO_VALUES.length]), PSEUDO_VALUES);
+        assertArrayEquals(PSEUDO_VALUES, outputStreamCaptor.getAllValues().toArray(new Integer[PSEUDO_VALUES.length]));
 
         return outputStream;
     }

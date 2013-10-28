@@ -1,15 +1,14 @@
 package no.kantega.pdf.job;
 
 import com.google.testing.threadtester.ThreadedTestRunner;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-@Test(singleThreaded = true)
 public class StubbedFutureWrappingPriorityFutureTest {
 
     private ThreadedTestRunner threadedTestRunner;
 
-    @BeforeMethod
+    @Before
     public void setUpThreadedTestRunner() throws Exception {
         threadedTestRunner = new ThreadedTestRunner();
     }

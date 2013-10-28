@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -65,6 +67,8 @@ final class PendingConversionFuture implements Future<Boolean> {
 
     @Override
     public String toString() {
-        return String.format("%s[cancelled=%b]", PendingConversionFuture.class.getSimpleName(), cancelled.get());
+        return Objects.toStringHelper(PendingConversionFuture.class)
+                .add("cancelled", cancelled.get())
+                .toString();
     }
 }

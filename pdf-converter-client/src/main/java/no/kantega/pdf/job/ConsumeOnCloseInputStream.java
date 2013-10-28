@@ -41,11 +41,7 @@ class ConsumeOnCloseInputStream extends InputStream {
 
     @Override
     public void close() throws IOException {
-        try {
-            underlyingInputStream.close();
-        } finally {
-            underlyingFuture.onSourceConsumed(underlyingInputStream);
-        }
+        underlyingFuture.onSourceConsumed(underlyingInputStream);
     }
 
     @Override

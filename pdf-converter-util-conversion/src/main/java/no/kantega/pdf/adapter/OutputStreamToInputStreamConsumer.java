@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IInputStreamConsumer;
@@ -33,7 +34,7 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
                 try {
                     Closeables.close(inputStream, true);
                 } catch (IOException e) {
-                    throw new AssertionError("Guava's Closeables#close threw an exception");
+                    throw new AssertionError("Guava's Closeables#close threw an exception that should be suppressed");
                 }
             }
         }
@@ -61,7 +62,9 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
 
     @Override
     public String toString() {
-        return String.format("%s[outputStream=%s,closeMark=%b]",
-                OutputStreamToInputStreamConsumer.class, outputStream, closeMark.get());
+        return Objects.toStringHelper(OutputStreamToInputStreamConsumer.class)
+                .add("outputStream", outputStream)
+                .add("closeMark", closeMark.get())
+                .toString();
     }
 }

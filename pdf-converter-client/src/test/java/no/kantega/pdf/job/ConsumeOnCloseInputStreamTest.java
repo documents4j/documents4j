@@ -1,12 +1,11 @@
 package no.kantega.pdf.job;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.InputStream;
 
 import static org.mockito.Mockito.*;
 
-@Test
 public class ConsumeOnCloseInputStreamTest {
 
     @Test
@@ -18,14 +17,13 @@ public class ConsumeOnCloseInputStreamTest {
         ConsumeOnCloseInputStream consumeOnCloseInputStream = new ConsumeOnCloseInputStream(future, inputStream);
         consumeOnCloseInputStream.close();
 
-        verify(inputStream, times(1)).close();
-        verifyNoMoreInteractions(inputStream);
+        verifyZeroInteractions(inputStream);
         verify(future, times(1)).onSourceConsumed(inputStream);
         verifyNoMoreInteractions(future);
 
         consumeOnCloseInputStream.close();
 
-        verify(inputStream, times(2)).close();
+        verifyZeroInteractions(inputStream);
         verifyNoMoreInteractions(inputStream);
         verify(future, times(2)).onSourceConsumed(inputStream);
         verifyNoMoreInteractions(future);

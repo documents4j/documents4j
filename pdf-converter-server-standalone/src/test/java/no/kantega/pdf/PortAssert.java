@@ -1,25 +1,27 @@
 package no.kantega.pdf;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
-public final class PortAssert {
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    public static final int TEST_PORT = 57379;
+public final class PortAssert {
 
     private static final int VALID_PORT_MINIMUM = 1024, VALID_PORT_MAXIMUM = 65535;
 
     public static void assertPortFree(int port) {
-        assert isAvailable(port) : String.format("Port %d is not available", port);
+        assertTrue(String.format("Port %d is not available", port), isAvailable(port));
     }
 
     public static void assertPortBusy(int port) {
-        assert !isAvailable(port) : String.format("Port %d is available", port);
+        assertFalse(String.format("Port %d is available", port), isAvailable(port));
     }
 
     private static boolean isAvailable(int port) {
-        assert port >= VALID_PORT_MINIMUM && port < VALID_PORT_MAXIMUM
-                : String.format("Invalid start port: %d", port);
+        assertTrue(String.format("Invalid start port: %d", port),
+                port >= VALID_PORT_MINIMUM && port < VALID_PORT_MAXIMUM);
         try {
             Socket socket = new Socket("localhost", port);
             socket.close();
@@ -27,6 +29,13 @@ public final class PortAssert {
         } catch (IOException e) {
             return true;
         }
+    }
+
+    public static int findFreePort() throws IOException {
+        ServerSocket server = new ServerSocket(0);
+        int port = server.getLocalPort();
+        server.close();
+        return port;
     }
 
     private PortAssert() {

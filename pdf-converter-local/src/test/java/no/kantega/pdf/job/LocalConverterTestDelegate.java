@@ -1,29 +1,34 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.AbstractWordBasedTest;
+import com.google.common.io.Files;
 import no.kantega.pdf.api.IConverter;
+import org.junit.Ignore;
 
-class LocalConverterTestDelegate extends AbstractWordBasedTest implements IConverterTestDelegate {
+import java.io.File;
+import java.io.IOException;
 
+// This is not an actual test but a test delegate that is triggered from another test.
+@Ignore
+class LocalConverterTestDelegate implements IConverterTestDelegate {
+
+    private File temporaryFolder;
     private IConverter converter;
 
-    @Override
-    protected void startConverter() {
-        converter = LocalConverter.builder().baseFolder(getTemporaryFolder()).build();
+    protected void setUp() {
+        temporaryFolder = Files.createTempDir();
+        converter = LocalConverter.builder().baseFolder(temporaryFolder).build();
     }
 
-    @Override
-    protected void shutDownConverter() {
-        converter.shutDown();
+    protected void tearDown() {
+        try {
+            converter.shutDown();
+        } finally {
+            temporaryFolder.delete();
+        }
     }
 
     @Override
     public IConverter getConverter() {
         return converter;
-    }
-
-    @Override
-    protected boolean converterRunsOnExit() {
-        return true;
     }
 }

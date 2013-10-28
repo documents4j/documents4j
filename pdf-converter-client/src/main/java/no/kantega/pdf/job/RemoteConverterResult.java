@@ -1,16 +1,17 @@
 package no.kantega.pdf.job;
 
 import com.google.common.base.Objects;
-import no.kantega.pdf.throwables.TransformationNativeException;
+import no.kantega.pdf.throwables.ConverterAccessException;
+import no.kantega.pdf.throwables.ConverterException;
 
 import javax.ws.rs.core.Response;
 
 enum RemoteConverterResult {
 
-    OK(Response.Status.OK, null),
-    SERVICE_UNAVAILABLE(Response.Status.SERVICE_UNAVAILABLE, TransformationNativeException.Reason.OTHER),
-    INTERNAL_SERVER_ERROR(Response.Status.INTERNAL_SERVER_ERROR, TransformationNativeException.Reason.OTHER),
-    UNKNOWN(null, TransformationNativeException.Reason.OTHER);
+    OK(Response.Status.OK, new IllegalStateException("Successful states are not linked to an exception")),
+    SERVICE_UNAVAILABLE(Response.Status.SERVICE_UNAVAILABLE, new ConverterAccessException("The remote converter is not available")),
+    INTERNAL_SERVER_ERROR(Response.Status.INTERNAL_SERVER_ERROR, new ConverterAccessException("The remote converter caused an error")),
+    UNKNOWN(null, new ConverterException("The conversion attempt caused an error"));
 
     public static RemoteConverterResult from(int statusCode) {
         for (RemoteConverterResult remoteResult : RemoteConverterResult.values()) {
@@ -22,26 +23,18 @@ enum RemoteConverterResult {
     }
 
     private final Response.Status status;
-    private final TransformationNativeException.Reason reason;
+    private final RuntimeException exception;
 
-    private RemoteConverterResult(Response.Status status, TransformationNativeException.Reason reason) {
+    private RemoteConverterResult(Response.Status status, RuntimeException exception) {
         this.status = status;
-        this.reason = reason;
+        this.exception = exception;
     }
 
-    public TransformationNativeException.Reason toReason() {
-        if (reason == null) {
-            throw new AssertionError(String.format("%s is not marked as an error state", this));
-        } else {
-            return reason;
-        }
-    }
-
-    public RemoteConverterResult escalateIfNot(RemoteConverterResult other) {
+    public boolean escalateIfNot(RemoteConverterResult other) {
         if (this != other) {
-            throw new TransformationNativeException(toReason());
+            throw exception;
         }
-        return this;
+        return exception instanceof IllegalStateException;
     }
 
     Response.Status getStatus() {

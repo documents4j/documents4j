@@ -1,47 +1,47 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.junit.After;
+import org.junit.Before;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractAdapterTest {
 
-    private static final String SAMPLE_RESOURCE = "/sample.txt";
-    private static final String EXISTENT_FILE_NAME = "source.file", INEXISTENT_FILE_NAME = "target.file";
+    private static final byte[] VALUES = "This is a test value!".getBytes(Charsets.UTF_8);
 
-    private File temporaryFolder, source, target;
+    private File temporaryFolder;
+    private AtomicInteger uniqueNameMaker;
 
-    @BeforeMethod(alwaysRun = true)
+    @Before
     public void setUp() throws Exception {
         temporaryFolder = Files.createTempDir();
-        source = new File(temporaryFolder, EXISTENT_FILE_NAME);
-        ByteStreams.copy(AbstractAdapterTest.class.getResourceAsStream(SAMPLE_RESOURCE),
-                Files.newOutputStreamSupplier(source));
-        assertTrue(source.exists(), String.format("%s does not exist", source));
-        target = new File(temporaryFolder, INEXISTENT_FILE_NAME);
-        assertFalse(target.exists(), String.format("%s exists but should not exist", target));
+        uniqueNameMaker = new AtomicInteger(1);
     }
 
-    @AfterMethod(alwaysRun = true)
+    @After
     public void tearDown() throws Exception {
-        temporaryFolder.delete();
+        assertTrue(temporaryFolder.delete());
     }
 
     protected File getTemporaryFolder() {
         return temporaryFolder;
     }
 
-    protected File getSource() {
-        return source;
-    }
-
-    protected File getTarget() {
-        return target;
+    protected File makeFile(boolean existent) throws Exception {
+        File file = new File(temporaryFolder, String.format("file.%d", uniqueNameMaker.getAndIncrement()));
+        if (existent) {
+            Files.copy(ByteStreams.newInputStreamSupplier(VALUES), file);
+        }
+        assertEquals(existent, file.isFile());
+        return file;
     }
 }

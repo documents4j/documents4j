@@ -102,8 +102,8 @@ public class RemoteConverter extends ConverterAdapter {
 
     private static WebTarget makeWebTarget(URI baseUri, long requestTimeout) {
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
-        clientBuilder.getConfiguration().getProperties()
-                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
+//        clientBuilder.getConfiguration().getProperties()
+//                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
         return clientBuilder.build().target(baseUri).path(WebServiceProtocol.RESOURCE_PATH);
     }
 

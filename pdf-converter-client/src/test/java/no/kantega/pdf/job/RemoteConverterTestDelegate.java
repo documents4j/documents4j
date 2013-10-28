@@ -1,12 +1,16 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.AbstractJerseyTest;
 import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.ws.endpoint.MockWebService;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.junit.Ignore;
 
-import java.io.File;
-import java.io.IOException;
+import javax.ws.rs.core.Application;
 
-public class RemoteConverterTestDelegate extends AbstractJerseyTest implements IConverterTestDelegate {
+// This is just a test delegate which should only be invoked by another test.
+@Ignore
+class RemoteConverterTestDelegate extends JerseyTest implements IConverterTestDelegate {
 
     private IConverter converter;
 
@@ -31,22 +35,7 @@ public class RemoteConverterTestDelegate extends AbstractJerseyTest implements I
     }
 
     @Override
-    public File validDocx() throws IOException {
-        return null;
-    }
-
-    @Override
-    public File makePdfTarget() throws IOException {
-        return null;
-    }
-
-    @Override
-    public File corruptDocx() throws IOException {
-        return null;
-    }
-
-    @Override
-    public File inexistentDocx() throws IOException {
-        return null;
+    protected Application configure() {
+        return new ResourceConfig(MockWebService.class);
     }
 }

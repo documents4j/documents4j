@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
+
 import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -37,5 +39,12 @@ class WebserviceRequestFutureWrapper implements Future<Boolean> {
     @Override
     public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         return futureResponse.get(timeout, unit).getStatus() == RemoteConverterResult.OK.getStatus().getStatusCode();
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(WebserviceRequestFutureWrapper.class)
+                .add("futureResponse", futureResponse)
+                .toString();
     }
 }

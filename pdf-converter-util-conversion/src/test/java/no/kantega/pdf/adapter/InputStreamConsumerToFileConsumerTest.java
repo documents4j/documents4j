@@ -2,17 +2,21 @@ package no.kantega.pdf.adapter;
 
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
+import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.channels.OverlappingFileLockException;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertFalse;
 
-@Test
 public class InputStreamConsumerToFileConsumerTest extends AbstractAdapterTest {
 
     private static class CloseInputStreamAnswer implements Answer<Void> {
@@ -24,43 +28,66 @@ public class InputStreamConsumerToFileConsumerTest extends AbstractAdapterTest {
     }
 
     @Test
-    public void testDelegationComplete() throws Exception {
+    public void testDelegationCompleteValid() throws Exception {
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
         doAnswer(new CloseInputStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
 
+        File source = makeFile(true);
+
         IFileConsumer fileConsumer = new InputStreamConsumerToFileConsumer(inputStreamConsumer);
-        fileConsumer.onComplete(getSource());
+        fileConsumer.onComplete(source);
 
         verify(inputStreamConsumer, times(1)).onComplete(any(InputStream.class));
         verifyNoMoreInteractions(inputStreamConsumer);
 
-        assertFalse(getSource().exists());
+        assertFalse(source.exists());
+    }
+
+    @Test(expected = FileSystemInteractionException.class)
+    public void testDelegationCompleteInexistent() throws Exception {
+        IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
+        doAnswer(new CloseInputStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
+
+        File source = makeFile(false);
+
+        IFileConsumer fileConsumer = new InputStreamConsumerToFileConsumer(inputStreamConsumer);
+
+        try {
+            fileConsumer.onComplete(source);
+        } catch (FileSystemInteractionException e) {
+            verifyZeroInteractions(inputStreamConsumer);
+            throw e;
+        }
     }
 
     @Test
     public void testDelegationCancel() throws Exception {
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
 
+        File source = makeFile(true);
+
         IFileConsumer fileConsumer = new InputStreamConsumerToFileConsumer(inputStreamConsumer);
-        fileConsumer.onCancel(getSource());
+        fileConsumer.onCancel(source);
 
         verify(inputStreamConsumer, times(1)).onCancel();
         verifyNoMoreInteractions(inputStreamConsumer);
 
-        assertFalse(getSource().exists());
+        assertFalse(source.exists());
     }
 
     @Test
     public void testDelegationException() throws Exception {
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
 
+        File source = makeFile(true);
+
         IFileConsumer fileConsumer = new InputStreamConsumerToFileConsumer(inputStreamConsumer);
         Exception exception = new Exception();
-        fileConsumer.onException(getSource(), exception);
+        fileConsumer.onException(source, exception);
 
         verify(inputStreamConsumer, times(1)).onException(exception);
         verifyNoMoreInteractions(inputStreamConsumer);
 
-        assertFalse(getSource().exists());
+        assertFalse(source.exists());
     }
 }

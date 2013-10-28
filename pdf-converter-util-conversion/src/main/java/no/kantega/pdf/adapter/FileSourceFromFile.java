@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileSource;
 
 import java.io.File;
@@ -24,6 +25,8 @@ class FileSourceFromFile implements IFileSource {
 
     @Override
     public String toString() {
-        return String.format("%s[file=%s]", FileSourceFromFile.class.getSimpleName(), file);
+        return Objects.toStringHelper(FileSourceFromFile.class)
+                .add("file", file)
+                .toString();
     }
 }

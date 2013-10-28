@@ -1,10 +1,9 @@
 package no.kantega.pdf.job;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
 
-@Test(singleThreaded = true)
 public class LocalConverterTest extends AbstractConverterTest {
 
     private final LocalConverterTestDelegate converterTestAdapter;
@@ -18,12 +17,12 @@ public class LocalConverterTest extends AbstractConverterTest {
         return converterTestAdapter;
     }
 
-    @BeforeClass(alwaysRun = true)
+    @Before
     public void setUp() throws Exception {
         converterTestAdapter.setUp();
     }
 
-    @AfterClass(alwaysRun = true)
+    @After
     public void tearDown() throws Exception {
         converterTestAdapter.tearDown();
     }

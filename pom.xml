@@ -10,17 +10,18 @@
     <packaging>pom</packaging>
 
     <!--
-     Note: This project can be built on any machine. However, most test cases require:
+     Note: This project can be built on any machine. However, testing the pdf-converter-transformer-office-word
+     module requires the following:
       (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
-      (3) Microsoft Word is not running when the built is started and is neither started manually while the
+      (3) Microsoft Word is not running when the built process is started and is neither started manually while the
           tests are running
-      (4) Port 57379 on localhost is available and can be bound.
+     Furthermore, for running the tests of the pdf-converter-server-standalone, you require:
+      (4) Your machine must have a free port and it must be possible to bind a server to this port
      On a machine without these requirements, this project must be built without running the supplied unit tests.
 
-     In general, unit tests for the converters are hard to run since MS Word was not built for constant restarting.
-     They might therefore fail even though this application works correctly. In the current release, I also experience
-     that tests will fail if all test cases are run at once. I suspect TestNG to be the reason behind this behavior.
+     In general, unit tests for the converters can fail since MS Word was not built for short-interval restarting.
+     They might therefore fail even though this application works correctly.
 
      Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
      running this program exits abnormally (for example by a user interrupt causing a TerminateProcess signal), the
@@ -32,12 +33,14 @@
         <module>pdf-converter-api</module>
         <module>pdf-converter-local</module>
         <module>pdf-converter-local-demo</module>
+        <module>pdf-converter-transformer</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>
         <module>pdf-converter-util-conversion</module>
-        <module>pdf-converter-util-conversion-test</module>
         <module>pdf-converter-util-ws</module>
+        <module>pdf-converter-test</module>
+        <module>pdf-converter-transformer-office</module>
     </modules>
 
     <properties>
@@ -50,13 +53,18 @@
         <version.zt-exec>1.5</version.zt-exec>
         <version.jopt-simple>4.5</version.jopt-simple>
         <version.slf4j>1.7.5</version.slf4j>
-        <version.testng>6.8.5</version.testng>
+        <version.junit>4.11</version.junit>
         <version.mockito>1.9.5</version.mockito>
         <version.thread-weaver>0.1</version.thread-weaver>
+        <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
+        <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
+        <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
+        <version.java.compiler>1.6</version.java.compiler>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- General -->
             <dependency>
                 <groupId>org.glassfish.jersey</groupId>
                 <artifactId>jersey-bom</artifactId>
@@ -89,6 +97,19 @@
                 <version>${version.jopt-simple}</version>
             </dependency>
 
+            <!-- RS-API / Jersey -->
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>${version.java.ws.rs}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.glassfish.jersey.core</groupId>
+                <artifactId>jersey-client</artifactId>
+                <version>${version.jersey}</version>
+            </dependency>
+
             <!-- Testing / Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -103,9 +124,9 @@
             </dependency>
 
             <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <version>${version.testng}</version>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${version.junit}</version>
             </dependency>
 
             <dependency>
@@ -119,19 +140,6 @@
                 <artifactId>threadweaver</artifactId>
                 <version>${version.thread-weaver}</version>
             </dependency>
-
-            <!-- Webservice (Jersey) -->
-            <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>${version.java.ws.rs}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>${version.jersey}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -140,11 +148,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>${version.maven.compiler-plugin}</version>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>${version.java.compiler}</source>
+                    <target>${version.java.compiler}</target>
                 </configuration>
             </plugin>
         </plugins>

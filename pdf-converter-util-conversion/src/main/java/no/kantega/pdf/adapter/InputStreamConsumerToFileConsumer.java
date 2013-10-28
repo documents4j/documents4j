@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
@@ -44,6 +45,8 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
 
     @Override
     public String toString() {
-        return String.format("%s[%s]", InputStreamConsumerToFileConsumer.class.getSimpleName(), inputStreamConsumer);
+        return Objects.toStringHelper(InputStreamConsumerToFileConsumer.class)
+                .add("inputStreamConsumer", inputStreamConsumer)
+                .toString();
     }
 }

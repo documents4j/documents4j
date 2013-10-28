@@ -1,5 +1,7 @@
 package no.kantega.pdf.job;
 
+import com.google.common.base.Objects;
+
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +42,9 @@ final class FailedConversionFuture implements Future<Boolean> {
 
     @Override
     public String toString() {
-        return String.format("%s[exception=%s: %s]", FailedConversionFuture.class.getSimpleName(),
-                exception.getClass().getSimpleName(), exception.getMessage());
+        return Objects.toStringHelper(FailedConversionFuture.class)
+                .add("exception", exception.getClass().getCanonicalName())
+                .add("message", exception.getMessage())
+                .toString();
     }
 }

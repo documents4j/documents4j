@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileSource;
@@ -52,7 +53,9 @@ class FileSourceFromInputStreamSource implements IFileSource {
 
     @Override
     public String toString() {
-        return String.format("%s[inputStreamSource=%s,temporaryFile=%s]",
-                FileSourceFromInputStreamSource.class.getSimpleName(), inputStream, tempStorage);
+        return Objects.toStringHelper(FileSourceFromInputStreamSource.class)
+                .add("inputStreamSource", inputStreamSource)
+                .add("temporaryFile", tempStorage)
+                .toString();
     }
 }

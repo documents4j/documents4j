@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
@@ -10,9 +11,11 @@ import java.io.InputStream;
 class InputStreamSourceFromInputStream implements IInputStreamSource {
 
     private final InputStream inputStream;
+    private final boolean close;
 
-    public InputStreamSourceFromInputStream(InputStream inputStream) {
+    public InputStreamSourceFromInputStream(InputStream inputStream, boolean close) {
         this.inputStream = inputStream;
+        this.close = close;
     }
 
     @Override
@@ -23,7 +26,9 @@ class InputStreamSourceFromInputStream implements IInputStreamSource {
     @Override
     public void onConsumed(InputStream inputStream) {
         try {
-            Closeables.close(inputStream, false);
+            if (close) {
+                Closeables.close(inputStream, false);
+            }
         } catch (IOException e) {
             throw new FileSystemInteractionException("Could not close input stream", e);
         }
@@ -31,6 +36,9 @@ class InputStreamSourceFromInputStream implements IInputStreamSource {
 
     @Override
     public String toString() {
-        return String.format("%s[inputStream=%s]", InputStreamSourceFromInputStream.class.getSimpleName(), inputStream);
+        return Objects.toStringHelper(InputStreamSourceFromInputStream.class)
+                .add("inputStream", inputStream)
+                .add("close", close)
+                .toString();
     }
 }

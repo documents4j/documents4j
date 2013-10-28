@@ -13,6 +13,8 @@ public interface IConverter {
 
     IConversionJobWithSourceSpecified convert(InputStream source);
 
+    IConversionJobWithSourceSpecified convert(InputStream source, boolean close);
+
     IConversionJobWithSourceSpecified convert(IFileSource source);
 
     IConversionJobWithSourceSpecified convert(IInputStreamSource source);

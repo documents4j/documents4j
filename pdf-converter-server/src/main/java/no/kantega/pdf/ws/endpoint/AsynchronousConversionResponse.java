@@ -1,11 +1,14 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.api.IInputStreamConsumer;
+import no.kantega.pdf.ws.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.TimeoutHandler;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
@@ -33,7 +36,8 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
-            asyncResponse.resume(inputStream);
+
+            asyncResponse.resume(Response.ok(inputStream, MimeType.APPLICATION_PDF).build());
         }
     }
 
@@ -52,7 +56,6 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
 
     @Override
     public void onException(Exception e) {
-        LOGGER.info("Error when converting uploaded input from {}", asyncResponse, e);
         if (asyncResponse.isDone()) {
             return;
         }
@@ -66,7 +69,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
 
     @Override
     public void handleTimeout(AsyncResponse asyncResponse) {
-        LOGGER.warn("Conversion request from {} timed out", asyncResponse);
+        LOGGER.warn("Conversion request timed out");
         onCancel();
     }
 }

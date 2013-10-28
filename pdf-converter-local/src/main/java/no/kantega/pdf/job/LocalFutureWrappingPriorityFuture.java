@@ -3,7 +3,7 @@ package no.kantega.pdf.job;
 import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IFileSource;
-import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.transformation.ConversionManager;
 
 import java.io.File;
 

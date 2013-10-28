@@ -2,12 +2,14 @@ package no.kantega.pdf.adapter;
 
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
 
 public class FileConsumerToInputStreamConsumerTest extends AbstractAdapterTest {
 
@@ -15,43 +17,48 @@ public class FileConsumerToInputStreamConsumerTest extends AbstractAdapterTest {
     public void testDelegationComplete() throws Exception {
         IFileConsumer fileConsumer = mock(IFileConsumer.class);
 
-        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(getTarget(), fileConsumer);
-        inputStreamConsumer.onComplete(new FileInputStream(getSource()));
+        File source = makeFile(true), target = makeFile(false);
 
-        verify(fileConsumer, times(1)).onComplete(getTarget());
+        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(target, fileConsumer);
+        InputStream inputStream = new FileInputStream(source);
+        inputStreamConsumer.onComplete(inputStream);
+
+        verify(fileConsumer, times(1)).onComplete(target);
         verifyNoMoreInteractions(fileConsumer);
 
-        assertEquals(getSource().length(), getTarget().length());
-        assertTrue(getTarget().exists());
-        assertTrue(getSource().delete());
+        assertEquals(source.length(), target.length());
+        assertTrue(target.delete());
+        assertTrue(source.delete());
     }
 
     @Test
     public void testDelegationCancel() throws Exception {
         IFileConsumer fileConsumer = mock(IFileConsumer.class);
 
-        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(getTarget(), fileConsumer);
+        File target = makeFile(false);
+
+        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(target, fileConsumer);
         inputStreamConsumer.onCancel();
 
-        verify(fileConsumer, times(1)).onCancel(getTarget());
+        verify(fileConsumer, times(1)).onCancel(target);
         verifyNoMoreInteractions(fileConsumer);
 
-        assertFalse(getTarget().exists());
-        assertTrue(getSource().delete());
+        assertFalse(target.exists());
     }
 
     @Test
     public void testDelegationException() throws Exception {
         IFileConsumer fileConsumer = mock(IFileConsumer.class);
 
-        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(getTarget(), fileConsumer);
+        File target = makeFile(false);
+
+        IInputStreamConsumer inputStreamConsumer = new FileConsumerToInputStreamConsumer(target, fileConsumer);
         Exception exception = new Exception();
         inputStreamConsumer.onException(exception);
 
-        verify(fileConsumer, times(1)).onException(getTarget(), exception);
+        verify(fileConsumer, times(1)).onException(target, exception);
         verifyNoMoreInteractions(fileConsumer);
 
-        assertFalse(getTarget().exists());
-        assertTrue(getSource().delete());
+        assertFalse(target.exists());
     }
 }

@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileConsumer;
@@ -51,7 +52,9 @@ class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
 
     @Override
     public String toString() {
-        return String.format("%s[file=%s,consumer=%s]",
-                FileConsumerToInputStreamConsumer.class.getSimpleName(), file, fileConsumer);
+        return Objects.toStringHelper(FileConsumerToInputStreamConsumer.class)
+                .add("file", file)
+                .add("fileConsumer", fileConsumer)
+                .toString();
     }
 }

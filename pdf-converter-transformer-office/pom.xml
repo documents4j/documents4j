@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>pdf-converter-parent</artifactId>
+        <groupId>no.kantega</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>pdf-converter-transformer-office</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>pdf-converter-transformer-office-word</module>
+    </modules>
+
+    <properties>
+        <office.skip.tests>false</office.skip.tests>
+    </properties>
+
+    <dependencies>
+        <!-- Local dependencies -->
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-transformer</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>no-office</id>
+            <properties>
+                <office.skip.tests>true</office.skip.tests>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.maven.surefire-plugin}</version>
+                <configuration>
+                    <skipTests>${office.skip.tests}</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

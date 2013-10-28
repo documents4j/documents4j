@@ -5,7 +5,7 @@ import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
-import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.transformation.ConversionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class LocalConverter extends ConverterAdapter {
 
@@ -56,9 +55,7 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     private final ConversionManager conversionManager;
-
     private final ExecutorService executorService;
-
     private final Thread shutdownHook;
 
     protected LocalConverter(File baseFolder,

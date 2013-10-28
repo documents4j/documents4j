@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileConsumer;
 
 import java.io.File;
@@ -33,6 +34,8 @@ class NoopFileConsumer implements IFileConsumer {
 
     @Override
     public String toString() {
-        return NoopFileConsumer.class.getSimpleName();
+        return Objects.toStringHelper(NoopFileConsumer.class)
+                .addValue("<singleton>")
+                .toString();
     }
 }

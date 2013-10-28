@@ -4,33 +4,55 @@ import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
-import org.testng.annotations.Test;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
+import org.junit.Test;
 
+import java.io.File;
 import java.io.InputStream;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
-@Test
 public class InputStreamFromFileSourceTest extends AbstractAdapterTest {
 
     @Test
-    public void testDelegation() throws Exception {
+    public void testDelegationValid() throws Exception {
+        File source = makeFile(true), target = makeFile(false);
+
         IFileSource fileSource = mock(IFileSource.class);
-        when(fileSource.getFile()).thenReturn(getSource());
+        when(fileSource.getFile()).thenReturn(source);
 
         IInputStreamSource translator = new InputStreamSourceFromFileSource(fileSource);
         InputStream inputStream = translator.getInputStream();
-        ByteStreams.copy(inputStream, Files.newOutputStreamSupplier(getTarget()));
+        ByteStreams.copy(inputStream, Files.newOutputStreamSupplier(target));
         translator.onConsumed(inputStream);
 
-        assertTrue(getTarget().exists());
-        assertEquals(getSource().length(), getTarget().length());
-        assertTrue(getSource().delete(), "Could not delete source after it was explicitly released");
+        assertTrue(target.isFile());
+        assertEquals(source.length(), target.length());
+        assertTrue("Could not delete source after it was explicitly released", source.delete());
 
         verify(fileSource, times(1)).getFile();
-        verify(fileSource, times(1)).onConsumed(getSource());
+        verify(fileSource, times(1)).onConsumed(source);
         verifyNoMoreInteractions(fileSource);
+
+        assertTrue(target.delete());
+    }
+
+    @Test(expected = FileSystemInteractionException.class)
+    public void testDelegationInexistent() throws Exception {
+        File source = makeFile(false), target = makeFile(false);
+
+        IFileSource fileSource = mock(IFileSource.class);
+        when(fileSource.getFile()).thenReturn(source);
+
+        IInputStreamSource translator = new InputStreamSourceFromFileSource(fileSource);
+        try {
+            translator.getInputStream();
+        } catch (FileSystemInteractionException e) {
+            assertFalse(target.exists());
+            verify(fileSource, times(1)).getFile();
+            verifyNoMoreInteractions(fileSource);
+            throw e;
+        }
     }
 }

@@ -36,7 +36,12 @@ public abstract class ConverterAdapter implements IConverter {
 
     @Override
     public IConversionJobWithSourceSpecified convert(InputStream source) {
-        return convert(new InputStreamSourceFromInputStream(source));
+        return convert(source, true);
+    }
+
+    @Override
+    public IConversionJobWithSourceSpecified convert(InputStream source, boolean close) {
+        return convert(new InputStreamSourceFromInputStream(source, close));
     }
 
     @Override

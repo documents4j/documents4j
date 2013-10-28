@@ -1,19 +1,21 @@
 package no.kantega.pdf.job;
 
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class RemoteConverterTest extends AbstractConverterTest {
 
     private RemoteConverterTestDelegate remoteConverterTestDelegate;
 
-    @BeforeMethod(alwaysRun = true)
+    @Before
     public void setUp() throws Exception {
         remoteConverterTestDelegate = new RemoteConverterTestDelegate();
         remoteConverterTestDelegate.setUp();
     }
 
-    @AfterMethod(alwaysRun = true)
+    @After
     public void tearDown() throws Exception {
         remoteConverterTestDelegate.tearDown();
     }

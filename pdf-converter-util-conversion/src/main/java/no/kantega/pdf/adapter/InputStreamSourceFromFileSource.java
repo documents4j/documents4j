@@ -1,5 +1,6 @@
 package no.kantega.pdf.adapter;
 
+import com.google.common.base.Objects;
 import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
@@ -49,7 +50,9 @@ class InputStreamSourceFromFileSource implements IInputStreamSource {
 
     @Override
     public String toString() {
-        return String.format(String.format("%s[file=%s,fileSource=%s]",
-                InputStreamSourceFromFileSource.class.getSimpleName(), file, fileSource));
+        return Objects.toStringHelper(InputStreamSourceFromFileSource.class)
+                .add("file", file)
+                .add("fileSource", fileSource)
+                .toString();
     }
 }

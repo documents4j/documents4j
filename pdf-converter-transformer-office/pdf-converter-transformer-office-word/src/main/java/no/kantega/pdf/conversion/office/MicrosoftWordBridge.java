@@ -3,8 +3,8 @@ package no.kantega.pdf.conversion.office;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import no.kantega.pdf.throwables.ConverterAccessException;
-import no.kantega.pdf.transformation.ExternalConverter;
-import no.kantega.pdf.transformation.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.IExternalConverter;
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class MicrosoftWordBridge implements ExternalConverter {
+public class MicrosoftWordBridge implements IExternalConverter {
 
     private static final String WORD_STARTUP_ERROR_MESSAGE = "Could not start external converter";
     private static final String WORD_SHUTDOWN_ERROR_MESSAGE = "Could not shut external converter down";
@@ -75,12 +75,10 @@ public class MicrosoftWordBridge implements ExternalConverter {
             // would typically be triggered from a shut down hook. Therefore, the shut down process
             // should never be killed during JVM shut down. In order to avoid an incomplete start up
             // procedure, start up processes will never be killed either.
-            int exitCode = makePresetProcessExecutor()
+            int exitValue = makePresetProcessExecutor()
                     .command("cmd", "/C", quote(script.getAbsolutePath()))
                     .execute().exitValue();
-            ExternalConverterScriptResult
-                    .from(exitCode)
-                    .escalateIfNot(ExternalConverterScriptResult.CONVERTER_INTERACTION_SUCCESSFUL);
+            ExternalConverterScriptResult.from(exitValue).resolve();
         } catch (IOException e) {
             String message = String.format("Unable to run script for starting MS Word: %s", script);
             LOGGER.error(message, e);

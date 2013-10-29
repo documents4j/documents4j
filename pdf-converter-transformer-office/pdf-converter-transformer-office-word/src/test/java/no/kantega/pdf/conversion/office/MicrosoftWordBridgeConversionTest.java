@@ -1,7 +1,7 @@
 package no.kantega.pdf.conversion.office;
 
 import no.kantega.pdf.AbstractWordBasedTest;
-import no.kantega.pdf.transformation.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         assertFalse(pdf.exists());
         StartedProcess conversion = getExternalConverter().startConversion(docx, pdf);
         assertEquals(
-                ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitCode().intValue(),
+                ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 conversion.future().get().exitValue());
         assertTrue(pdf.exists());
     }
@@ -113,7 +113,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         File pdf = makeTarget(false);
         StartedProcess conversion = getExternalConverter().startConversion(corruptDocx(true), pdf);
         assertEquals(
-                ExternalConverterScriptResult.ILLEGAL_INPUT.getExitCode().intValue(),
+                ExternalConverterScriptResult.ILLEGAL_INPUT.getExitValue().intValue(),
                 conversion.future().get().exitValue());
         assertFalse(pdf.exists());
     }
@@ -123,7 +123,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         File pdf = makeTarget(false);
         StartedProcess conversion = getExternalConverter().startConversion(inexistentDocx(), pdf);
         assertEquals(
-                ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitCode().intValue(),
+                ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitValue().intValue(),
                 conversion.future().get().exitValue());
         assertFalse(pdf.exists());
     }
@@ -138,7 +138,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         }
         fileOutputStream.close();
         assertEquals(
-                ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitCode().intValue(),
+                ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue());
     }
 
@@ -149,7 +149,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);
         try {
             assertEquals(
-                    ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitCode().intValue(),
+                    ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                     getExternalConverter().startConversion(docx, makeTarget(true)).future().get().exitValue());
         } finally {
             fileInputStream.close();
@@ -164,7 +164,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         fileOutputStream.getChannel().lock();
         try {
             assertEquals(
-                    ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitCode().intValue(),
+                    ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitValue().intValue(),
                     getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue());
         } finally {
             fileOutputStream.close();

@@ -2,10 +2,10 @@ package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.ws.MimeType;
+import no.kantega.pdf.ws.WebServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Response;
@@ -36,22 +36,16 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
-
-            asyncResponse.resume(Response.ok(inputStream, MimeType.APPLICATION_PDF).build());
+            asyncResponse.resume(Response
+                    .ok(inputStream, MimeType.APPLICATION_PDF)
+                    .status(WebServiceProtocol.Status.OK.getStatusCode())
+                    .build());
         }
     }
 
     @Override
     public void onCancel() {
-        if (asyncResponse.isDone()) {
-            return;
-        }
-        synchronized (answerLock) {
-            if (asyncResponse.isDone()) {
-                return;
-            }
-            asyncResponse.cancel();
-        }
+        onCancel(WebServiceProtocol.Status.CANCEL);
     }
 
     @Override
@@ -63,13 +57,31 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
-            asyncResponse.resume(e);
+            asyncResponse.resume(Response
+                    .noContent()
+                    .status(WebServiceProtocol.Status.describe(e).getStatusCode())
+                    .build());
         }
     }
 
     @Override
     public void handleTimeout(AsyncResponse asyncResponse) {
         LOGGER.warn("Conversion request timed out");
-        onCancel();
+        onCancel(WebServiceProtocol.Status.TIMEOUT);
+    }
+
+    private void onCancel(WebServiceProtocol.Status status) {
+        if (asyncResponse.isDone()) {
+            return;
+        }
+        synchronized (answerLock) {
+            if (asyncResponse.isDone()) {
+                return;
+            }
+            asyncResponse.resume(Response
+                    .noContent()
+                    .status(status.getStatusCode())
+                    .build());
+        }
     }
 }

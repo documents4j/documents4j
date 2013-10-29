@@ -11,8 +11,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
 
 @Path(WebServiceProtocol.RESOURCE_PATH)
 public class MockWebService {
@@ -21,8 +19,9 @@ public class MockWebService {
     @Consumes({MimeType.WORD_DOC, MimeType.WORD_DOCX, MimeType.WORD_ANY})
     @Produces(MimeType.APPLICATION_PDF)
     public Response answer(String message) {
-        Response.ResponseBuilder responseBuilder = Response.status(0);
-        MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8))).handle(new StubbedConverterWebService(responseBuilder));
+        Response.ResponseBuilder responseBuilder = Response.noContent();
+        MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8)))
+                .applyTo(new MockWebServiceCallback(responseBuilder));
         return responseBuilder.build();
     }
 }

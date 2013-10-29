@@ -19,6 +19,12 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>pdf-converter-util-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- External dependencies -->
         <dependency>
             <groupId>org.zeroturnaround</groupId>

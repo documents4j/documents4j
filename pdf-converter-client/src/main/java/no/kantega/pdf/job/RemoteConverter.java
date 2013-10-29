@@ -1,13 +1,11 @@
 package no.kantega.pdf.job;
 
-import com.google.common.primitives.Ints;
 import no.kantega.pdf.adapter.ConversionJobAdapter;
 import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.ws.WebServiceProtocol;
-import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +100,7 @@ public class RemoteConverter extends ConverterAdapter {
 
     private static WebTarget makeWebTarget(URI baseUri, long requestTimeout) {
         ClientBuilder clientBuilder = ClientBuilder.newBuilder();
+        // TODO: Why is this timeout property not recognized? (Related to change to v2?)
 //        clientBuilder.getConfiguration().getProperties()
 //                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
         return clientBuilder.build().target(baseUri).path(WebServiceProtocol.RESOURCE_PATH);

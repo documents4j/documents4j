@@ -2,7 +2,7 @@ package no.kantega.pdf.conversion.office;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
-import no.kantega.pdf.transformation.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.zeroturnaround.exec.listener.ProcessListener;
 
 import java.io.File;

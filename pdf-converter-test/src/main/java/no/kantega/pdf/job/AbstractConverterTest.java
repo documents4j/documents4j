@@ -7,7 +7,8 @@ import no.kantega.pdf.throwables.FileSystemInteractionException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.*;
 import java.util.Set;
@@ -21,12 +22,20 @@ import static org.mockito.Mockito.*;
 
 public abstract class AbstractConverterTest {
 
-    private static final long DEFAULT_CONVERSION_TIMEOUT = 10000L;
+    private static final long DEFAULT_CONVERSION_TIMEOUT = 2000L;
 
     private static final String MESSAGE = "This is a test message!";
     private static final String NAME_PREFIX = "file";
     private static final String SOURCE_SUFFIX = "source";
     private static final String TARGET_SUFFIX = "target";
+
+    private static class CloseStreamAnswer implements Answer<Void> {
+        @Override
+        public Void answer(InvocationOnMock invocation) throws Throwable {
+            ((InputStream) invocation.getArguments()[0]).close();
+            return null;
+        }
+    }
 
     protected abstract IConverterTestDelegate getConverterTestDelegate();
 
@@ -54,11 +63,11 @@ public abstract class AbstractConverterTest {
     }
 
     protected File validFile(boolean delete) throws IOException {
-        return MockConversion.VALID.asFile(MESSAGE, makeFile(delete, SOURCE_SUFFIX));
+        return MockConversion.OK.asFile(MESSAGE, makeFile(delete, SOURCE_SUFFIX));
     }
 
     protected File invalidFile(boolean delete) throws IOException {
-        return MockConversion.VALID.asFile(MESSAGE, makeFile(delete, SOURCE_SUFFIX));
+        return MockConversion.INPUT_ERROR.asFile(MESSAGE, makeFile(delete, SOURCE_SUFFIX));
     }
 
     protected File inexistentFile(boolean delete) throws IOException {
@@ -181,16 +190,17 @@ public abstract class AbstractConverterTest {
 
         OutputStream outputStream = mock(OutputStream.class);
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
+        doAnswer(new CloseStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
 
         assertTrue(getConverter().convert(inputStreamSource).to(inputStreamConsumer).execute());
         assertTrue(docx.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
-        verify(inputStreamSource, times(1)).onConsumed(Matchers.any(InputStream.class));
+        verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
         verify(inputStream, never()).close();
         inputStream.close();
 
-        verify(inputStreamConsumer, times(1)).onComplete(Matchers.any(InputStream.class));
+        verify(inputStreamConsumer, times(1)).onComplete(any(InputStream.class));
         verifyNoMoreInteractions(inputStreamConsumer);
         verify(outputStream, never()).close();
     }
@@ -205,16 +215,17 @@ public abstract class AbstractConverterTest {
 
         OutputStream outputStream = mock(OutputStream.class);
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
+        doAnswer(new CloseStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
 
         assertTrue(getConverter().convert(inputStreamSource).to(inputStreamConsumer).schedule().get());
         assertTrue(docx.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
-        verify(inputStreamSource, times(1)).onConsumed(Matchers.any(InputStream.class));
+        verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
         verify(inputStream, never()).close();
         inputStream.close();
 
-        verify(inputStreamConsumer, times(1)).onComplete(Matchers.any(InputStream.class));
+        verify(inputStreamConsumer, times(1)).onComplete(any(InputStream.class));
         verifyNoMoreInteractions(inputStreamConsumer);
         verify(outputStream, never()).close();
     }

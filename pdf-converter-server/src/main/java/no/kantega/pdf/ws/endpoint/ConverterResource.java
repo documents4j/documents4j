@@ -9,8 +9,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
 import java.io.InputStream;
 
 @Path(WebServiceProtocol.RESOURCE_PATH)
@@ -25,7 +23,7 @@ public class ConverterResource {
     public void convertWordToPdf(
             InputStream inputStream,
             @Suspended AsyncResponse asyncResponse,
-            @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(WebServiceProtocol.JOB_PRIORITY) int priority) {
+            @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(WebServiceProtocol.HEADER_JOB_PRIORITY) int priority) {
         webConverterConfiguration.getConverter()
                 .convert(inputStream)
                 .to(new AsynchronousConversionResponse(asyncResponse, webConverterConfiguration.getTimeout()))

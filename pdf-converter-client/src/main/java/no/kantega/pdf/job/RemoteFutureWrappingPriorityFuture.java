@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.ws.MimeType;
+import no.kantega.pdf.ws.WebServiceProtocol;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -53,7 +54,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     @Override
     protected void onConversionFinished(RemoteConversionContext conversionContext) throws Exception {
         Response response = conversionContext.getWebResponse().get();
-        RemoteConverterResult.from(response.getStatus()).escalateIfNot(RemoteConverterResult.OK);
+        // We do not need to check the status again, this callback will only be triggered on a successful conversion.
         consumer.onComplete(response.readEntity(InputStream.class));
     }
 

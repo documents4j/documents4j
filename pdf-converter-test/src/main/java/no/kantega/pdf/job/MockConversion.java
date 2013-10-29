@@ -3,7 +3,10 @@ package no.kantega.pdf.job;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
+import no.kantega.pdf.throwables.ConversionInputException;
+import no.kantega.pdf.throwables.ConverterAccessException;
 import no.kantega.pdf.throwables.ConverterException;
+import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -15,14 +18,16 @@ import static org.junit.Assert.assertTrue;
 
 public enum MockConversion {
 
-    VALID(10),
+    OK(10),
     CANCEL(20),
-    ERROR(30),
-    TIMEOUT(40);
+    CONVERTER_ERROR(30),
+    INPUT_ERROR(40),
+    FILE_SYSTEM_ERROR(50),
+    GENERIC_ERROR(60),
+    TIMEOUT(70);
 
     // Two one byte delimiters plus two byte status code.
     private static final char DELIMITER = '@';
-    private static final String REPLY_PREFIX = "Handled: ";
 
     public class RichMessage {
 
@@ -40,7 +45,7 @@ public enum MockConversion {
             return message;
         }
 
-        public void handle(IStrategyCallback callback) {
+        public void applyTo(IStrategyCallback callback) {
             MockConversion.this.handle(message, callback);
         }
     }
@@ -81,17 +86,26 @@ public enum MockConversion {
     void handle(String message, IStrategyCallback callback) {
         try {
             switch (this) {
-                case VALID:
+                case OK:
                     onSuccess(message, callback);
                     break;
                 case CANCEL:
                     onCancel(callback);
                     break;
-                case ERROR:
-                    onError(message, callback);
+                case CONVERTER_ERROR:
+                    onError(new ConverterAccessException(asReply(message)), callback);
+                    break;
+                case INPUT_ERROR:
+                    onError(new ConversionInputException(asReply(message)), callback);
+                    break;
+                case FILE_SYSTEM_ERROR:
+                    onError(new FileSystemInteractionException(asReply(message)), callback);
+                    break;
+                case GENERIC_ERROR:
+                    onError(new ConverterException(asReply(message)), callback);
                     break;
                 case TIMEOUT:
-                    // Do nothing.
+                    // Emulate timeout: Do nothing.
                     break;
                 default:
                     throw new AssertionError(String.format("Unexpected conversion result: %s", this));
@@ -102,24 +116,18 @@ public enum MockConversion {
     }
 
     private void onSuccess(String message, IStrategyCallback callback) throws IOException {
-        byte[] input;
-        byte[] prefix = REPLY_PREFIX.getBytes(Charsets.UTF_8);
-        byte[] suffix = message.getBytes(Charsets.UTF_8);
-        input = new byte[prefix.length + suffix.length];
-        System.arraycopy(prefix, 0, input, 0, prefix.length);
-        System.arraycopy(suffix, 0, input, prefix.length, suffix.length);
-        callback.onComplete(new ByteArrayInputStream(input));
+        callback.onComplete(new ByteArrayInputStream(asReply(message).getBytes(Charsets.UTF_8)));
     }
 
     private void onCancel(IStrategyCallback callback) {
         callback.onCancel();
     }
 
-    private void onError(String message, IStrategyCallback callback) throws IOException, ClassNotFoundException {
-        callback.onException(new ConverterException(asReply(message)));
+    private void onError(Exception exception, IStrategyCallback callback) {
+        callback.onException(exception);
     }
 
-    public InputStream asInputStream(String message) {
+    public InputStream toInputStream(String message) {
         return new ByteArrayInputStream(
                 new StringBuilder()
                         .append(DELIMITER)
@@ -132,7 +140,7 @@ public enum MockConversion {
     }
 
     public File asFile(String message, File file) throws IOException {
-        InputStream inputStream = asInputStream(message);
+        InputStream inputStream = toInputStream(message);
         try {
             ByteStreams.copy(inputStream, Files.newOutputStreamSupplier(file));
         } finally {
@@ -141,8 +149,7 @@ public enum MockConversion {
         return file;
     }
 
-    public static String asReply(String message) {
-        return String.format("%s%s", REPLY_PREFIX, message);
+    public String asReply(String message) {
+        return String.format("Handled: %s (code: %d)", message, messageCode);
     }
-
 }

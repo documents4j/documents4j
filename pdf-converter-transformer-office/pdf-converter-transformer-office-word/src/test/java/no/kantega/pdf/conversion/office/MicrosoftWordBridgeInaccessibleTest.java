@@ -2,7 +2,7 @@ package no.kantega.pdf.conversion.office;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.AbstractWordBasedTest;
-import no.kantega.pdf.transformation.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.junit.Test;
 
 import java.io.File;
@@ -21,7 +21,7 @@ public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
         assertTrue(otherFolder.delete());
         File pdf = makeTarget(false);
         assertEquals(getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue(),
-                ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitCode().intValue());
+                ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
         assertFalse(pdf.exists());
     }
 }

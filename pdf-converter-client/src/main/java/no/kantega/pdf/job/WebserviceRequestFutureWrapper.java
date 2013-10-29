@@ -1,6 +1,8 @@
 package no.kantega.pdf.job;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.throwables.ConverterException;
+import no.kantega.pdf.ws.WebServiceProtocol;
 
 import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
@@ -33,12 +35,20 @@ class WebserviceRequestFutureWrapper implements Future<Boolean> {
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        return futureResponse.get().getStatus() == RemoteConverterResult.OK.getStatus().getStatusCode();
+        return handle(futureResponse.get());
     }
 
     @Override
     public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return futureResponse.get(timeout, unit).getStatus() == RemoteConverterResult.OK.getStatus().getStatusCode();
+        return handle(futureResponse.get(timeout, unit));
+    }
+
+    private boolean handle(Response response) throws ExecutionException {
+        try {
+            return WebServiceProtocol.Status.from(response.getStatus()).resolve();
+        } catch (ConverterException e) {
+            throw new ExecutionException("The conversion resulted in an error", e);
+        }
     }
 
     @Override

@@ -2,7 +2,7 @@ package no.kantega.pdf;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.conversion.office.MicrosoftWordBridge;
-import no.kantega.pdf.transformation.ExternalConverter;
+import no.kantega.pdf.conversion.IExternalConverter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
 
     private static File EXTERNAL_CONVERTER_DIRECTORY;
-    private static ExternalConverter EXTERNAL_CONVERTER;
+    private static IExternalConverter EXTERNAL_CONVERTER;
 
     @BeforeClass
     public static void setUpConverter() throws Exception {
@@ -41,7 +41,7 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
         }
     }
 
-    public static ExternalConverter getExternalConverter() {
+    public static IExternalConverter getExternalConverter() {
         return EXTERNAL_CONVERTER;
     }
 

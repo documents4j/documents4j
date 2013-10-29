@@ -2,7 +2,7 @@ package no.kantega.pdf.conversion.office;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.AbstractWordAssertingTest;
-import no.kantega.pdf.transformation.ExternalConverter;
+import no.kantega.pdf.conversion.IExternalConverter;
 import org.junit.Test;
 
 import java.io.File;
@@ -32,7 +32,7 @@ public class MicrosoftWordBridgeStartStopTest extends AbstractWordAssertingTest 
     }
 
     private void startUpAndShutDown(File folder) throws Exception {
-        ExternalConverter externalConverter = null;
+        IExternalConverter externalConverter = null;
         try {
             externalConverter = new MicrosoftWordBridge(folder, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
             getWordAssert().assertWordRunning();

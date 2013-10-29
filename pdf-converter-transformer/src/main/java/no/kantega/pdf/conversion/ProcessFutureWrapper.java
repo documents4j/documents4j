@@ -1,4 +1,4 @@
-package no.kantega.pdf.transformation;
+package no.kantega.pdf.conversion;
 
 import no.kantega.pdf.throwables.ConverterException;
 import org.zeroturnaround.exec.StartedProcess;
@@ -41,11 +41,11 @@ class ProcessFutureWrapper implements Future<Boolean> {
         return evaluateExitValue(startedProcess.future().get(timeout, unit).exitValue());
     }
 
-    private boolean evaluateExitValue(int exitCode) throws ExecutionException {
+    private boolean evaluateExitValue(int exitValue) throws ExecutionException {
         try {
             return ExternalConverterScriptResult
-                    .from(exitCode)
-                    .escalateIfNot(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL);
+                    .from(exitValue)
+                    .resolve();
         } catch (ConverterException e) {
             throw new ExecutionException("The conversion finished unsuccessful", e);
         }

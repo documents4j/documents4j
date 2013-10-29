@@ -1,4 +1,4 @@
-package no.kantega.pdf.transformation;
+package no.kantega.pdf.conversion;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,17 +7,17 @@ import java.io.File;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class ConversionManager {
+public class ConversionManager implements IConversionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
 
     public static final String MICROSOFT_WORD_BRIDGE_CLASS_NAME = "no.kantega.pdf.conversion.office.MicrosoftWordBridge";
 
-    private final ExternalConverter externalConverter;
+    private final IExternalConverter externalConverter;
 
     public ConversionManager(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         try {
-            externalConverter = (ExternalConverter) Class
+            externalConverter = (IExternalConverter) Class
                     .forName(MICROSOFT_WORD_BRIDGE_CLASS_NAME)
                     .getConstructor(File.class, long.class, TimeUnit.class)
                     .newInstance(baseFolder, processTimeout, processTimeoutUnit);
@@ -26,6 +26,7 @@ public class ConversionManager {
         }
     }
 
+    @Override
     public void shutDown() {
         try {
             externalConverter.shutDown();
@@ -34,6 +35,7 @@ public class ConversionManager {
         }
     }
 
+    @Override
     public Future<Boolean> startConversion(File source, File target) {
         return new ProcessFutureWrapper(externalConverter.startConversion(source, target));
     }

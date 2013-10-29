@@ -1,10 +1,10 @@
-package no.kantega.pdf.transformation;
+package no.kantega.pdf.conversion;
 
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 
-public interface ExternalConverter {
+public interface IExternalConverter {
 
     void shutDown();
 

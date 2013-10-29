@@ -5,7 +5,8 @@ import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
-import no.kantega.pdf.transformation.ConversionManager;
+import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.conversion.IConversionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class LocalConverter extends ConverterAdapter {
         return builder().build();
     }
 
-    private final ConversionManager conversionManager;
+    private final IConversionManager conversionManager;
     private final ExecutorService executorService;
     private final Thread shutdownHook;
 
@@ -63,13 +64,17 @@ public class LocalConverter extends ConverterAdapter {
                              long processTimeout, TimeUnit processTimeoutUnit) {
         super(baseFolder);
         try {
-            this.conversionManager = new ConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+            this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
             this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         } finally {
             this.shutdownHook = new ConverterShutdownHook();
             registerShutdownHook();
         }
         LOGGER.info("Local To-PDF converter has started successfully");
+    }
+
+    protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
+        return new ConversionManager(baseFolder, processTimeout, unit);
     }
 
     private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {

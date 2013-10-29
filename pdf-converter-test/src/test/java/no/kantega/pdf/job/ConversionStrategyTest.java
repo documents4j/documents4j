@@ -15,52 +15,52 @@ public class ConversionStrategyTest {
 
     @Test
     public void testConversionSuccess() throws Exception {
-        InputStream inputStream = MockConversion.VALID.asInputStream(MESSAGE);
+        InputStream inputStream = MockConversion.OK.toInputStream(MESSAGE);
         MockConversion.RichMessage richMessage = MockConversion.from(inputStream);
-        assertEquals(MockConversion.VALID, richMessage.getMockConversion());
+        assertEquals(MockConversion.OK, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
         IStrategyCallback callback = mock(IStrategyCallback.class);
-        richMessage.handle(callback);
+        richMessage.applyTo(callback);
         verify(callback).onComplete(any(InputStream.class));
         verifyNoMoreInteractions(callback);
     }
 
     @Test
     public void testConversionCancel() throws Exception {
-        InputStream inputStream = MockConversion.CANCEL.asInputStream(MESSAGE);
+        InputStream inputStream = MockConversion.CANCEL.toInputStream(MESSAGE);
         MockConversion.RichMessage richMessage = MockConversion.from(inputStream);
         assertEquals(MockConversion.CANCEL, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
         IStrategyCallback callback = mock(IStrategyCallback.class);
-        richMessage.handle(callback);
+        richMessage.applyTo(callback);
         verify(callback).onCancel();
         verifyNoMoreInteractions(callback);
     }
 
     @Test
     public void testConversionError() throws Exception {
-        InputStream inputStream = MockConversion.ERROR.asInputStream(MESSAGE);
+        InputStream inputStream = MockConversion.CONVERTER_ERROR.toInputStream(MESSAGE);
         MockConversion.RichMessage richMessage = MockConversion.from(inputStream);
-        assertEquals(MockConversion.ERROR, richMessage.getMockConversion());
+        assertEquals(MockConversion.CONVERTER_ERROR, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
         IStrategyCallback callback = mock(IStrategyCallback.class);
-        richMessage.handle(callback);
+        richMessage.applyTo(callback);
         verify(callback).onException(any(ConverterException.class));
         verifyNoMoreInteractions(callback);
     }
 
     @Test
     public void testConversionTimeout() throws Exception {
-        InputStream inputStream = MockConversion.TIMEOUT.asInputStream(MESSAGE);
+        InputStream inputStream = MockConversion.TIMEOUT.toInputStream(MESSAGE);
         MockConversion.RichMessage richMessage = MockConversion.from(inputStream);
         assertEquals(MockConversion.TIMEOUT, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
         IStrategyCallback callback = mock(IStrategyCallback.class);
-        richMessage.handle(callback);
+        richMessage.applyTo(callback);
         verifyZeroInteractions(callback);
     }
 }

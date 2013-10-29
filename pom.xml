@@ -16,12 +16,12 @@
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
       (3) Microsoft Word is not running when the built process is started and is neither started manually while the
           tests are running
-     Furthermore, for running the tests of the pdf-converter-server-standalone, you require:
-      (4) Your machine must have a free port and it must be possible to bind a server to this port
-     On a machine without these requirements, this project must be built without running the supplied unit tests.
+     If you cannot provide this setup, build this project with active "no-office" profile and the corresponding
+     tests will be skipped. In general, unit tests for the converters can fail since MS Word was not built for
+     short-interval restarting. However, this happens rarely.
 
-     In general, unit tests for the converters can fail since MS Word was not built for short-interval restarting.
-     They might therefore fail even though this application works correctly.
+     Furthermore, for running the tests of the pdf-converter-server-standalone module, you require:
+      (4) Your machine must have a free port and it must be possible to bind a server listener to this port
 
      Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
      running this program exits abnormally (for example by a user interrupt causing a TerminateProcess signal), the
@@ -34,13 +34,14 @@
         <module>pdf-converter-local</module>
         <module>pdf-converter-local-demo</module>
         <module>pdf-converter-transformer</module>
+        <module>pdf-converter-transformer-office</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>
+        <module>pdf-converter-util-all</module>
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
         <module>pdf-converter-test</module>
-        <module>pdf-converter-transformer-office</module>
     </modules>
 
     <properties>
@@ -157,5 +158,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

@@ -18,7 +18,7 @@
     </modules>
 
     <properties>
-        <office.skip.tests>false</office.skip.tests>
+        <testing.skip.office>false</testing.skip.office>
     </properties>
 
     <dependencies>
@@ -34,7 +34,7 @@
         <profile>
             <id>no-office</id>
             <properties>
-                <office.skip.tests>true</office.skip.tests>
+                <testing.skip.office>true</testing.skip.office>
             </properties>
         </profile>
     </profiles>
@@ -46,7 +46,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${version.maven.surefire-plugin}</version>
                 <configuration>
-                    <skipTests>${office.skip.tests}</skipTests>
+                    <skipTests>${testing.skip.office}</skipTests>
                 </configuration>
             </plugin>
         </plugins>

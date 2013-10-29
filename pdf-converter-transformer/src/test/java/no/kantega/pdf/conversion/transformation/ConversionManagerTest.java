@@ -1,6 +1,7 @@
-package no.kantega.pdf.transformation;
+package no.kantega.pdf.conversion.transformation;
 
 import com.google.common.io.Files;
+import no.kantega.pdf.conversion.ConversionManager;
 import no.kantega.pdf.conversion.office.MicrosoftWordBridge;
 import org.junit.After;
 import org.junit.Before;

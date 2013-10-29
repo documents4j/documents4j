@@ -66,7 +66,7 @@ public class PseudoConverter extends ConverterAdapter {
         public Future<Boolean> schedule() {
             InputStream inputStream = source.getInputStream();
             try {
-                MockConversion.from(inputStream).handle(new InputStreamConsumerStrategyCallbackAdapter(callback));
+                MockConversion.from(inputStream).applyTo(new InputStreamConsumerStrategyCallbackAdapter(callback));
             } finally {
                 source.onConsumed(inputStream);
             }

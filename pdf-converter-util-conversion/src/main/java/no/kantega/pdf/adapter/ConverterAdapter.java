@@ -4,6 +4,8 @@ import no.kantega.pdf.api.IConversionJobWithSourceSpecified;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
@@ -18,15 +20,20 @@ import static com.google.common.base.Preconditions.checkState;
 
 public abstract class ConverterAdapter implements IConverter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConverterAdapter.class);
+
     private static final String NO_EXTENSION = "";
     private static final String TEMP_FILE_PREFIX = "temp";
 
     private final File tempFileFolder;
     private final AtomicLong uniqueNameMaker;
+    private final Thread shutDownHook;
 
     protected ConverterAdapter(File tempFileFolder) {
         this.tempFileFolder = makeTemporaryFolder(tempFileFolder);
         this.uniqueNameMaker = new AtomicLong(1L);
+        this.shutDownHook = new ConverterShutdownHook();
+        registerShutdownHook();
     }
 
     @Override
@@ -54,7 +61,7 @@ public abstract class ConverterAdapter implements IConverter {
         return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
     }
 
-    protected class ConverterShutdownHook extends Thread {
+    private class ConverterShutdownHook extends Thread {
         public ConverterShutdownHook() {
             super(String.format("Shutdown hook: %s", ConverterAdapter.this.getClass().getName()));
         }
@@ -87,5 +94,33 @@ public abstract class ConverterAdapter implements IConverter {
         File tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
         checkState(tempFileFolder.mkdir(), String.format("Cannot create folder: %s", tempFileFolder));
         return tempFileFolder;
+    }
+
+    @Override
+    public void shutDown() {
+        deregisterShutdownHook();
+        deleteOrLog(tempFileFolder);
+    }
+
+    protected void registerShutdownHook() {
+        try {
+            Runtime.getRuntime().addShutdownHook(shutDownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.info("Tried to register shut down hook in shut down period", e);
+        }
+    }
+
+    protected void deregisterShutdownHook() {
+        try {
+            Runtime.getRuntime().removeShutdownHook(shutDownHook);
+        } catch (IllegalStateException e) {
+            LOGGER.info("Tried to deregister shut down hook in shut down period", e);
+        }
+    }
+
+    private static void deleteOrLog(File file) {
+        if (!file.delete()) {
+            LOGGER.warn("Could not delete temporary folder: {}", file);
+        }
     }
 }

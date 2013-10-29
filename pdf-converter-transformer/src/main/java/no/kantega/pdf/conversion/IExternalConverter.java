@@ -6,7 +6,9 @@ import java.io.File;
 
 public interface IExternalConverter {
 
-    void shutDown();
-
     StartedProcess startConversion(File source, File target);
+
+    boolean isOperational();
+
+    void shutDown();
 }

@@ -48,6 +48,10 @@ public enum MockConversion {
         public void applyTo(IStrategyCallback callback) {
             MockConversion.this.handle(message, callback);
         }
+
+        public RichMessage with(MockConversion mockConversion) {
+            return mockConversion.new RichMessage(message);
+        }
     }
 
     public static RichMessage from(InputStream inputStream) {
@@ -61,7 +65,6 @@ public enum MockConversion {
             assertTrue(secondDelimiterIndex >= 0);
             messageCode = Integer.valueOf(raw.substring(1, secondDelimiterIndex));
             message = raw.substring(secondDelimiterIndex + 1);
-
         } catch (IOException e) {
             throw new AssertionError("Could not read input stream");
         }
@@ -83,7 +86,7 @@ public enum MockConversion {
         return messageCode;
     }
 
-    void handle(String message, IStrategyCallback callback) {
+    public void handle(String message, IStrategyCallback callback) {
         try {
             switch (this) {
                 case OK:

@@ -11,26 +11,95 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Future;
 
-public class MockConversionManager implements IConversionManager {
+public abstract class MockConversionManager implements IConversionManager {
+
+    private static class OperationalMockConversionManager extends MockConversionManager {
+
+        private volatile boolean shutDown;
+
+        private OperationalMockConversionManager(File baseFolder) {
+            super(baseFolder);
+            this.shutDown = false;
+        }
+
+        @Override
+        protected MockConversion.RichMessage resolve(InputStream inputStream) {
+            return MockConversion.from(inputStream);
+        }
+
+        @Override
+        public boolean isOperational() {
+            return !shutDown;
+        }
+
+        @Override
+        public void shutDown() {
+            shutDown = true;
+        }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(OperationalMockConversionManager.class)
+                    .add("baseFolder", getBaseFolder())
+                    .add("shutDown", shutDown)
+                    .toString();
+        }
+    }
+
+    private static class InoperationalMockConversionManager extends MockConversionManager {
+
+        private InoperationalMockConversionManager(File baseFolder) {
+            super(baseFolder);
+        }
+
+        @Override
+        protected MockConversion.RichMessage resolve(InputStream inputStream) {
+            return MockConversion.from(inputStream).with(MockConversion.CONVERTER_ERROR);
+        }
+
+        @Override
+        public boolean isOperational() {
+            return false;
+        }
+
+        @Override
+        public void shutDown() {
+            /* do nothing */
+        }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(InoperationalMockConversionManager.class)
+                    .add("baseFolder", getBaseFolder())
+                    .toString();
+        }
+    }
+
+    public static IConversionManager operational(File baseFolder) {
+        return new OperationalMockConversionManager(baseFolder);
+    }
+
+    public static IConversionManager inoperational(File baseFolder) {
+        return new InoperationalMockConversionManager(baseFolder);
+    }
 
     private final File baseFolder;
 
-    public MockConversionManager(File baseFolder) {
+    protected MockConversionManager(File baseFolder) {
         this.baseFolder = baseFolder;
     }
 
-    @Override
-    public void shutDown() {
+    protected File getBaseFolder() {
+        return baseFolder;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Future<Boolean> startConversion(File source, File target) {
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(source);
             MockConversionManagerCallback callback = new MockConversionManagerCallback(target);
-            MockConversion.from(inputStream).applyTo(callback);
+            resolve(inputStream).applyTo(callback);
             return callback.getResultAsFuture();
         } catch (IOException e) {
             return MockProcessResult.indicating(new FileSystemInteractionException(
@@ -44,10 +113,5 @@ public class MockConversionManager implements IConversionManager {
         }
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(MockConversionManager.class)
-                .add("baseFolder", baseFolder)
-                .toString();
-    }
+    protected abstract MockConversion.RichMessage resolve(InputStream inputStream);
 }

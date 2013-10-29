@@ -8,8 +8,7 @@ import org.junit.Test;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MicrosoftWordBridgeStartStopTest extends AbstractWordAssertingTest {
 
@@ -36,9 +35,12 @@ public class MicrosoftWordBridgeStartStopTest extends AbstractWordAssertingTest 
         try {
             externalConverter = new MicrosoftWordBridge(folder, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
             getWordAssert().assertWordRunning();
+            assertTrue(externalConverter.isOperational());
         } finally {
             assertNotNull(externalConverter);
             externalConverter.shutDown();
+            assertFalse(externalConverter.isOperational());
+            getWordAssert().assertWordNotRunning();
         }
     }
 }

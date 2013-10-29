@@ -19,5 +19,7 @@ public interface IConverter {
 
     IConversionJobWithSourceSpecified convert(IInputStreamSource source);
 
+    boolean isOperational();
+
     void shutDown();
 }

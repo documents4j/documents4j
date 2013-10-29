@@ -4,38 +4,60 @@ import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.ws.endpoint.MockWebService;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.glassfish.jersey.test.spi.TestContainerException;
 import org.junit.Ignore;
 
 import javax.ws.rs.core.Application;
+import java.net.URI;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 // This is just a test delegate which should only be invoked by another test.
 @Ignore
-class RemoteConverterTestDelegate extends JerseyTest implements IConverterTestDelegate {
+class RemoteConverterTestDelegate implements IConverterTestDelegate {
 
-    private IConverter converter;
+    private static final long REMOTE_CONVERTER_TIMEOUT = 2000L;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-        converter = RemoteConverter.make(getBaseUri());
+    private class ConfiguredJerseyTest extends JerseyTest {
+
+        @Override
+        protected Application configure() {
+            return new ResourceConfig().register(new MockWebService(operational, REMOTE_CONVERTER_TIMEOUT));
+        }
+
+        @Override
+        public URI getBaseUri() {
+            return super.getBaseUri();
+        }
     }
 
-    @Override
+    private final boolean operational;
+    private final ConfiguredJerseyTest jerseyTest;
+    private IConverter converter;
+
+    public RemoteConverterTestDelegate(boolean operational) throws TestContainerException {
+        this.operational = operational;
+        this.jerseyTest = new ConfiguredJerseyTest();
+    }
+
+    public void setUp() throws Exception {
+        jerseyTest.setUp();
+        converter = RemoteConverter.make(jerseyTest.getBaseUri());
+        assertEquals(operational, converter.isOperational());
+    }
+
     public void tearDown() throws Exception {
         try {
             converter.shutDown();
+            assertFalse(converter.isOperational());
         } finally {
-            super.tearDown();
+            jerseyTest.tearDown();
         }
     }
 
     @Override
     public IConverter getConverter() {
         return converter;
-    }
-
-    @Override
-    protected Application configure() {
-        return new ResourceConfig(MockWebService.class);
     }
 }

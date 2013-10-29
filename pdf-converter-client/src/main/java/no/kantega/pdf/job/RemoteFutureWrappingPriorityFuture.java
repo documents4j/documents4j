@@ -46,6 +46,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     @Override
     protected RemoteConversionContext startConversion(InputStream fetchedSource) {
         return new RemoteConversionContext(webTarget
+                .path(WebServiceProtocol.RESOURCE_PATH)
                 .request(MimeType.APPLICATION_PDF)
                 .async()
                 .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), MimeType.WORD_DOCX)));

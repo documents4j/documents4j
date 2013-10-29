@@ -1,45 +1,36 @@
 package no.kantega.pdf.conversion.office;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import no.kantega.pdf.throwables.ConverterAccessException;
-import no.kantega.pdf.conversion.IExternalConverter;
+import no.kantega.pdf.conversion.AbstractExternalConverter;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
+import no.kantega.pdf.throwables.ConverterAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class MicrosoftWordBridge implements IExternalConverter {
-
-    private static final String WORD_STARTUP_ERROR_MESSAGE = "Could not start external converter";
-    private static final String WORD_SHUTDOWN_ERROR_MESSAGE = "Could not shut external converter down";
+public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
 
-    private static final Joiner ARGUMENT_JOINER = Joiner.on(' ');
-
     private static final Object WORD_LOCK = new Object();
 
-    private final long processTimeout;
-    private final File baseFolder;
-    private final File conversionScript;
+    private final File conversionScript, assertScript;
 
     public MicrosoftWordBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        this.baseFolder = baseFolder;
-        this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
-        this.conversionScript = MicrosoftWordShellScript.WORD_PDF_CONVERSION_SCRIPT.materializeIn(baseFolder);
+        super(baseFolder, processTimeout, processTimeoutUnit);
+        this.conversionScript = MicrosoftWordScript.WORD_PDF_CONVERSION_SCRIPT.materializeIn(baseFolder);
+        this.assertScript = MicrosoftWordScript.WORD_ASSERT_SCRIPT.materializeIn(baseFolder);
         startUp();
     }
 
     private void startUp() {
         synchronized (WORD_LOCK) {
             tryStart();
+            LOGGER.info("From-Microsoft-Word-Converter was started successfully");
         }
     }
 
@@ -47,52 +38,33 @@ public class MicrosoftWordBridge implements IExternalConverter {
     public void shutDown() {
         synchronized (WORD_LOCK) {
             tryStop();
+            LOGGER.info("From-Microsoft-Word-Converter was shut down successfully");
         }
     }
 
     private void tryStart() {
-        runNoArgumentScript(MicrosoftWordShellScript.WORD_STARTUP_SCRIPT, WORD_STARTUP_ERROR_MESSAGE);
-        LOGGER.info("From-Microsoft-Word-Converter was started successfully");
+        ExternalConverterScriptResult
+                .from(runNoArgumentScript(MicrosoftWordScript.WORD_STARTUP_SCRIPT))
+                .resolve();
     }
 
     private void tryStop() {
         try {
-            runNoArgumentScript(MicrosoftWordShellScript.WORD_SHUTDOWN_SCRIPT, WORD_SHUTDOWN_ERROR_MESSAGE);
+            ExternalConverterScriptResult
+                    .from(runNoArgumentScript(MicrosoftWordScript.WORD_SHUTDOWN_SCRIPT))
+                    .resolve();
         } finally {
-            conversionScript.delete();
+            tryDelete(conversionScript);
+            tryDelete(assertScript);
         }
-        LOGGER.info("From-Microsoft-Word-Converter was shut down successfully");
     }
 
-    private static String quote(String... args) {
-        return String.format("\"%s\"", ARGUMENT_JOINER.join(args));
-    }
-
-    private void runNoArgumentScript(MicrosoftWordShellScript scriptResource, String errorMessage) {
-        File script = scriptResource.materializeIn(baseFolder);
+    private int runNoArgumentScript(MicrosoftWordScript microsoftWordScript) {
+        File script = microsoftWordScript.materializeIn(getBaseFolder());
         try {
-            // Do not kill this process on a JVM shut down! A script for e.g. shutting down MS Word
-            // would typically be triggered from a shut down hook. Therefore, the shut down process
-            // should never be killed during JVM shut down. In order to avoid an incomplete start up
-            // procedure, start up processes will never be killed either.
-            int exitValue = makePresetProcessExecutor()
-                    .command("cmd", "/C", quote(script.getAbsolutePath()))
-                    .execute().exitValue();
-            ExternalConverterScriptResult.from(exitValue).resolve();
-        } catch (IOException e) {
-            String message = String.format("Unable to run script for starting MS Word: %s", script);
-            LOGGER.error(message, e);
-            throw new ConverterAccessException(message, e);
-        } catch (InterruptedException e) {
-            String message = String.format("Thread responsible for monitoring MS Word startup was interrupted: %s", script);
-            LOGGER.error(message, e);
-            throw new ConverterAccessException(message, e);
-        } catch (TimeoutException e) {
-            String message = String.format("Thread responsible for monitoring MS Word startup timed out: %s", script);
-            LOGGER.error(message, e);
-            throw new ConverterAccessException(message, e);
+            return runNoArgumentScript(script);
         } finally {
-            script.delete();
+            tryDelete(script);
         }
     }
 
@@ -112,20 +84,17 @@ public class MicrosoftWordBridge implements IExternalConverter {
     }
 
     @Override
-    public String toString() {
-        return Objects.toStringHelper(MicrosoftWordBridge.class)
-                .add("baseFolder", baseFolder)
-                .add("processTimeout", processTimeout)
-                .toString();
+    public boolean isOperational() {
+        return conversionScript.isFile() && assertScript.isFile()
+                && runNoArgumentScript(MicrosoftWordScript.WORD_ASSERT_SCRIPT)
+                == ExternalConverterScriptResult.CONVERTER_INTERACTION_SUCCESSFUL.getExitValue();
     }
 
-    private ProcessExecutor makePresetProcessExecutor() {
-        return new ProcessExecutor()
-                .redirectOutputAsInfo(LOGGER)
-                .redirectErrorAsInfo(LOGGER)
-                .readOutput(true)
-                .directory(baseFolder)
-                .timeout(processTimeout, TimeUnit.MILLISECONDS)
-                .exitValueAny();
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(MicrosoftWordBridge.class)
+                .add("baseFolder", getBaseFolder())
+                .add("processTimeout", getProcessTimeout())
+                .toString();
     }
 }

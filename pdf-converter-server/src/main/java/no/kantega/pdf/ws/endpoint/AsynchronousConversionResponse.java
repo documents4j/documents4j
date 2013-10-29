@@ -37,8 +37,9 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
                 return;
             }
             asyncResponse.resume(Response
-                    .ok(inputStream, MimeType.APPLICATION_PDF)
                     .status(WebServiceProtocol.Status.OK.getStatusCode())
+                    .entity(inputStream)
+                    .type(MimeType.APPLICATION_PDF)
                     .build());
         }
     }
@@ -58,7 +59,6 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
                 return;
             }
             asyncResponse.resume(Response
-                    .noContent()
                     .status(WebServiceProtocol.Status.describe(e).getStatusCode())
                     .build());
         }
@@ -79,7 +79,6 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
                 return;
             }
             asyncResponse.resume(Response
-                    .noContent()
                     .status(status.getStatusCode())
                     .build());
         }

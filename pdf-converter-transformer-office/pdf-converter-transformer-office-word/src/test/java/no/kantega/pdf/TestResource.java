@@ -11,8 +11,7 @@ public enum TestResource {
 
     DOCX_VALID("/valid.docx"),
     DOCX_CORRUPT("/corrupt.docx"),
-    DOCX_INEXISTENT("/inexistent.docx"),
-    WORD_ASSERT_SCRIPT("/word_assert.vbs");
+    DOCX_INEXISTENT("/inexistent.docx");
 
     private final String path;
 

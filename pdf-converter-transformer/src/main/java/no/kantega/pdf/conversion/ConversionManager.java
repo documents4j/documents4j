@@ -27,16 +27,21 @@ public class ConversionManager implements IConversionManager {
     }
 
     @Override
+    public Future<Boolean> startConversion(File source, File target) {
+        return new ProcessFutureWrapper(externalConverter.startConversion(source, target));
+    }
+
+    @Override
+    public boolean isOperational() {
+        return externalConverter.isOperational();
+    }
+
+    @Override
     public void shutDown() {
         try {
             externalConverter.shutDown();
         } catch (RuntimeException e) {
             LOGGER.warn("Could not shut down converter {}", externalConverter, e);
         }
-    }
-
-    @Override
-    public Future<Boolean> startConversion(File source, File target) {
-        return new ProcessFutureWrapper(externalConverter.startConversion(source, target));
     }
 }

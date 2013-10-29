@@ -7,7 +7,7 @@ Set wordApplication = GetObject(, "Word.Application")
 
 ' Signal whether or not such an instance could not be found.
 If Err <> 0 then
-  WScript.Quit -10
+  WScript.Quit -6
 Else
-  WScript.Quit 10
+  WScript.Quit 3
 End If

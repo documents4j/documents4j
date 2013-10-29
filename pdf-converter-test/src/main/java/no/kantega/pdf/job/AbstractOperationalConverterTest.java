@@ -20,7 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-public abstract class AbstractConverterTest {
+public abstract class AbstractOperationalConverterTest {
 
     private static final long DEFAULT_CONVERSION_TIMEOUT = 2000L;
 
@@ -36,8 +36,6 @@ public abstract class AbstractConverterTest {
             return null;
         }
     }
-
-    protected abstract IConverterTestDelegate getConverterTestDelegate();
 
     private File folder;
     private Set<File> files;
@@ -57,6 +55,8 @@ public abstract class AbstractConverterTest {
         }
         assertTrue(folder.delete());
     }
+
+    protected abstract IConverterTestDelegate getConverterTestDelegate();
 
     protected IConverter getConverter() {
         return getConverterTestDelegate().getConverter();

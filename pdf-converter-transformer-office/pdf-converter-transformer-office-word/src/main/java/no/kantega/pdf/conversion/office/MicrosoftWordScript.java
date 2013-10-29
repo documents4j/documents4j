@@ -11,17 +11,18 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-public enum MicrosoftWordShellScript {
+public enum MicrosoftWordScript {
 
     WORD_PDF_CONVERSION_SCRIPT("/doc2pdf.vbs"),
     WORD_STARTUP_SCRIPT("/word_start.vbs"),
-    WORD_SHUTDOWN_SCRIPT("/word_shutdown.vbs");
+    WORD_SHUTDOWN_SCRIPT("/word_shutdown.vbs"),
+    WORD_ASSERT_SCRIPT("/word_assert.vbs");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordShellScript.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordScript.class);
 
     private final String path;
 
-    private MicrosoftWordShellScript(String path) {
+    private MicrosoftWordScript(String path) {
         this.path = path;
     }
 
@@ -48,7 +49,7 @@ public enum MicrosoftWordShellScript {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(MicrosoftWordShellScript.class)
+        return Objects.toStringHelper(MicrosoftWordScript.class)
                 .add("resource", path)
                 .toString();
     }

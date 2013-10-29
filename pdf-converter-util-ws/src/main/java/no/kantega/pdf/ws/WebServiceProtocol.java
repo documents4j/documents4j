@@ -6,6 +6,8 @@ import no.kantega.pdf.util.Reaction;
 
 public final class WebServiceProtocol {
 
+    public static final int CURRENT_PROTOCOL_VERSION = 1;
+
     public static final String RESOURCE_PATH = "/";
 
     public static final String HEADER_JOB_PRIORITY = "Converter-Job-Priority";

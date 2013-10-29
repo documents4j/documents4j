@@ -57,19 +57,13 @@ public class LocalConverter extends ConverterAdapter {
 
     private final IConversionManager conversionManager;
     private final ExecutorService executorService;
-    private final Thread shutdownHook;
 
     protected LocalConverter(File baseFolder,
                              int corePoolSize, int maximumPoolSize, long keepAliveTime,
                              long processTimeout, TimeUnit processTimeoutUnit) {
         super(baseFolder);
-        try {
-            this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-            this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        } finally {
-            this.shutdownHook = new ConverterShutdownHook();
-            registerShutdownHook();
-        }
+        this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         LOGGER.info("Local To-PDF converter has started successfully");
     }
 
@@ -139,31 +133,19 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     @Override
+    public boolean isOperational() {
+        return !executorService.isShutdown() && conversionManager.isOperational();
+    }
+
+    @Override
     public void shutDown() {
         try {
             conversionManager.shutDown();
             executorService.shutdownNow();
         } finally {
-            getTempFileFolder().delete();
-            deregisterShutdownHook();
+            super.shutDown();
         }
         LOGGER.info("Local To-PDF converter has shut down successfully");
     }
 
-    private void registerShutdownHook() {
-        try {
-            Runtime.getRuntime().addShutdownHook(shutdownHook);
-        } catch (IllegalStateException e) {
-            LOGGER.info("Tried to register shut down hook in shut down period");
-            shutDown();
-        }
-    }
-
-    private void deregisterShutdownHook() {
-        try {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
-        } catch (IllegalStateException e) {
-            LOGGER.info("Tried to deregister shut down hook in shut down period");
-        }
-    }
 }

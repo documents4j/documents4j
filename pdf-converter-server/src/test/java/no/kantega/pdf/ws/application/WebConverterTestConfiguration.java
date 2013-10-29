@@ -2,20 +2,30 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.PseudoConverter;
+import no.kantega.pdf.ws.WebServiceProtocol;
 
 public class WebConverterTestConfiguration implements IWebConverterConfiguration {
 
-    public static final long TEST_TIMEOUT = 1000L;
+    private final IConverter converter;
+    private final long timeout;
 
-    private static final IConverter CONVERTER = new PseudoConverter();
+    public WebConverterTestConfiguration(boolean operational, long timeout) {
+        this.converter = new PseudoConverter(operational);
+        this.timeout = timeout;
+    }
 
     @Override
     public IConverter getConverter() {
-        return CONVERTER;
+        return converter;
     }
 
     @Override
     public long getTimeout() {
-        return TEST_TIMEOUT;
+        return timeout;
+    }
+
+    @Override
+    public int getProtocolVersion() {
+        return WebServiceProtocol.CURRENT_PROTOCOL_VERSION;
     }
 }

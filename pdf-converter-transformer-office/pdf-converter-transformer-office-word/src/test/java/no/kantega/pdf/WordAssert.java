@@ -1,6 +1,7 @@
 package no.kantega.pdf;
 
-import no.kantega.pdf.conversion.office.MicrosoftWordShellScript;
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.office.MicrosoftWordScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -16,23 +17,23 @@ public final class WordAssert {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WordAssert.class);
 
-    // Note: These status codes are duplicated in the VBS script.
-    private static final int STATUS_CODE_WORD_RUNNING = 10;
-    private static final int STATUS_CODE_WORD_NOT_RUNNING = -10;
-
     private final File wordAssertScript, wordShutdownScript;
 
     public WordAssert(File temporaryFolder) {
-        wordAssertScript = TestResource.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
-        wordShutdownScript = MicrosoftWordShellScript.WORD_SHUTDOWN_SCRIPT.materializeIn(temporaryFolder);
+        wordAssertScript = MicrosoftWordScript.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
+        wordShutdownScript = MicrosoftWordScript.WORD_SHUTDOWN_SCRIPT.materializeIn(temporaryFolder);
     }
 
     public void assertWordRunning() throws Exception {
-        assertEquals("Unexpected state: MS Word is not running", STATUS_CODE_WORD_RUNNING, runWordCheckScript());
+        assertEquals("Unexpected state: MS Word is not running",
+                ExternalConverterScriptResult.CONVERTER_INTERACTION_SUCCESSFUL.getExitValue().intValue(),
+                runWordCheckScript());
     }
 
     public void assertWordNotRunning() throws Exception {
-        assertEquals("Unexpected state: MS Word is running", STATUS_CODE_WORD_NOT_RUNNING, runWordCheckScript());
+        assertEquals("Unexpected state: MS Word is running",
+                ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue(),
+                runWordCheckScript());
     }
 
     private int runWordCheckScript() throws Exception {
@@ -48,6 +49,7 @@ public final class WordAssert {
     }
 
     public void killWord() throws Exception {
+        assertTrue(wordShutdownScript.exists());
         new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))
                 .redirectErrorAsInfo(LOGGER)

@@ -1,8 +1,8 @@
 package no.kantega.pdf;
 
 import com.google.common.io.Files;
-import no.kantega.pdf.conversion.office.MicrosoftWordBridge;
 import no.kantega.pdf.conversion.IExternalConverter;
+import no.kantega.pdf.conversion.office.MicrosoftWordBridge;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -30,12 +30,15 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
         EXTERNAL_CONVERTER = new MicrosoftWordBridge(EXTERNAL_CONVERTER_DIRECTORY,
                 DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
         getWordAssert().assertWordRunning();
+        assertTrue(EXTERNAL_CONVERTER.isOperational());
     }
 
     @AfterClass
     public static void tearDownConverter() throws Exception {
         try {
             EXTERNAL_CONVERTER.shutDown();
+            assertFalse(EXTERNAL_CONVERTER.isOperational());
+            getWordAssert().assertWordNotRunning();
         } finally {
             assertTrue(EXTERNAL_CONVERTER_DIRECTORY.delete());
         }

@@ -5,12 +5,14 @@ import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
+import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.WebServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.net.URI;
 import java.util.concurrent.ExecutorService;
@@ -80,21 +82,14 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     private final WebTarget webTarget;
-
     private final ExecutorService executorService;
-
-    private final Thread shutdownHook;
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime) {
         super(baseFolder);
         this.webTarget = makeWebTarget(baseUri, requestTimeout);
-        try {
-            this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        } finally {
-            this.shutdownHook = new ConverterShutdownHook();
-            registerShutdownHook();
-        }
+        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        printConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
     }
 
@@ -165,29 +160,44 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     @Override
+    public boolean isOperational() {
+        try {
+            return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
+        } catch (Exception e) {
+            LOGGER.info("Remote converter is not operational", e);
+            return false;
+        }
+    }
+
+    private ConverterServerInformation fetchConverterServerInformation() {
+        return webTarget
+                .path(WebServiceProtocol.RESOURCE_PATH)
+                .request(MediaType.APPLICATION_XML_TYPE)
+                .get(ConverterServerInformation.class);
+    }
+
+    private void printConverterServerInformation() {
+        try {
+            ConverterServerInformation converterServerInformation = fetchConverterServerInformation();
+            LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
+            LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
+            LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
+            if (converterServerInformation.getProtocolVersion() != WebServiceProtocol.CURRENT_PROTOCOL_VERSION) {
+                LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
+                        converterServerInformation.getProtocolVersion(), WebServiceProtocol.CURRENT_PROTOCOL_VERSION);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Cannot connect to remote converter at {}", webTarget.getUri(), e);
+        }
+    }
+
+    @Override
     public void shutDown() {
         try {
             executorService.shutdown();
         } finally {
-            getTempFileFolder().delete();
-            deregisterShutdownHook();
+            super.shutDown();
         }
         LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", webTarget.getUri());
-    }
-
-    private void registerShutdownHook() {
-        try {
-            Runtime.getRuntime().addShutdownHook(shutdownHook);
-        } catch (IllegalStateException e) {
-            LOGGER.info("Tried to register shut down hook in shut down period", e);
-        }
-    }
-
-    private void deregisterShutdownHook() {
-        try {
-            Runtime.getRuntime().removeShutdownHook(shutdownHook);
-        } catch (IllegalStateException e) {
-            LOGGER.info("Tried to deregister shut down hook in shut down period", e);
-        }
     }
 }

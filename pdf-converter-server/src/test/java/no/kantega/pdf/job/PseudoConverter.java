@@ -10,12 +10,16 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.Future;
 
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class PseudoConverter extends ConverterAdapter {
 
-    public PseudoConverter() {
+    private final boolean operational;
+
+    public PseudoConverter(boolean operational) {
         super(Files.createTempDir());
+        this.operational = operational;
     }
 
     private class PseudoConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -66,7 +70,12 @@ public class PseudoConverter extends ConverterAdapter {
         public Future<Boolean> schedule() {
             InputStream inputStream = source.getInputStream();
             try {
-                MockConversion.from(inputStream).applyTo(new InputStreamConsumerStrategyCallbackAdapter(callback));
+                IStrategyCallback strategyCallback = new InputStreamConsumerStrategyCallbackAdapter(callback);
+                if (operational) {
+                    MockConversion.from(inputStream).applyTo(strategyCallback);
+                } else {
+                    MockConversion.from(inputStream).with(MockConversion.CONVERTER_ERROR).applyTo(strategyCallback);
+                }
             } finally {
                 source.onConsumed(inputStream);
             }
@@ -80,7 +89,23 @@ public class PseudoConverter extends ConverterAdapter {
     }
 
     @Override
+    public boolean isOperational() {
+        return operational;
+    }
+
+    @Override
     public void shutDown() {
-        new File(getTempFileFolder().getParent()).delete();
+        super.shutDown();
+        assertTrue(getTempFileFolder().getParentFile().delete());
+    }
+
+    @Override
+    protected void registerShutdownHook() {
+        /* do nothing */
+    }
+
+    @Override
+    protected void deregisterShutdownHook() {
+        /* do nothing */
     }
 }

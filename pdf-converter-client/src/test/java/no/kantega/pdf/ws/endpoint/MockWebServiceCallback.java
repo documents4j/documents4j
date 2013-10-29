@@ -11,23 +11,23 @@ import java.io.InputStream;
 
 class MockWebServiceCallback implements IStrategyCallback {
 
-    private final Response.ResponseBuilder responseBuilder;
+    private Response.ResponseBuilder responseBuilder;
 
-    public MockWebServiceCallback(Response.ResponseBuilder responseBuilder) {
-        this.responseBuilder = responseBuilder;
+    MockWebServiceCallback() {
+        responseBuilder = Response.status(-1);
     }
 
     @Override
     public void onComplete(InputStream inputStream) {
-        responseBuilder
+        responseBuilder = Response
                 .status(WebServiceProtocol.Status.OK.getStatusCode())
-                .type(MimeType.APPLICATION_PDF)
-                .entity(inputStream);
+                .entity(inputStream)
+                .type(MimeType.APPLICATION_PDF);
     }
 
     @Override
     public void onCancel() {
-        responseBuilder.status(WebServiceProtocol.Status.CANCEL.getStatusCode());
+        responseBuilder = Response.status(WebServiceProtocol.Status.CANCEL.getStatusCode());
     }
 
     @Override
@@ -40,6 +40,10 @@ class MockWebServiceCallback implements IStrategyCallback {
         } else {
             statusCode = WebServiceProtocol.Status.UNKNOWN.getStatusCode();
         }
-        responseBuilder.status(statusCode);
+        responseBuilder = Response.status(statusCode);
+    }
+
+    public Response buildResponse() {
+        return responseBuilder.build();
     }
 }

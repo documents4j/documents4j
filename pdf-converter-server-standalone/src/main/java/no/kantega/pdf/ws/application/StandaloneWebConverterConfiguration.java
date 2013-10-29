@@ -2,6 +2,7 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.LocalConverter;
+import no.kantega.pdf.ws.WebServiceProtocol;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -30,5 +31,10 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
     @Override
     public long getTimeout() {
         return requestTimeOut;
+    }
+
+    @Override
+    public int getProtocolVersion() {
+        return WebServiceProtocol.CURRENT_PROTOCOL_VERSION;
     }
 }

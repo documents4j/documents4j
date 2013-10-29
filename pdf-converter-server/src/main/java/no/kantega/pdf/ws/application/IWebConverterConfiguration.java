@@ -11,4 +11,6 @@ public interface IWebConverterConfiguration {
     IConverter getConverter();
 
     long getTimeout();
+
+    int getProtocolVersion();
 }

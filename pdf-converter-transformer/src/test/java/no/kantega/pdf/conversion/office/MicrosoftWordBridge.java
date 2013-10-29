@@ -34,4 +34,9 @@ public class MicrosoftWordBridge implements IExternalConverter {
     public String toString() {
         return "Test dummy for: MicrosoftWordBridge";
     }
+
+    @Override
+    public boolean isOperational() {
+        return true;
+    }
 }

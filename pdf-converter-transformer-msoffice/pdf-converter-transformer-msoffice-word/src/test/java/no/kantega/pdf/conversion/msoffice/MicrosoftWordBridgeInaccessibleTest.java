@@ -1,4 +1,4 @@
-package no.kantega.pdf.conversion.office;
+package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.AbstractWordBasedTest;

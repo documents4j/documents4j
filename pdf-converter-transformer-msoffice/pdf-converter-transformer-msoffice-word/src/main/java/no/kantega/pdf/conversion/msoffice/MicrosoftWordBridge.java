@@ -1,4 +1,4 @@
-package no.kantega.pdf.conversion.office;
+package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.base.Objects;
 import no.kantega.pdf.conversion.AbstractExternalConverter;
@@ -18,12 +18,11 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Object WORD_LOCK = new Object();
 
-    private final File conversionScript, assertScript;
+    private final File conversionScript;
 
     public MicrosoftWordBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         super(baseFolder, processTimeout, processTimeoutUnit);
         this.conversionScript = MicrosoftWordScript.WORD_PDF_CONVERSION_SCRIPT.materializeIn(baseFolder);
-        this.assertScript = MicrosoftWordScript.WORD_ASSERT_SCRIPT.materializeIn(baseFolder);
         startUp();
     }
 
@@ -55,7 +54,6 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
                     .resolve();
         } finally {
             tryDelete(conversionScript);
-            tryDelete(assertScript);
         }
     }
 
@@ -74,7 +72,7 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
             return makePresetProcessExecutor().command("cmd", "/C",
                     quote(conversionScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()))
-                    .destroyOnExit().addListener(new TargetNameCorrector(target)).start();
+                    .destroyOnExit().addListener(new MicrosoftWordTargetNameCorrector(target)).start();
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' to '%s' ",
                     conversionScript, source, target);
@@ -85,7 +83,7 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     @Override
     public boolean isOperational() {
-        return conversionScript.isFile() && assertScript.isFile()
+        return conversionScript.isFile()
                 && runNoArgumentScript(MicrosoftWordScript.WORD_ASSERT_SCRIPT)
                 == ExternalConverterScriptResult.CONVERTER_INTERACTION_SUCCESSFUL.getExitValue();
     }

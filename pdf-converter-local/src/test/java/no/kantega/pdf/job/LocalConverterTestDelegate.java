@@ -15,6 +15,23 @@ import static org.junit.Assert.*;
 @Ignore
 class LocalConverterTestDelegate implements IConverterTestDelegate {
 
+    private class StubbedLocalConverter extends LocalConverter {
+
+        private StubbedLocalConverter(File baseFolder) {
+            super(baseFolder,
+                    LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE,
+                    LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE,
+                    LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME,
+                    LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT,
+                    TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
+            return MockConversionManager.make(baseFolder, operational);
+        }
+    }
+
     private final boolean operational;
     private File temporaryFolder;
     private IConverter converter;
@@ -25,19 +42,7 @@ class LocalConverterTestDelegate implements IConverterTestDelegate {
 
     public void setUp() {
         temporaryFolder = Files.createTempDir();
-        converter = new LocalConverter(temporaryFolder,
-                LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE,
-                LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE,
-                LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME,
-                LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT,
-                TimeUnit.MILLISECONDS) {
-            @Override
-            protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
-                return operational
-                        ? MockConversionManager.operational(baseFolder)
-                        : MockConversionManager.inoperational(baseFolder);
-            }
-        };
+        converter = new StubbedLocalConverter(temporaryFolder);
         assertEquals(operational, converter.isOperational());
     }
 

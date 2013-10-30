@@ -1,7 +1,6 @@
-package no.kantega.pdf;
+package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
-import no.kantega.pdf.conversion.office.MicrosoftWordScript;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -13,13 +12,13 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public final class WordAssert {
+public final class MicrosoftWordAssert {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WordAssert.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordAssert.class);
 
     private final File wordAssertScript, wordShutdownScript;
 
-    public WordAssert(File temporaryFolder) {
+    public MicrosoftWordAssert(File temporaryFolder) {
         wordAssertScript = MicrosoftWordScript.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
         wordShutdownScript = MicrosoftWordScript.WORD_SHUTDOWN_SCRIPT.materializeIn(temporaryFolder);
     }

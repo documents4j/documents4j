@@ -1,4 +1,4 @@
-package no.kantega.pdf.conversion.office;
+package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.conversion.IExternalConverter;
 import org.zeroturnaround.exec.StartedProcess;

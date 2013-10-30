@@ -10,23 +10,27 @@
     <packaging>pom</packaging>
 
     <!--
-     Note: This project can be built on any machine. However, testing the pdf-converter-transformer-office-word
+     Note: This project can be built on any machine. However, testing the pdf-converter-transformer-msoffice-word
      module requires the following:
       (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
       (3) Microsoft Word is not running when the built process is started and is neither started manually while the
           tests are running
-     If you cannot provide this setup, build this project with active "no-office" profile and the corresponding
+     If you cannot provide this setup, build this project with active "no-msoffice" profile and the corresponding
      tests will be skipped. In general, unit tests for the converters can fail since MS Word was not built for
      short-interval restarting. However, this happens rarely.
 
      Furthermore, for running the tests of the pdf-converter-server-standalone module, you require:
       (4) Your machine must have a free port and it must be possible to bind a server listener to this port
 
-     Also, be careful when running a local converter since it requires synchronization with MS Word. When the JVM
-     running this program exits abnormally (for example by a user interrupt causing a TerminateProcess signal), the
-     application cannot run any shut down hooks to terminate MS Word. The MS Word process will therefore leak.
-     When developing and testing this application, always keep an eye on your machine's task manager.
+     Many tests throughout all modules require:
+      (5) Possibility to create temporary folders on the local file system and creating, deleting and executing
+          files in these folders
+
+     Also, be careful when running a local MS Word transformer since it requires synchronization with MS Word.
+     When the JVM running this program exits abnormally (for example by a user interrupt causing a TerminateProcess
+     signal), the application cannot run any shut down hooks to terminate MS Word. The MS Word process will
+     therefore leak. When developing and testing this application, always keep an eye on your machine's task manager.
     -->
 
     <modules>
@@ -34,7 +38,7 @@
         <module>pdf-converter-local</module>
         <module>pdf-converter-local-demo</module>
         <module>pdf-converter-transformer</module>
-        <module>pdf-converter-transformer-office</module>
+        <module>pdf-converter-transformer-msoffice</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>

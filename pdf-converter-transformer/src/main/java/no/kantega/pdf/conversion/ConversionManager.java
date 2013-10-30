@@ -11,7 +11,7 @@ public class ConversionManager implements IConversionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConversionManager.class);
 
-    public static final String MICROSOFT_WORD_BRIDGE_CLASS_NAME = "no.kantega.pdf.conversion.office.MicrosoftWordBridge";
+    public static final String MICROSOFT_WORD_BRIDGE_CLASS_NAME = "no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge";
 
     private final IExternalConverter externalConverter;
 

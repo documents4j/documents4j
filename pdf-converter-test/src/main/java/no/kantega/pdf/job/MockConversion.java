@@ -49,7 +49,7 @@ public enum MockConversion {
             MockConversion.this.handle(message, callback);
         }
 
-        public RichMessage with(MockConversion mockConversion) {
+        public RichMessage overrideWith(MockConversion mockConversion) {
             return mockConversion.new RichMessage(message);
         }
     }

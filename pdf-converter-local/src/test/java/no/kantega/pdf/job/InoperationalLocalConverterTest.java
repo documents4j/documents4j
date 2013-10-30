@@ -1,5 +1,6 @@
 package no.kantega.pdf.job;
 
+import no.kantega.pdf.throwables.ConverterAccessException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +11,7 @@ public class InoperationalLocalConverterTest extends AbstractInoperationalConver
 
     @Before
     public void setUpConverter() throws Exception {
-        converterTestDelegate = new LocalConverterTestDelegate(true);
+        converterTestDelegate = new LocalConverterTestDelegate(false);
         converterTestDelegate.setUp();
     }
 
@@ -22,11 +23,5 @@ public class InoperationalLocalConverterTest extends AbstractInoperationalConver
     @Override
     protected IConverterTestDelegate getConverterTestDelegate() {
         return converterTestDelegate;
-    }
-
-    @Override
-    @Test
-    public void testInoperationalRemoteConverterExecute() throws Exception {
-        super.testInoperationalRemoteConverterExecute();
     }
 }

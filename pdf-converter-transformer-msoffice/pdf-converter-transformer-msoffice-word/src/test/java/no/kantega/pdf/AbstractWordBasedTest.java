@@ -2,7 +2,7 @@ package no.kantega.pdf;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.conversion.IExternalConverter;
-import no.kantega.pdf.conversion.office.MicrosoftWordBridge;
+import no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

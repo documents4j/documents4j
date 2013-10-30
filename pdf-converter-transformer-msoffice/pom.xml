@@ -10,11 +10,11 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-transformer-office</artifactId>
+    <artifactId>pdf-converter-transformer-msoffice</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>pdf-converter-transformer-office-word</module>
+        <module>pdf-converter-transformer-msoffice-word</module>
     </modules>
 
     <properties>

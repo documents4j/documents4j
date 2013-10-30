@@ -54,7 +54,7 @@ public abstract class MockConversionManager implements IConversionManager {
 
         @Override
         protected MockConversion.RichMessage resolve(InputStream inputStream) {
-            return MockConversion.from(inputStream).with(MockConversion.CONVERTER_ERROR);
+            return MockConversion.from(inputStream).overrideWith(MockConversion.CONVERTER_ERROR);
         }
 
         @Override
@@ -75,12 +75,12 @@ public abstract class MockConversionManager implements IConversionManager {
         }
     }
 
-    public static IConversionManager operational(File baseFolder) {
-        return new OperationalMockConversionManager(baseFolder);
-    }
-
-    public static IConversionManager inoperational(File baseFolder) {
-        return new InoperationalMockConversionManager(baseFolder);
+    public static IConversionManager make(File baseFolder, boolean operational) {
+        if (operational) {
+            return new OperationalMockConversionManager(baseFolder);
+        } else {
+            return new InoperationalMockConversionManager(baseFolder);
+        }
     }
 
     private final File baseFolder;

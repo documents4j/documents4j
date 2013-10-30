@@ -1,4 +1,4 @@
-package no.kantega.pdf.conversion.office;
+package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.base.Objects;
 import com.google.common.io.ByteStreams;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-public enum MicrosoftWordScript {
+enum MicrosoftWordScript {
 
     WORD_PDF_CONVERSION_SCRIPT("/doc2pdf.vbs"),
     WORD_STARTUP_SCRIPT("/word_start.vbs"),

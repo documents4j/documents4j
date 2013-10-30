@@ -74,7 +74,7 @@ public class PseudoConverter extends ConverterAdapter {
                 if (operational) {
                     MockConversion.from(inputStream).applyTo(strategyCallback);
                 } else {
-                    MockConversion.from(inputStream).with(MockConversion.CONVERTER_ERROR).applyTo(strategyCallback);
+                    MockConversion.from(inputStream).overrideWith(MockConversion.CONVERTER_ERROR).applyTo(strategyCallback);
                 }
             } finally {
                 source.onConsumed(inputStream);

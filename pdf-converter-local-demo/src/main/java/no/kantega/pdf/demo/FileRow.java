@@ -46,6 +46,7 @@ public class FileRow implements Serializable {
         if (milliseconds < 1000L) {
             return String.format("%d ms", milliseconds);
         } else {
+            // Integral division is wanted in order to truncate the resulting value.
             double seconds = (milliseconds / 100L) / 10d;
             return String.format("~%.1f s", seconds);
         }

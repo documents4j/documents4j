@@ -36,6 +36,7 @@ public class LinkPanel extends Panel {
             } else if (size < 1024L * 1024L) {
                 return String.format("~%d kB", size / 1024L);
             } else {
+                // Integral division is wanted in order to truncate the resulting value.
                 double truncatedMegabyte = (size / 1024L) / 1024d;
                 return String.format("~%.2f MB", truncatedMegabyte);
             }

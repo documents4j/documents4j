@@ -23,13 +23,12 @@ public class ConverterResource {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public Response serverInformation() {
-        ConverterServerInformation converterServerInformation = new ConverterServerInformation();
-        converterServerInformation.setTimeout(webConverterConfiguration.getTimeout());
-        converterServerInformation.setOperational(webConverterConfiguration.getConverter().isOperational());
-        converterServerInformation.setProtocolVersion(WebServiceProtocol.CURRENT_PROTOCOL_VERSION);
         return Response
                 .status(WebServiceProtocol.Status.OK.getStatusCode())
-                .entity(converterServerInformation)
+                .entity(new ConverterServerInformation(
+                        webConverterConfiguration.getConverter().isOperational(),
+                        webConverterConfiguration.getTimeout(),
+                        WebServiceProtocol.CURRENT_PROTOCOL_VERSION))
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

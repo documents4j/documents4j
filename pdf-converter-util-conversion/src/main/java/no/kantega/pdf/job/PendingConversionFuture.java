@@ -52,13 +52,13 @@ final class PendingConversionFuture implements Future<Boolean> {
             return false;
         }
         // See comment in PendingConversionFuture#get().
-        conversionJob.getPendingCondition().await(timeout, unit);
-        // The Object#lock(long) method has a different contract than the Future contract. Instead of throwing
-        // a TimeoutException, it will simply resume its execution. Therefore, we need to additionally check if the
-        // job that is described by this wrapper has already terminated. However, instead of relying on the return
-        // value, we simply check for the wrapper' state since it should return the same value but has a smaller
-        // racing condition.
-        if (conversionJob.isDone()) {
+        boolean complete = conversionJob.getPendingCondition().await(timeout, unit);
+        // The CountDownLatch#await(long, TimeUnit) method has a different contract than the Future contract. Instead
+        // of throwing a TimeoutException, it will simply resume its execution. Therefore, we need to additionally
+        // check if the job that is described by this wrapper has already terminated. However, instead of relying
+        // on the return value, we simply check for the wrapper' state since it should return the same value but has a
+        // smaller racing condition.
+        if (complete || conversionJob.isDone()) {
             return conversionJob.get();
         } else {
             throw new TimeoutException(String.format("Waiting timed out after %d milliseconds", unit.toMillis(timeout)));

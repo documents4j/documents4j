@@ -54,7 +54,7 @@
              supported external converter which is why this dependency is declared explicitly. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>pdf-converter-transformer-office-word</artifactId>
+            <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
             <version>${project.version}</version>
         </dependency>
 

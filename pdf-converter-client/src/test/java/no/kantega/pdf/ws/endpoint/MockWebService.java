@@ -25,13 +25,12 @@ public class MockWebService {
     @GET
     @Produces(MediaType.APPLICATION_XML)
     public Response serverInformation() {
-        ConverterServerInformation converterServerInformation = new ConverterServerInformation();
-        converterServerInformation.setTimeout(timeout);
-        converterServerInformation.setOperational(operational);
-        converterServerInformation.setProtocolVersion(WebServiceProtocol.CURRENT_PROTOCOL_VERSION);
         return Response
                 .status(WebServiceProtocol.Status.OK.getStatusCode())
-                .entity(converterServerInformation)
+                .entity(new ConverterServerInformation(
+                        operational,
+                        timeout,
+                        WebServiceProtocol.CURRENT_PROTOCOL_VERSION))
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

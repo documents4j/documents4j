@@ -6,6 +6,8 @@ import com.google.common.io.Closeables;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +16,8 @@ import java.io.InputStream;
 
 class FileSourceFromInputStreamSource implements IFileSource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileSourceFromInputStreamSource.class);
+
     private final IInputStreamSource inputStreamSource;
     private final File tempStorage;
 
@@ -21,7 +25,7 @@ class FileSourceFromInputStreamSource implements IFileSource {
 
     public FileSourceFromInputStreamSource(IInputStreamSource inputStreamSource, File tempStorage) {
         this.inputStreamSource = inputStreamSource;
-        this.tempStorage = new File("C:\\Users\\rafwin\\mytest.docx");
+        this.tempStorage = tempStorage;
     }
 
     @Override
@@ -45,7 +49,9 @@ class FileSourceFromInputStreamSource implements IFileSource {
     @Override
     public void onConsumed(File file) {
         try {
-            tempStorage.delete();
+            if (!tempStorage.delete()) {
+                LOGGER.warn("Could not delete temporary file {}", tempStorage);
+            }
         } finally {
             inputStreamSource.onConsumed(inputStream);
         }

@@ -52,7 +52,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <version.java.ws.rs>2.0</version.java.ws.rs>
         <version.javax.inject>1.0.0-PRD</version.javax.inject>
-        <version.jersey>2.1</version.jersey>
+        <version.jersey>2.4</version.jersey>
         <version.hk2>2.1.96</version.hk2>
         <version.guava>14.0.1</version.guava>
         <version.zt-exec>1.5</version.zt-exec>
@@ -102,7 +102,7 @@
                 <version>${version.jopt-simple}</version>
             </dependency>
 
-            <!-- RS-API / Jersey -->
+            <!-- JAX-RS / Jersey / servlet -->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>

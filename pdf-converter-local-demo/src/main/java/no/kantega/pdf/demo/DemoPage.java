@@ -70,11 +70,15 @@ public class DemoPage extends WebPage {
                 }
 
                 File transactionFolder = new File(DemoApplication.get().getUploadFolder(), DemoApplication.get().nextFolderName());
-                transactionFolder.mkdirs();
+                if (!transactionFolder.mkdirs()) {
+                    LOGGER.warn("Could not create directory", transactionFolder);
+                }
                 File newFile = new File(transactionFolder, FileRow.SOURCE_FILE_NAME);
 
                 try {
-                    newFile.createNewFile();
+                    if (!newFile.createNewFile()) {
+                        throw new IOException(String.format("Could not create file %s", newFile));
+                    }
                     fileUpload.writeTo(newFile);
                     File target = new File(transactionFolder, FileRow.TARGET_FILE_NAME);
 
@@ -90,7 +94,17 @@ public class DemoPage extends WebPage {
                         properties.setProperty(FileRow.CONVERSION_DURATION_PROPERTY_KEY, String.valueOf(conversionDuration));
                         writeProperties(properties, transactionFolder);
                     } catch (ConverterException e) {
-                        transactionFolder.delete();
+                        File[] transactionFiles = transactionFolder.listFiles();
+                        if (transactionFiles != null) {
+                            for (File file : transactionFiles) {
+                                if (!file.delete()) {
+                                    LOGGER.warn("Could not delete transaction file {}", file);
+                                }
+                            }
+                        }
+                        if (!transactionFolder.delete()) {
+                            LOGGER.warn("Could not delete transaction folder {}", transactionFolder);
+                        }
                         /* other than this, this exception is already handled by the callback (FeedbackMessageConductor) */
                     }
                     getFeedbackMessages().add(conductor.getFeedbackMessage());
@@ -105,9 +119,15 @@ public class DemoPage extends WebPage {
 
     private void writeProperties(Properties properties, File transactionFolder) throws IOException {
         File file = new File(transactionFolder, FileRow.PROPERTIES_FILE_NAME);
-        file.createNewFile();
+        if (!file.createNewFile()) {
+            throw new IOException(String.format("Could not create properties file %s", file));
+        }
         FileOutputStream fileOutputStream = new FileOutputStream(file);
-        properties.store(fileOutputStream, FileRow.PROPERTY_COMMENT);
+        try {
+            properties.store(fileOutputStream, FileRow.PROPERTY_COMMENT);
+        } finally {
+            fileOutputStream.close();
+        }
     }
 
     private FileUploadField makeUploadField(String identifier) {

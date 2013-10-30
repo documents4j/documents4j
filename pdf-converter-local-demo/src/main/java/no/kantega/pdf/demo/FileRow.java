@@ -1,9 +1,6 @@
 package no.kantega.pdf.demo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +46,7 @@ public class FileRow implements Serializable {
         if (milliseconds < 1000L) {
             return String.format("%d ms", milliseconds);
         } else {
-            double seconds = ((double) (milliseconds / 100L)) / 10d;
+            double seconds = (milliseconds / 100L) / 10d;
             return String.format("~%.1f s", seconds);
         }
     }
@@ -65,6 +62,9 @@ public class FileRow implements Serializable {
     public static List<FileRow> findAll() {
 
         File[] folders = DemoApplication.get().getUploadFolder().listFiles();
+        if (folders == null) {
+            throw new IllegalArgumentException("Argument must be a directory");
+        }
         Arrays.sort(folders);
 
         List<FileRow> result = new ArrayList<FileRow>();
@@ -93,8 +93,13 @@ public class FileRow implements Serializable {
             return null;
         }
         try {
-            properties.load(new FileInputStream(file));
-            return properties;
+            InputStream inputStream = new FileInputStream(file);
+            try {
+                properties.load(inputStream);
+                return properties;
+            } finally {
+                inputStream.close();
+            }
         } catch (IOException e) {
             return null;
         }

@@ -4,11 +4,15 @@ import com.google.common.base.Objects;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 
 class InputStreamConsumerToFileConsumer implements IFileConsumer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(InputStreamConsumerToFileConsumer.class);
 
     private final IInputStreamConsumer inputStreamConsumer;
 
@@ -30,7 +34,7 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
         try {
             inputStreamConsumer.onCancel();
         } finally {
-            file.delete();
+            tryDelete(file);
         }
     }
 
@@ -39,7 +43,13 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
         try {
             inputStreamConsumer.onException(e);
         } finally {
-            file.delete();
+            tryDelete(file);
+        }
+    }
+
+    private void tryDelete(File file) {
+        if (file.exists() && !file.delete()) {
+            LOGGER.warn("Could not delete target file {} after unsuccessful conversion", file);
         }
     }
 

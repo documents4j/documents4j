@@ -1,5 +1,8 @@
 package no.kantega.pdf.adapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,6 +10,8 @@ import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class DeleteFileOnCloseInputStream extends InputStream {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeleteFileOnCloseInputStream.class);
 
     private final File file;
     private final InputStream underlyingInputStream;
@@ -53,7 +58,9 @@ class DeleteFileOnCloseInputStream extends InputStream {
             underlyingInputStream.close();
         } finally {
             if (deletedMark.compareAndSet(false, true)) {
-                file.delete();
+                if (!file.delete()) {
+                    LOGGER.warn("Could not delete file {} after input stream was closed", file);
+                }
             }
         }
     }

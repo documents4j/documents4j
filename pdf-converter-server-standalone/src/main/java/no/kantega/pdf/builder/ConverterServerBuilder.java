@@ -82,12 +82,16 @@ public class ConverterServerBuilder {
 
     public HttpServer build() {
         checkNotNull(baseUri);
+        StandaloneWebConverterConfiguration configuration = makeConfiguration();
+        // The configuration has to be configured both by a binder to make it injectable
+        // and directly in order to trigger life cycle methods on the deployment container.
         ResourceConfig resourceConfig = new ResourceConfig(ConverterResource.class)
-                .register(new StandaloneWebConverterBinder(makeConfiguration()));
+                .register(new StandaloneWebConverterBinder(configuration))
+                .register(configuration);
         return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
     }
 
-    private IWebConverterConfiguration makeConfiguration() {
+    private StandaloneWebConverterConfiguration makeConfiguration() {
         return new StandaloneWebConverterConfiguration(baseFolder,
                 corePoolSize, maximumPoolSize, keepAliveTime,
                 processTimeout, requestTimeout);

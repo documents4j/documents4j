@@ -12,6 +12,16 @@ public class ConverterServerInformation {
     private long timeout;
     private int protocolVersion;
 
+    public ConverterServerInformation() {
+        /* JAX-RS requires default constructor */
+    }
+
+    public ConverterServerInformation(boolean operational, long timeout, int protocolVersion) {
+        this.operational = operational;
+        this.timeout = timeout;
+        this.protocolVersion = protocolVersion;
+    }
+
     @XmlElement(required = true, nillable = false)
     public boolean isOperational() {
         return operational;

@@ -34,9 +34,13 @@ public class DemoApplication extends WebApplication {
 
         nameSequence = new AtomicInteger(1);
 
-        converter = LocalConverter.builder()
+        converter = loadConverter();
+    }
+
+    protected IConverter loadConverter() {
+        return LocalConverter.builder()
                 .baseFolder(baseFolder)
-                .processTimeout(2L, TimeUnit.MILLISECONDS)
+                .processTimeout(2L, TimeUnit.MINUTES)
                 .build();
     }
 

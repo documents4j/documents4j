@@ -38,6 +38,7 @@
         <module>pdf-converter-local</module>
         <module>pdf-converter-local-demo</module>
         <module>pdf-converter-transformer</module>
+        <module>pdf-converter-transformer-api</module>
         <module>pdf-converter-transformer-msoffice</module>
         <module>pdf-converter-client</module>
         <module>pdf-converter-server</module>
@@ -61,6 +62,7 @@
         <version.junit>4.11</version.junit>
         <version.mockito>1.9.5</version.mockito>
         <version.thread-weaver>0.1</version.thread-weaver>
+        <version.jetty>8.1.13.v20130916</version.jetty>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
         <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
@@ -144,6 +146,12 @@
                 <groupId>com.googlecode.thread-weaver</groupId>
                 <artifactId>threadweaver</artifactId>
                 <version>${version.thread-weaver}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.eclipse.jetty.aggregate</groupId>
+                <artifactId>jetty-all-server</artifactId>
+                <version>${version.jetty}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

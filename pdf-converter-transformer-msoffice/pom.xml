@@ -25,7 +25,7 @@
         <!-- Local dependencies -->
         <dependency>
             <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-transformer</artifactId>
+            <artifactId>pdf-converter-transformer-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

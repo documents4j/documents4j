@@ -1,5 +1,6 @@
 package no.kantega.pdf.conversion;
 
+import no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +18,11 @@ public class ConversionManager implements IConversionManager {
 
     public ConversionManager(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         try {
-            externalConverter = (IExternalConverter) Class
-                    .forName(MICROSOFT_WORD_BRIDGE_CLASS_NAME)
-                    .getConstructor(File.class, long.class, TimeUnit.class)
-                    .newInstance(baseFolder, processTimeout, processTimeoutUnit);
+            externalConverter = new MicrosoftWordBridge(baseFolder, processTimeout, processTimeoutUnit);
+//            externalConverter = (IExternalConverter) Class
+//                    .forName(MICROSOFT_WORD_BRIDGE_CLASS_NAME, true, getClass().getClassLoader())
+//                    .getConstructor(File.class, long.class, TimeUnit.class)
+//                    .newInstance(baseFolder, processTimeout, processTimeoutUnit);
         } catch (Exception e) {
             throw new IllegalStateException("Could not load MicrosoftWordBridge from class path", e);
         }

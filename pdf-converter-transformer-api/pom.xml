@@ -3,13 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>pdf-converter-parent</artifactId>
         <groupId>no.kantega</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-transformer</artifactId>
+    <artifactId>pdf-converter-transformer-api</artifactId>
 
     <dependencies>
         <!-- Local dependencies -->
@@ -20,14 +21,8 @@
         </dependency>
 
         <dependency>
-            <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-transformer-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>pdf-converter-util-all</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -40,30 +35,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-
-        <!-- Testing dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

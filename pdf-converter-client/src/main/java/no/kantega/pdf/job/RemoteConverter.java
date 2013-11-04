@@ -1,5 +1,6 @@
 package no.kantega.pdf.job;
 
+import com.google.common.primitives.Ints;
 import no.kantega.pdf.adapter.ConversionJobAdapter;
 import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
@@ -7,6 +8,11 @@ import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.WebServiceProtocol;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.glassfish.jersey.apache.connector.ApacheClientProperties;
+import org.glassfish.jersey.apache.connector.ApacheConnector;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,19 +154,25 @@ public class RemoteConverter extends ConverterAdapter {
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime) {
         super(baseFolder);
-        this.webTarget = makeWebTarget(baseUri, requestTimeout);
+        this.webTarget = makeWebTarget(baseUri, requestTimeout, maximumPoolSize);
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         logConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
     }
 
-    private static WebTarget makeWebTarget(URI baseUri, long requestTimeout) {
-        ClientBuilder clientBuilder = ClientBuilder.newBuilder();
-        // TODO: Why is this timeout property not recognized? (Related to change to v2?)
-//        clientBuilder.getConfiguration().getProperties()
-//                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
+    private static WebTarget makeWebTarget(URI baseUri, long requestTimeout, int maxConnections) {
+        ClientConfig clientConfig = new ClientConfig();
+        int castRequestTimeout = Ints.checkedCast(requestTimeout);
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
+        clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnections);
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
+        ApacheConnector connector = new ApacheConnector(clientConfig);
+        clientConfig.connector(connector);
         // TODO: Add GZip converter - find out why some header fields are removed by Jersey.
-        return clientBuilder.build()
+        return ClientBuilder.newClient(clientConfig)
                 .target(baseUri)
                 .path(WebServiceProtocol.RESOURCE_PATH);
     }

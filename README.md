@@ -1,12 +1,15 @@
-Reliable Word to PDF conversion for Java
+A reliable Word to PDF converter for Java applications
 =============
 This converter is a tool for converting MS Word files to PDF in Java. This is achieved by delegating the conversion
 to a running instance of MS Word. This does however not mean that MS Word must be installed on the local machine.
 Besides running locally, the converter can be run from a server which offers a REST-API to a converter client. We
 experienced that this is the only reliable way of converting MS Word files since a native approach often results
 in distorted files due to the bad documentation and the frequent changes of the Word file format. Finally, we
-discovered that MS Word offers a much faster solution than other solutions. This makes this converter feasible
-for converting large amounts of files. (We tried quite a few before writing this application.)
+discovered that MS Word offers a much faster conversion than non-Microsoft solutions. This makes this converter
+feasible for converting large amounts of files. (We tried quite a few before writing this application.)
+
+**Note**: This converter was written with the aspiration of extending its functionality in the future. This might
+require minor changes in its API in the future. These changes will be announced and documented.
 
 The API
 ---------------------

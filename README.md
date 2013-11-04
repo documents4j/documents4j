@@ -175,6 +175,6 @@ only executed when the *extras* profile is active.
 
 Credits
 ---------------------
-Without the [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround, the work in this project
-would have been a lot harder. Also, I want to thank the makers of [*threadweaver*](http://code.google.com/p/thread-weaver/)
-for their great framework for unit testing concurrent applications.
+The [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround was a great help for running processes.
+Also, I want to thank the makers of [*threadweaver*](http://code.google.com/p/thread-weaver/) for their great framework
+for unit testing concurrent applications.

@@ -36,7 +36,6 @@
     <modules>
         <module>pdf-converter-api</module>
         <module>pdf-converter-local</module>
-        <module>pdf-converter-local-demo</module>
         <module>pdf-converter-transformer</module>
         <module>pdf-converter-transformer-api</module>
         <module>pdf-converter-transformer-msoffice</module>
@@ -47,6 +46,7 @@
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
         <module>pdf-converter-test</module>
+        <module>pdf-converter-demo</module>
     </modules>
 
     <properties>

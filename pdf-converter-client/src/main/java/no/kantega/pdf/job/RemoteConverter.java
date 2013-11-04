@@ -89,7 +89,7 @@ public class RemoteConverter extends ConverterAdapter {
         super(baseFolder);
         this.webTarget = makeWebTarget(baseUri, requestTimeout);
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        printConverterServerInformation();
+//        logConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
     }
 
@@ -98,7 +98,10 @@ public class RemoteConverter extends ConverterAdapter {
         // TODO: Why is this timeout property not recognized? (Related to change to v2?)
 //        clientBuilder.getConfiguration().getProperties()
 //                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
-        return clientBuilder.build().target(baseUri).path(WebServiceProtocol.RESOURCE_PATH);
+        // TODO: Add GZip converter.
+        return clientBuilder.build()
+                .target(baseUri)
+                .path(WebServiceProtocol.RESOURCE_PATH);
     }
 
     private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -176,7 +179,7 @@ public class RemoteConverter extends ConverterAdapter {
                 .get(ConverterServerInformation.class);
     }
 
-    private void printConverterServerInformation() {
+    private void logConverterServerInformation() {
         try {
             ConverterServerInformation converterServerInformation = fetchConverterServerInformation();
             LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());

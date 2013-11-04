@@ -4,9 +4,8 @@ import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.WebServiceProtocol;
-import no.kantega.pdf.ws.application.IWebConverterConfiguration;
-import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import no.kantega.pdf.ws.application.WebConverterApplication;
+import no.kantega.pdf.ws.application.WebConverterTestConfigurationBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
@@ -27,14 +26,9 @@ public class InoperationalConverterResourceTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return new ResourceConfig(ConverterResource.class)
-                .register(new AbstractBinder() {
-                    @Override
-                    protected void configure() {
-                        bind(new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT))
-                                .to(IWebConverterConfiguration.class);
-                    }
-                });
+        return ResourceConfig
+                .forApplication(new WebConverterApplication())
+                .register(new WebConverterTestConfigurationBinder(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -54,7 +48,7 @@ public class InoperationalConverterResourceTest extends JerseyTest {
     public void testConversion() throws Exception {
         Response response = target(WebServiceProtocol.RESOURCE_PATH)
                 .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), MimeType.WORD_DOC));
+                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), MimeType.WORD_ANY));
         assertEquals(WebServiceProtocol.Status.CONVERTER_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));

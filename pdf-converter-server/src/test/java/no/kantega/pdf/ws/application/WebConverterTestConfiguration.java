@@ -4,7 +4,7 @@ import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.PseudoConverter;
 import no.kantega.pdf.ws.WebServiceProtocol;
 
-public class WebConverterTestConfiguration implements IWebConverterConfiguration {
+class WebConverterTestConfiguration implements IWebConverterConfiguration {
 
     private final IConverter converter;
     private final long timeout;

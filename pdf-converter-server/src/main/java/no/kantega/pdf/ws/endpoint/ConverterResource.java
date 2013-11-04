@@ -10,8 +10,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.*;
 import java.io.InputStream;
 
 @Path(WebServiceProtocol.RESOURCE_PATH)
@@ -40,8 +39,10 @@ public class ConverterResource {
             InputStream inputStream,
             @Suspended AsyncResponse asyncResponse,
             @DefaultValue("" + IConverter.JOB_PRIORITY_NORMAL) @QueryParam(WebServiceProtocol.HEADER_JOB_PRIORITY) int priority) {
+        // The received input stream does not need to be closed since the underlying channel is automatically closed with responding.
+        // If the stream was closed manually, this would in contrast lead to a NullPointerException since the channel was already detached.
         webConverterConfiguration.getConverter()
-                .convert(inputStream)
+                .convert(inputStream, false)
                 .to(new AsynchronousConversionResponse(asyncResponse, webConverterConfiguration.getTimeout()))
                 .prioritizeWith(priority)
                 .schedule();

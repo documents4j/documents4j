@@ -155,7 +155,8 @@ For developers
 ---------------------
 This project was set up to allow running as many tests as possible without requiring MS Word. For this purpose, the project
 includes a lot of rich stubs that step in place of MS Word. When you are building this project on a machine that does not
-run MS Windows or MS Word, you should build the project with the *no-office* profile which skips the corresponding tests:
+run MS Windows or MS Word, you should build the project with the *no-office* profile which skips any tests that rely on
+an actual MS Word instance:
 
 ```
 mvn clean package -Pno-office

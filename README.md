@@ -170,7 +170,7 @@ mvn clean package -Pno-office
 
 If Maven discovers that the build is not run on MS Windows, this profile will be activated by default.
 
-Several time consuming operation such as building source code and javadoc artifacts as well as building the shaded jar are
+Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar are
 only executed when the *extras* profile is active.
 
 Credits

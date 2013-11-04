@@ -23,4 +23,10 @@ public class OperationalRemoteConverterTest extends AbstractOperationalConverter
     protected IConverterTestDelegate getConverterTestDelegate() {
         return remoteConverterTestDelegate;
     }
+
+    @Override
+    @Test
+    public void testFileToFileExecute() throws Exception {
+        super.testFileToFileExecute();
+    }
 }

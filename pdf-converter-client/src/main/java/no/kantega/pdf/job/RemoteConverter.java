@@ -22,12 +22,23 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * A converter that relies on a remote converter.
+ */
 public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
 
+    /**
+     * A builder for constructing a {@link RemoteConverter}.
+     * <p/>
+     * <i>Note</i>: This builder is not thread safe.
+     */
     public static final class Builder extends AbstractConverterBuilder<Builder> {
 
+        /**
+         * The default timeout of a network request.
+         */
         public static final long DEFAULT_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(5L);
 
         private URI baseUri;
@@ -37,16 +48,37 @@ public class RemoteConverter extends ConverterAdapter {
             /* empty */
         }
 
+        /**
+         * Specifies the base URI of the remote conversion server.
+         *
+         * @param baseUri The URI under which the remote conversion server is reachable.
+         * @return This builder instance.
+         */
         public Builder baseUri(URI baseUri) {
+            checkNotNull(baseUri);
             this.baseUri = baseUri;
             return this;
         }
 
+        /**
+         * Specifies the base URI of the remote conversion server.
+         *
+         * @param baseUri The URI under which the remote conversion server is reachable.
+         * @return This builder instance.
+         */
         public Builder baseUri(String baseUri) {
+            checkNotNull(baseUri);
             this.baseUri = URI.create(baseUri);
             return this;
         }
 
+        /**
+         * Specifies the timeout for a network request.
+         *
+         * @param timeout The timeout for a network request.
+         * @param unit    The time unit of the specified timeout.
+         * @return This builder instance.
+         */
         public Builder requestTimeout(long timeout, TimeUnit unit) {
             assertNumericArgument(timeout, true, Integer.MAX_VALUE);
             this.requestTimeout = unit.toMillis(timeout);
@@ -60,23 +92,52 @@ public class RemoteConverter extends ConverterAdapter {
                     corePoolSize, maximumPoolSize, keepAliveTime);
         }
 
+        /**
+         * Gets the currently specified base URI.
+         *
+         * @return The current base URI of the remote conversion server or {@code null}
+         *         if no such URI was specified.
+         */
         public URI getBaseUri() {
             return baseUri;
         }
 
+        /**
+         * Gets the current network request timeout in milliseconds.
+         *
+         * @return The current network request timeout in milliseconds.
+         */
         public long getRequestTimeout() {
             return requestTimeout;
         }
     }
 
+    /**
+     * Creates a new builder instance.
+     *
+     * @return A new builder instance.
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Creates a new {@link RemoteConverter} with default configuration.
+     *
+     * @param baseUri The base URI of the remote conversion server.
+     * @return A {@link RemoteConverter} with default configuration.
+     */
     public static IConverter make(URI baseUri) {
         return builder().baseUri(baseUri).build();
     }
 
+
+    /**
+     * Creates a new {@link RemoteConverter} with default configuration.
+     *
+     * @param baseUri The base URI of the remote conversion server.
+     * @return A {@link RemoteConverter} with default configuration.
+     */
     public static IConverter make(String baseUri) {
         return builder().baseUri(baseUri).build();
     }
@@ -89,7 +150,7 @@ public class RemoteConverter extends ConverterAdapter {
         super(baseFolder);
         this.webTarget = makeWebTarget(baseUri, requestTimeout);
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-//        logConverterServerInformation();
+        logConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
     }
 
@@ -98,7 +159,7 @@ public class RemoteConverter extends ConverterAdapter {
         // TODO: Why is this timeout property not recognized? (Related to change to v2?)
 //        clientBuilder.getConfiguration().getProperties()
 //                .put(ClientProperties.CONNECT_TIMEOUT, Ints.checkedCast(requestTimeout));
-        // TODO: Add GZip converter.
+        // TODO: Add GZip converter - find out why some header fields are removed by Jersey.
         return clientBuilder.build()
                 .target(baseUri)
                 .path(WebServiceProtocol.RESOURCE_PATH);

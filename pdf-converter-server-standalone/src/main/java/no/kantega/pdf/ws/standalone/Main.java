@@ -17,10 +17,19 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * Entry point for a command-line invoked standalone conversion server.
+ */
 public class Main {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
+    /**
+     * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
+     * the application via the command line.
+     *
+     * @param args The parameters for configuring this server.
+     */
     public static void main(String[] args) {
         try {
             ConverterServerBuilder builder = asBuilder(args);

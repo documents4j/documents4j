@@ -16,12 +16,30 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A converter that relies on an external converter such as MS Word on the local file system.
+ * <p/>
+ * <i>Important</i>: There should only exist <b>one</b> {@link LocalConverter} per <b>physical machine</b>!
+ * This instance needs to communicate with external applications via command line and needs to shut down
+ * and start up applications. This cannot be done in a safely manner without introducing a major latency. It
+ * is therefore the responsibility of the application developer to only run this program once per physical machine.
+ * It should be made explicit: It is not enough to create a singleton instance per JVM a {@link LocalConverter}
+ * on another JVM would share external application state.
+ */
 public class LocalConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
 
+    /**
+     * A builder for constructing a {@link LocalConverter}.
+     * <p/>
+     * <i>Note</i>: This builder is not thread safe.
+     */
     public static final class Builder extends AbstractConverterBuilder<Builder> {
 
+        /**
+         * The default time out for external processes.
+         */
         public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
 
         private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
@@ -30,6 +48,15 @@ public class LocalConverter extends ConverterAdapter {
             /* empty */
         }
 
+        /**
+         * Specifies a global timeout for external processes. After the specified amount of milliseconds
+         * any conversion process will be killed and the conversion will result with an error. This timeout
+         * also applies for starting up or terminating an external converter.
+         *
+         * @param processTimeout The process timeout.
+         * @param timeUnit       The time unit of the specified process timeout.
+         * @return This builder instance.
+         */
         public Builder processTimeout(long processTimeout, TimeUnit timeUnit) {
             assertNumericArgument(processTimeout, true);
             this.processTimeout = timeUnit.toMillis(processTimeout);
@@ -42,15 +69,30 @@ public class LocalConverter extends ConverterAdapter {
                     keepAliveTime, processTimeout, TimeUnit.MILLISECONDS);
         }
 
+        /**
+         * Returns the specified process time out in milliseconds.
+         *
+         * @return The process time out in milliseconds.
+         */
         public long getProcessTimeout() {
             return processTimeout;
         }
     }
 
+    /**
+     * Creates a new builder instance.
+     *
+     * @return A new builder instance.
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Creates a new {@link LocalConverter} with default configuration.
+     *
+     * @return A {@link LocalConverter} with default configuration.
+     */
     public static IConverter make() {
         return builder().build();
     }

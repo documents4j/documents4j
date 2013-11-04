@@ -7,6 +7,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A JAX-RS remote conversion server web converter application.
+ *
+ * @see IWebConverterConfiguration
+ */
 public class WebConverterApplication extends Application {
 
     private final Set<Class<?>> classes;

@@ -18,16 +18,38 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static no.kantega.pdf.builder.AbstractConverterBuilder.assertNumericArgument;
 
+/**
+ * Builds a standalone remote conversion server. This builder is usually run from the command line.
+ *
+ * @see no.kantega.pdf.ws.standalone.Main#main(String[])
+ */
 public class ConverterServerBuilder {
 
+    /**
+     * Creates a new builder instance.
+     *
+     * @return A new builder instance.
+     */
     public static ConverterServerBuilder builder() {
         return new ConverterServerBuilder();
     }
 
+    /**
+     * Creates a new {@link ConverterServerBuilder} with default configuration.
+     *
+     * @param baseUri The base URI of this conversion server.
+     * @return A {@link ConverterServerBuilder} with default configuration.
+     */
     public static HttpServer make(URI baseUri) {
         return builder().baseUri(baseUri).build();
     }
 
+    /**
+     * Creates a new {@link ConverterServerBuilder} with default configuration.
+     *
+     * @param baseUri The base URI of this conversion server.
+     * @return A {@link ConverterServerBuilder} with default configuration.
+     */
     public static HttpServer make(String baseUri) {
         return builder().baseUri(baseUri).build();
     }
@@ -44,21 +66,51 @@ public class ConverterServerBuilder {
         /* empty */
     }
 
+    /**
+     * Specifies the base URI of this conversion server.
+     *
+     * @param baseUri The URI under which this conversion server is reachable.
+     * @return This builder instance.
+     */
     public ConverterServerBuilder baseUri(URI baseUri) {
+        checkNotNull(baseUri);
         this.baseUri = baseUri;
         return this;
     }
 
+    /**
+     * Specifies the base URI of this conversion server.
+     *
+     * @param baseUri The URI under which this remote conversion server is reachable.
+     * @return This builder instance.
+     */
     public ConverterServerBuilder baseUri(String baseUri) {
+        checkNotNull(baseUri);
         this.baseUri = URI.create(baseUri);
         return this;
     }
 
+    /**
+     * Sets a folder for the constructed converter to save files in.
+     *
+     * @param baseFolder The base folder to be used or {@code null} if such a folder should be
+     *                   created as temporary folder by the converter.
+     * @return This builder instance.
+     */
     public ConverterServerBuilder baseFolder(File baseFolder) {
         this.baseFolder = baseFolder;
         return this;
     }
 
+    /**
+     * Configures a worker pool for the converter.
+     *
+     * @param corePoolSize    The core pool size of the worker pool.
+     * @param maximumPoolSize The maximum pool size of the worker pool.
+     * @param keepAliveTime   The keep alive time of the worker pool.
+     * @param unit            The time unit of the specified keep alive time.
+     * @return This builder instance.
+     */
     public ConverterServerBuilder workerPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         assertNumericArgument(corePoolSize, true);
         assertNumericArgument(maximumPoolSize, true);
@@ -70,18 +122,35 @@ public class ConverterServerBuilder {
         return this;
     }
 
+    /**
+     * Specifies the timeout for a network request.
+     *
+     * @param timeout The timeout for a network request.
+     * @param unit    The time unit of the specified timeout.
+     * @return This builder instance.
+     */
     public ConverterServerBuilder requestTimeout(long timeout, TimeUnit unit) {
         assertNumericArgument(timeout, true);
         this.requestTimeout = unit.toMillis(timeout);
         return this;
     }
 
+    /**
+     * Returns the specified process time out in milliseconds.
+     *
+     * @return The process time out in milliseconds.
+     */
     public ConverterServerBuilder processTimeout(long processTimeout, TimeUnit timeUnit) {
         assertNumericArgument(processTimeout, false);
         this.processTimeout = timeUnit.toMillis(processTimeout);
         return this;
     }
 
+    /**
+     * Creates the conversion server that is specified by this builder.
+     *
+     * @return The conversion server that is specified by this builder.
+     */
     public HttpServer build() {
         checkNotNull(baseUri);
         StandaloneWebConverterConfiguration configuration = makeConfiguration();
@@ -102,30 +171,66 @@ public class ConverterServerBuilder {
                 processTimeout, requestTimeout);
     }
 
+    /**
+     * Gets the currently specified base URI.
+     *
+     * @return The current base URI of this conversion server or {@code null}
+     *         if no such URI was specified.
+     */
     public URI getBaseUri() {
         return baseUri;
     }
 
+    /**
+     * Returns the currently configured base folder.
+     *
+     * @return The specified base folder or {@code null} if the folder was not specified.
+     */
     public File getBaseFolder() {
         return baseFolder;
     }
 
+    /**
+     * The currently specified core pool size of the converter's worker pool.
+     *
+     * @return The core pool size of the converter's worker pool.
+     */
     public int getCorePoolSize() {
         return corePoolSize;
     }
 
+    /**
+     * The currently specified maximum pool size of the converter's worker pool.
+     *
+     * @return The maximum pool size of the converter's worker pool.
+     */
     public int getMaximumPoolSize() {
         return maximumPoolSize;
     }
 
+    /**
+     * The currently specified keep alive time of the converter's worker pool in milliseconds.
+     *
+     * @return The keep alive time of the converter's worker pool in milliseconds.
+     */
     public long getKeepAliveTime() {
         return keepAliveTime;
     }
 
+    /**
+     * Returns the specified process time out in milliseconds.
+     *
+     * @return The process time out in milliseconds.
+     */
     public long getProcessTimeout() {
         return processTimeout;
     }
 
+    /**
+     * Gets the current network request timeout in milliseconds.
+     *
+     * @return The current network request timeout in milliseconds.
+     */
     public long getRequestTimeout() {
         return requestTimeout;
     }

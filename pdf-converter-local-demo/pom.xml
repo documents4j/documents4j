@@ -10,7 +10,7 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>pdf-converter-demo</artifactId>
+    <artifactId>pdf-converter-local-demo</artifactId>
     <packaging>war</packaging>
 
     <properties>

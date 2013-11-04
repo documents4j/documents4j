@@ -4,14 +4,29 @@ import com.google.common.base.Objects;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.util.Reaction;
 
+/**
+ *
+ */
 public final class WebServiceProtocol {
 
+    /**
+     * The current protocol version.
+     */
     public static final int CURRENT_PROTOCOL_VERSION = 1;
 
+    /**
+     * The root resource path.
+     */
     public static final String RESOURCE_PATH = "/";
 
+    /**
+     * A header for indicating a job's priority. (optional)
+     */
     public static final String HEADER_JOB_PRIORITY = "Converter-Job-Priority";
 
+    /**
+     * A collection of known status codes used for communication.
+     */
     public static enum Status {
 
         OK(200, Reaction.with(true)),

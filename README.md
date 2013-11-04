@@ -157,7 +157,7 @@ The following modules are of interest for the end user:
    the MS Word instance. (You can remove this leaked instance via the Windows task manager.) In order to avoid this leak,
    terminate the servlet container running the application gently.
 
-For developers
+Building the project
 ---------------------
 This project was set up to allow running as many tests as possible without requiring MS Word. For this purpose, the project
 includes a lot of rich stubs that step in place of MS Word. When you are building this project on a machine that does not
@@ -167,6 +167,11 @@ an actual MS Word instance:
 ```
 mvn clean package -Pno-office
 ```
+
+If Maven discovers that the build is not run on MS Windows, this profile will be activated by default.
+
+Several time consuming operation such as building source code and javadoc artifacts as well as building the shaded jar are
+only executed when the *extras* profile is active.
 
 Credits
 ---------------------

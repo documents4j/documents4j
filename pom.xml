@@ -10,8 +10,8 @@
     <packaging>pom</packaging>
 
     <!--
-     Note: This project can be built on any machine. However, testing the pdf-converter-transformer-msoffice-word
-     module requires the following:
+     Note: This project can be built on any machine. However, running the tests of the pdf-converter-transformer-msoffice-word
+     module requires the following configuration:
       (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
       (3) Microsoft Word is not running when the built process is started and is neither started manually while the
@@ -31,6 +31,11 @@
      When the JVM running this program exits abnormally (for example by a user interrupt causing a TerminateProcess
      signal), the application cannot run any shut down hooks to terminate MS Word. The MS Word process will
      therefore leak. When developing and testing this application, always keep an eye on your machine's task manager.
+
+     Profile summary:
+      (1) no-office: All tests that require MS Word are skipped. (Automatically activated when the build is run
+          on a non-Windows operating system.
+      (2) extras: Build a shaded jar for the standalone conversion server as well as javadoc and source artifacts.
     -->
 
     <modules>
@@ -171,36 +176,44 @@
                     <target>${version.java.compiler}</target>
                 </configuration>
             </plugin>
-
-            <!-- Create source artifacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${version.maven.source-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Create javadoc artifacts -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${version.maven.javadoc-plugin}</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>extras</id>
+            <build>
+                <plugins>
+                    <!-- Create source artifacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>${version.maven.source-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Create javadoc artifacts -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${version.maven.javadoc-plugin}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

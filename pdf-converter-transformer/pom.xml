@@ -25,12 +25,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>no.kantega</groupId>
-            <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- External dependencies -->
         <dependency>
             <groupId>org.zeroturnaround</groupId>

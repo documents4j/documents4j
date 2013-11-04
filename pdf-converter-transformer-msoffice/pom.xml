@@ -36,6 +36,11 @@
             <properties>
                 <testing.skip.office>true</testing.skip.office>
             </properties>
+            <activation>
+                <os>
+                    <family>!Windows</family>
+                </os>
+            </activation>
         </profile>
     </profiles>
 

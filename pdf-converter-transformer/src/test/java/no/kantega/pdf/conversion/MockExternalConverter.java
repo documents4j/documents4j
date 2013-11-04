@@ -1,4 +1,4 @@
-package no.kantega.pdf.conversion.msoffice;
+package no.kantega.pdf.conversion;
 
 import no.kantega.pdf.conversion.IExternalConverter;
 import org.zeroturnaround.exec.StartedProcess;
@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 
-public class MicrosoftWordBridge implements IExternalConverter {
+public class MockExternalConverter implements IExternalConverter {
 
     private final IExternalConverter delegate;
 
-    public MicrosoftWordBridge(File file, long timeout, TimeUnit timeUnit) {
+    public MockExternalConverter(File file, long timeout, TimeUnit timeUnit) {
         delegate = mock(IExternalConverter.class);
     }
 
@@ -28,11 +28,6 @@ public class MicrosoftWordBridge implements IExternalConverter {
 
     public IExternalConverter getDelegate() {
         return delegate;
-    }
-
-    @Override
-    public String toString() {
-        return "Test dummy for: MicrosoftWordBridge";
     }
 
     @Override

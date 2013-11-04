@@ -4,14 +4,15 @@ import no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge;
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class ClasspathTest {
+public class ClassPathTest {
 
     @Test
-    public void testMicrosoftWordBridgeOnClassPath() throws Exception {
-        Class<?> clazz = Class.forName(MicrosoftWordBridge.class.getName(), false, getClass().getClassLoader());
-        assertNotNull(clazz);
-        assertTrue(IExternalConverter.class.isAssignableFrom(clazz));
+    public void testClassPathAllAutoDiscovery() throws Exception {
+        for (ExternalConverterDiscovery autoDiscovery : ExternalConverterDiscovery.values()) {
+            assertNotNull(autoDiscovery.tryFindClass());
+        }
     }
 }

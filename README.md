@@ -150,12 +150,19 @@ The following modules are of interest for the end user:
    that allows to create a conversion server programmatically. (If you are using the `ConverterServerBuilder`, make sure
    to include the unshaded jar into your project.) The shaded jar comes bundled with the
    *no.kantega/pdf-converter-transformer-msoffice-word* dependency.
+-  The *no.kantega/pdf-converter-local-demo* includes a demo application which allows to run a `LocalConverter` from
+   a simple application in the browser. Simply run the application for example by calling `mvn jetty:run` and go to
+   for example *http://localhost:8080*. You can then upload MS Word files and view the resulting PDF documents.
+   **Warning**: Do not kill the application server since shut down hooks are not executed. This will lead to a leak of
+   the MS Word instance. (You can remove this leaked instance via the Windows task manager.) In order to avoid this leak,
+   terminate the servlet container running the application gently.
 
 For developers
 ---------------------
 This project was set up to allow running as many tests as possible without requiring MS Word. For this purpose, the project
 includes a lot of rich stubs that step in place of MS Word. When you are building this project on a machine that does not
-run MS Windows or MS Word, you should build the project with the *no-office* profile which skips the corresponding tests:
+run MS Windows or MS Word, you should build the project with the *no-office* profile which skips any tests that rely on
+an actual MS Word instance:
 
 ```
 mvn clean package -Pno-office

@@ -8,7 +8,8 @@ import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.WebServiceProtocol;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnector;
 import org.glassfish.jersey.client.ClientConfig;
@@ -165,16 +166,22 @@ public class RemoteConverter extends ConverterAdapter {
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(maxConnections);
-        connectionManager.setDefaultMaxPerRoute(maxConnections);
-        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, connectionManager);
-        ApacheConnector connector = new ApacheConnector(clientConfig);
-        clientConfig.connector(connector);
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
+        clientConfig.connector(new ApacheConnector(clientConfig));
         // TODO: Add GZip converter - find out why some header fields are removed by Jersey.
         return ClientBuilder.newClient(clientConfig)
                 .target(baseUri)
                 .path(WebServiceProtocol.RESOURCE_PATH);
+    }
+
+    private static ClientConnectionManager makeConnectionManager(int maxConnections) {
+        // Jersey requires an instance of the ClientConnectionManager interface which is deprecated in the latest
+        // version of the Apache HttpComponents. In a future version, this implementation should be updated to
+        // the PoolingHttpClientConnectionManager and the HttpClientConnectionManager.
+        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnections);
+        return connectionManager;
     }
 
     private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {

@@ -56,7 +56,6 @@
         <version.jersey>2.4</version.jersey>
         <version.guava>14.0.1</version.guava>
         <version.zt-exec>1.5</version.zt-exec>
-        <version.httpclient>4.3.1</version.httpclient>
         <version.jopt-simple>4.5</version.jopt-simple>
         <version.slf4j>1.7.5</version.slf4j>
         <version.junit>4.11</version.junit>
@@ -65,6 +64,9 @@
         <version.jetty>8.1.13.v20130916</version.jetty>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
         <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
+        <version.maven.source-plugin>2.2.1</version.maven.source-plugin>
+        <version.maven.javadoc-plugin>2.9.1</version.maven.javadoc-plugin>
+        <version.maven.war-plugin>2.3</version.maven.war-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
         <version.java.compiler>1.6</version.java.compiler>
     </properties>
@@ -117,12 +119,6 @@
                 <version>${version.jersey}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${version.httpclient}</version>
-            </dependency>
-
             <!-- Testing / Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -164,6 +160,7 @@
 
     <build>
         <plugins>
+            <!-- Set Java version -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -173,6 +170,36 @@
                     <source>${version.java.compiler}</source>
                     <target>${version.java.compiler}</target>
                 </configuration>
+            </plugin>
+
+            <!-- Create source artifacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${version.maven.source-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create javadoc artifacts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${version.maven.javadoc-plugin}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

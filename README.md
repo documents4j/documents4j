@@ -1,4 +1,4 @@
-A reliable MS Word to PDF converter for Java
+Reliable Word to PDF conversion for Java
 =============
 This converter is a tool for converting MS Word files to PDF in Java. This is achieved by delegating the conversion
 to a running instance of MS Word. This does however not mean that MS Word must be installed on the local machine.
@@ -22,7 +22,7 @@ be conducted before a conversion with lower priority if both conversions are que
 A conversion with a given instance of `IConverter` would therefore look like this:
 
 ```
-File source = new File( ... ), target = new File ( ... );
+File source = new File( ... ), target = new File( ... );
 IConverter converter = getConverter();
 Future<Boolean> conversion = converter.convert(source).to(target).prioritizeWith(1000).schedule();
 ```

@@ -1,15 +1,16 @@
 package no.kantega.pdf.throwables;
 
-import java.io.IOException;
-
+/**
+ * This exception is thrown when a file on the file system cannot be read or written or when
+ * a script file cannot be executed. Usually, this is a wrapper for an {@link java.io.IOException}.
+ */
 public class FileSystemInteractionException extends ConverterException {
 
-    public FileSystemInteractionException(String message, IOException cause) {
-        super(message, cause);
+    public FileSystemInteractionException(String message) {
+        super(message);
     }
 
-    @Override
-    public IOException getCause() {
-        return (IOException) super.getCause();
+    public FileSystemInteractionException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

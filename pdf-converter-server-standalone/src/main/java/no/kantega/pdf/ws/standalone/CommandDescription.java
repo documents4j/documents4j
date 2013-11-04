@@ -1,10 +1,6 @@
 package no.kantega.pdf.ws.standalone;
 
-final class CommandDescription {
-
-    private CommandDescription() {
-        /* empty */
-    }
+class CommandDescription {
 
     public static final String ARGUMENT_LONG_BASE_FOLDER = "base-folder";
     public static final String ARGUMENT_SHORT_BASE_FOLDER = "F";
@@ -71,4 +67,8 @@ final class CommandDescription {
     public static final String DESCRIPTION_CONTEXT_HELP = "Displays information about this program.";
 
     public static final String DESCRIPTION_BASE_URI = "The base URI of this server instance. (e.g. http://localhost:8080)";
+
+    private CommandDescription() {
+        throw new AssertionError();
+    }
 }

@@ -1,46 +1,31 @@
 package no.kantega.pdf.ws.application;
 
-import com.google.common.io.Files;
 import no.kantega.pdf.api.IConverter;
-import no.kantega.pdf.job.LocalConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import no.kantega.pdf.job.PseudoConverter;
+import no.kantega.pdf.ws.WebServiceProtocol;
 
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.TimeoutHandler;
-import java.util.concurrent.TimeUnit;
+class WebConverterTestConfiguration implements IWebConverterConfiguration {
 
-public class WebConverterTestConfiguration implements IWebConverterConfiguration {
+    private final IConverter converter;
+    private final long timeout;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebConverterTestConfiguration.class);
-
-    private static final long TIMEOUT = TimeUnit.MINUTES.toMillis(1L);
-
-    private static final TimeoutHandler TIMEOUT_HANDLER = new TimeoutHandler() {
-        @Override
-        public void handleTimeout(AsyncResponse asyncResponse) {
-            LOGGER.error("Timeout after {} milliseconds: {}", TIMEOUT, asyncResponse);
-            asyncResponse.cancel();
-        }
-    };
-
-    private static final IConverter CONVERTER = LocalConverter.builder()
-            .baseFolder(Files.createTempDir())
-            .processTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-            .build();
+    public WebConverterTestConfiguration(boolean operational, long timeout) {
+        this.converter = new PseudoConverter(operational);
+        this.timeout = timeout;
+    }
 
     @Override
     public IConverter getConverter() {
-        return CONVERTER;
+        return converter;
     }
 
     @Override
     public long getTimeout() {
-        return TIMEOUT;
+        return timeout;
     }
 
     @Override
-    public TimeoutHandler getTimeoutHandler() {
-        return TIMEOUT_HANDLER;
+    public int getProtocolVersion() {
+        return WebServiceProtocol.CURRENT_PROTOCOL_VERSION;
     }
 }

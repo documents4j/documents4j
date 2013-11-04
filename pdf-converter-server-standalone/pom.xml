@@ -12,13 +12,38 @@
 
     <artifactId>pdf-converter-server-standalone</artifactId>
 
+    <properties>
+        <exec.class.main>no.kantega.pdf.ws.standalone.Main</exec.class.main>
+    </properties>
+
     <dependencies>
+        <!-- Local dependencies -->
         <dependency>
             <groupId>no.kantega</groupId>
             <artifactId>pdf-converter-server</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-local</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-ws</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Make the MS Office available on the classpath -->
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- External dependencies -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
@@ -33,6 +58,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
         </dependency>
+
+        <!-- Testing dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -41,7 +73,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.0</version>
+                <version>${version.maven.shade-plugin}</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -54,7 +86,7 @@
                                         implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>no.kantega.pdf.ws.standalone.Main</mainClass>
+                                    <mainClass>${exec.class.main}</mainClass>
                                 </transformer>
                             </transformers>
                             <createDependencyReducedPom>false</createDependencyReducedPom>

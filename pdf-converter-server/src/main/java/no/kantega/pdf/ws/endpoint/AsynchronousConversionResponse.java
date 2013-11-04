@@ -1,53 +1,86 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.api.IInputStreamConsumer;
-import no.kantega.pdf.mime.CustomMediaType;
+import no.kantega.pdf.ws.MimeType;
+import no.kantega.pdf.ws.WebServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-public class AsynchronousConversionResponse implements IInputStreamConsumer {
-
-    private static final long WRITE_TIMEOUT = TimeUnit.MINUTES.toMillis(2L);
+public class AsynchronousConversionResponse implements IInputStreamConsumer, TimeoutHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsynchronousConversionResponse.class);
 
     private final AsyncResponse asyncResponse;
-    private final CountDownLatch countDownLatch;
 
-    public AsynchronousConversionResponse(AsyncResponse asyncResponse) {
+    private final Object answerLock;
+
+    public AsynchronousConversionResponse(AsyncResponse asyncResponse, long requestTimeout) {
         this.asyncResponse = asyncResponse;
-        countDownLatch = new CountDownLatch(1);
+        this.answerLock = new Object();
+        asyncResponse.setTimeoutHandler(this);
+        asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void onComplete(InputStream inputStream) {
-        asyncResponse.resume(Response.ok(new ConversionResultOutput(inputStream, countDownLatch), CustomMediaType.APPLICATION_PDF).build());
-        try {
-            if (!countDownLatch.await(WRITE_TIMEOUT, TimeUnit.MILLISECONDS) && asyncResponse.isSuspended()) {
-                asyncResponse.cancel();
+        if (asyncResponse.isDone()) {
+            return;
+        }
+        synchronized (answerLock) {
+            if (asyncResponse.isDone()) {
+                return;
             }
-        } catch (InterruptedException e) {
-            LOGGER.warn("Interruption when waiting for stream", e);
-            if (!asyncResponse.isSuspended()) {
-                asyncResponse.resume(Response.serverError().build());
-            }
+            asyncResponse.resume(Response
+                    .status(WebServiceProtocol.Status.OK.getStatusCode())
+                    .entity(inputStream)
+                    .type(MimeType.APPLICATION_PDF)
+                    .build());
         }
     }
 
     @Override
     public void onCancel() {
-        asyncResponse.cancel();
+        onCancel(WebServiceProtocol.Status.CANCEL);
     }
 
     @Override
     public void onException(Exception e) {
-        LOGGER.warn("Could not complete conversion", e);
-        asyncResponse.resume(Response.serverError().build());
+        if (asyncResponse.isDone()) {
+            return;
+        }
+        synchronized (answerLock) {
+            if (asyncResponse.isDone()) {
+                return;
+            }
+            asyncResponse.resume(Response
+                    .status(WebServiceProtocol.Status.describe(e).getStatusCode())
+                    .build());
+        }
+    }
+
+    @Override
+    public void handleTimeout(AsyncResponse asyncResponse) {
+        LOGGER.warn("Conversion request timed out");
+        onCancel(WebServiceProtocol.Status.TIMEOUT);
+    }
+
+    private void onCancel(WebServiceProtocol.Status status) {
+        if (asyncResponse.isDone()) {
+            return;
+        }
+        synchronized (answerLock) {
+            if (asyncResponse.isDone()) {
+                return;
+            }
+            asyncResponse.resume(Response
+                    .status(status.getStatusCode())
+                    .build());
+        }
     }
 }

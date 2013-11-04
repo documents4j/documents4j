@@ -2,40 +2,37 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.LocalConverter;
+import no.kantega.pdf.ws.WebServiceProtocol;
+import org.glassfish.jersey.server.spi.Container;
+import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.TimeoutHandler;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
-public class StandaloneWebConverterConfiguration implements IWebConverterConfiguration {
+public class StandaloneWebConverterConfiguration implements IWebConverterConfiguration, ContainerLifecycleListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneWebConverterConfiguration.class);
 
-    private final IConverter converter;
-    private final long requestTimeOut;
-    private final TimeoutHandler timeoutHandler;
+    private final File baseFolder;
+    private final int corePoolSize, maximumPoolSize;
+    private final long keepAliveTime;
 
-    private class StandaloneTimeoutHandler implements TimeoutHandler {
-        @Override
-        public void handleTimeout(AsyncResponse asyncResponse) {
-            asyncResponse.cancel();
-            LOGGER.error("Request timeout after {} milliseconds: {}", requestTimeOut, asyncResponse);
-        }
-    }
+    private final long processTimeout;
+    private final long requestTimeout;
+
+    private volatile IConverter converter;
 
     public StandaloneWebConverterConfiguration(File baseFolder,
                                                int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                               long processTimeOut, long requestTimeOut) {
-        this.converter = LocalConverter.builder()
-                .baseFolder(baseFolder)
-                .processTimeout(processTimeOut, TimeUnit.MILLISECONDS)
-                .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
-                .build();
-        this.requestTimeOut = requestTimeOut;
-        this.timeoutHandler = new StandaloneTimeoutHandler();
+                                               long processTimeout, long requestTimeout) {
+        this.baseFolder = baseFolder;
+        this.corePoolSize = corePoolSize;
+        this.maximumPoolSize = maximumPoolSize;
+        this.keepAliveTime = keepAliveTime;
+        this.processTimeout = processTimeout;
+        this.requestTimeout = requestTimeout;
     }
 
     @Override
@@ -45,11 +42,35 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
 
     @Override
     public long getTimeout() {
-        return requestTimeOut;
+        return requestTimeout;
     }
 
     @Override
-    public TimeoutHandler getTimeoutHandler() {
-        return timeoutHandler;
+    public int getProtocolVersion() {
+        return WebServiceProtocol.CURRENT_PROTOCOL_VERSION;
+    }
+
+    @Override
+    public void onStartup(Container container) {
+        LOGGER.info("Standalone conversion server is starting: starting up local converter");
+        this.converter = LocalConverter.builder()
+                .baseFolder(baseFolder)
+                .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
+                .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
+                .build();
+        LOGGER.info("Standalone conversion server is starting: local converter is started");
+    }
+
+    @Override
+    public void onShutdown(Container container) {
+        LOGGER.info("Standalone conversion server is shutting down: shutting local converter down");
+        converter.shutDown();
+        LOGGER.info("Standalone conversion server is shutting down: local converter was shut down");
+    }
+
+    @Override
+    public void onReload(Container container) {
+        onShutdown(container);
+        onStartup(container);
     }
 }

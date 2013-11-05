@@ -132,12 +132,7 @@ public enum MockConversion {
 
     public InputStream toInputStream(String message) {
         return new ByteArrayInputStream(
-                new StringBuilder()
-                        .append(DELIMITER)
-                        .append(this.getMessageCode())
-                        .append(DELIMITER)
-                        .append(message)
-                        .toString()
+                String.format("%c%d%c%s", DELIMITER, this.getMessageCode(), DELIMITER, message)
                         .getBytes(Charsets.UTF_8));
 
     }

@@ -1,9 +1,7 @@
 package no.kantega.pdf.job;
 
-import no.kantega.pdf.throwables.ConverterAccessException;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 public class InoperationalLocalConverterTest extends AbstractInoperationalConverterTest {
 

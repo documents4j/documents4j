@@ -7,16 +7,9 @@ import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.WebServiceProtocol;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.ReaderInterceptorContext;
-import javax.ws.rs.ext.WriterInterceptor;
-import javax.ws.rs.ext.WriterInterceptorContext;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 @Path(WebServiceProtocol.RESOURCE_PATH)
 public class MockWebService {

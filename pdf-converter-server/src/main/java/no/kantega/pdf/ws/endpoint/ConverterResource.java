@@ -10,7 +10,8 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.InputStream;
 
 @Path(WebServiceProtocol.RESOURCE_PATH)

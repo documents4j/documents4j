@@ -9,9 +9,6 @@ import org.junit.Ignore;
 import javax.ws.rs.core.Application;
 import java.net.URI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-
 // This is just a test delegate which should only be invoked by another test.
 @Ignore
 class RemoteConverterTestDelegate implements IConverterTestDelegate {

@@ -54,7 +54,7 @@ public class ConversionManagerTest {
         verifyNoMoreInteractions(bridge.getDelegate());
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = LinkageError.class)
     public void testEmptyConversionManager() throws Exception {
         makeConversionManager(true);
     }

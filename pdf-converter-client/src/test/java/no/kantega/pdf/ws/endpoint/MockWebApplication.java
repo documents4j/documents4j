@@ -7,21 +7,12 @@ import java.util.Set;
 
 public class MockWebApplication extends Application {
 
-    private final Set<Class<?>> classes;
     private final Set<Object> singletons;
 
     public MockWebApplication(boolean operational, long timeout) {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        // TODO: Add GZip converter.
-        this.classes = Collections.unmodifiableSet(classes);
         Set<Object> singletons = new HashSet<Object>();
         singletons.add(new MockWebService(operational, timeout));
-        this.singletons = singletons;
-    }
-
-    @Override
-    public Set<Class<?>> getClasses() {
-        return classes;
+        this.singletons = Collections.unmodifiableSet(singletons);
     }
 
     @Override

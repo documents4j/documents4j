@@ -20,7 +20,8 @@ enum ExternalConverterDiscovery {
                     .getConstructor(File.class, long.class, TimeUnit.class)
                     .newInstance(baseFolder, processTimeout, timeUnit);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not create external converter", e);
+            throw new LinkageError(String.format("The class path contains an external converter with an " +
+                    "invalid constructor signature: %s", e.getMessage()));
         }
     }
 
@@ -33,7 +34,7 @@ enum ExternalConverterDiscovery {
         return externalConverters;
     }
 
-    private static Set<Class<? extends IExternalConverter>> discoverRelevant(
+    private static Set<Class<? extends IExternalConverter>> discover(
             Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
         Set<Class<? extends IExternalConverter>> discovered = new HashSet<Class<? extends IExternalConverter>>();
         Map<String, ExternalConverterDiscovery> autoDetectNameMap = makeAutoDetectNameMap();
@@ -53,6 +54,13 @@ enum ExternalConverterDiscovery {
         return discovered;
     }
 
+    private static Set<Class<? extends IExternalConverter>> validate(Set<Class<? extends IExternalConverter>> externalConverterClasses) {
+        if (externalConverterClasses.size() == 0) {
+            throw new LinkageError("There were no external converters found on the class path.");
+        }
+        return externalConverterClasses;
+    }
+
     private static Map<String, ExternalConverterDiscovery> makeAutoDetectNameMap() {
         Map<String, ExternalConverterDiscovery> autoDetectNames = new HashMap<String, ExternalConverterDiscovery>();
         for (ExternalConverterDiscovery autoDetect : ExternalConverterDiscovery.values()) {
@@ -63,7 +71,7 @@ enum ExternalConverterDiscovery {
 
     public static Set<IExternalConverter> loadConfiguration(Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration,
                                                             File baseFolder, long processTimeout, TimeUnit timeUnit) {
-        return makeAll(discoverRelevant(externalConverterRegistration), baseFolder, processTimeout, timeUnit);
+        return makeAll(validate(discover(externalConverterRegistration)), baseFolder, processTimeout, timeUnit);
     }
 
     private final String className;

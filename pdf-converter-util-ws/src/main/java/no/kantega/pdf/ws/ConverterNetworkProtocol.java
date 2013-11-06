@@ -5,9 +5,10 @@ import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.util.Reaction;
 
 /**
- *
+ * This class is a non-instantiable carrier for values that are used in network communication between a
+ * conversion server and a remote converter.
  */
-public final class WebServiceProtocol {
+public final class ConverterNetworkProtocol {
 
     /**
      * The current protocol version.
@@ -23,6 +24,11 @@ public final class WebServiceProtocol {
      * A header for indicating a job's priority. (optional)
      */
     public static final String HEADER_JOB_PRIORITY = "Converter-Job-Priority";
+
+    /**
+     * GZip compression type names.
+     */
+    public static final String COMPRESSION_TYPE_GZIP = "gzip", COMPRESSION_TYPE_XGZIP = "x-gzip";
 
     /**
      * A collection of known status codes used for communication.
@@ -78,7 +84,7 @@ public final class WebServiceProtocol {
         }
     }
 
-    private WebServiceProtocol() {
+    private ConverterNetworkProtocol() {
         throw new AssertionError();
     }
 }

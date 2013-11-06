@@ -2,7 +2,7 @@ package no.kantega.pdf.job;
 
 import com.google.common.base.Objects;
 import no.kantega.pdf.throwables.ConverterException;
-import no.kantega.pdf.ws.WebServiceProtocol;
+import no.kantega.pdf.ws.ConverterNetworkProtocol;
 
 import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
@@ -45,7 +45,7 @@ class WebserviceRequestFutureWrapper implements Future<Boolean> {
 
     private boolean handle(Response response) throws ExecutionException {
         try {
-            return WebServiceProtocol.Status.from(response.getStatus()).resolve();
+            return ConverterNetworkProtocol.Status.from(response.getStatus()).resolve();
         } catch (ConverterException e) {
             throw new ExecutionException("The conversion resulted in an error", e);
         }

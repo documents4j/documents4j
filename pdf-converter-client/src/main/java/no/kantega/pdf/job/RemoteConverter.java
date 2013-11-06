@@ -6,8 +6,8 @@ import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
+import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
-import no.kantega.pdf.ws.WebServiceProtocol;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
@@ -17,6 +17,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -149,29 +150,32 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-    private final WebTarget webTarget;
+    private final Client client;
+    private final URI baseUri;
     private final ExecutorService executorService;
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime) {
         super(baseFolder);
-        this.webTarget = makeWebTarget(baseUri, requestTimeout, maximumPoolSize);
+        this.client = makeClient(requestTimeout, maximumPoolSize);
+        this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         logConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
     }
 
-    private static WebTarget makeWebTarget(URI baseUri, long requestTimeout, int maxConnections) {
+    private static Client makeClient(long requestTimeout, int maxConnections) {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
         clientConfig.connector(new ApacheConnector(clientConfig));
-        // TODO: Add GZip converter - find out why some header fields are removed by Jersey.
-        return ClientBuilder.newClient(clientConfig)
-                .target(baseUri)
-                .path(WebServiceProtocol.RESOURCE_PATH);
+        return ClientBuilder.newClient(clientConfig);
+    }
+
+    private WebTarget makeTarget() {
+        return client.target(baseUri).path(ConverterNetworkProtocol.RESOURCE_PATH);
     }
 
     private static ClientConnectionManager makeConnectionManager(int maxConnections) {
@@ -217,7 +221,7 @@ public class RemoteConverter extends ConverterAdapter {
 
         @Override
         public Future<Boolean> schedule() {
-            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(webTarget, source, callback, priority);
+            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(makeTarget(), source, callback, priority);
             // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
             // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
             executorService.execute(job);
@@ -253,8 +257,7 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     private ConverterServerInformation fetchConverterServerInformation() {
-        return webTarget
-                .path(WebServiceProtocol.RESOURCE_PATH)
+        return makeTarget()
                 .request(MediaType.APPLICATION_XML_TYPE)
                 .get(ConverterServerInformation.class);
     }
@@ -265,12 +268,12 @@ public class RemoteConverter extends ConverterAdapter {
             LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
             LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
             LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
-            if (converterServerInformation.getProtocolVersion() != WebServiceProtocol.CURRENT_PROTOCOL_VERSION) {
+            if (converterServerInformation.getProtocolVersion() != ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION) {
                 LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
-                        converterServerInformation.getProtocolVersion(), WebServiceProtocol.CURRENT_PROTOCOL_VERSION);
+                        converterServerInformation.getProtocolVersion(), ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION);
             }
         } catch (Exception e) {
-            LOGGER.warn("Cannot connect to remote converter at {}", webTarget.getUri(), e);
+            LOGGER.warn("Cannot connect to remote converter at {}", baseUri, e);
         }
     }
 
@@ -281,6 +284,6 @@ public class RemoteConverter extends ConverterAdapter {
         } finally {
             super.shutDown();
         }
-        LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", webTarget.getUri());
+        LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", baseUri);
     }
 }

@@ -19,7 +19,6 @@ public class WebConverterApplication extends Application {
     public WebConverterApplication() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ConverterResource.class);
-        classes.add(ConverterServerGZipInterceptor.class);
         this.classes = Collections.unmodifiableSet(classes);
     }
 

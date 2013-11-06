@@ -3,6 +3,9 @@ package no.kantega.pdf.ws;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+/**
+ * This bean is used for exchanging meta information between a conversion server and a remote converter.
+ */
 @XmlRootElement(name = ConverterServerInformation.ROOT_ELEMENT_NAME)
 public class ConverterServerInformation {
 

@@ -1,8 +1,8 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.api.IInputStreamConsumer;
+import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.MimeType;
-import no.kantega.pdf.ws.WebServiceProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
                 return;
             }
             asyncResponse.resume(Response
-                    .status(WebServiceProtocol.Status.OK.getStatusCode())
+                    .status(ConverterNetworkProtocol.Status.OK.getStatusCode())
                     .entity(inputStream)
                     .type(MimeType.APPLICATION_PDF)
                     .build());
@@ -46,7 +46,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
 
     @Override
     public void onCancel() {
-        onCancel(WebServiceProtocol.Status.CANCEL);
+        onCancel(ConverterNetworkProtocol.Status.CANCEL);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
                 return;
             }
             asyncResponse.resume(Response
-                    .status(WebServiceProtocol.Status.describe(e).getStatusCode())
+                    .status(ConverterNetworkProtocol.Status.describe(e).getStatusCode())
                     .build());
         }
     }
@@ -67,10 +67,10 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
     @Override
     public void handleTimeout(AsyncResponse asyncResponse) {
         LOGGER.warn("Conversion request timed out");
-        onCancel(WebServiceProtocol.Status.TIMEOUT);
+        onCancel(ConverterNetworkProtocol.Status.TIMEOUT);
     }
 
-    private void onCancel(WebServiceProtocol.Status status) {
+    private void onCancel(ConverterNetworkProtocol.Status status) {
         if (asyncResponse.isDone()) {
             return;
         }

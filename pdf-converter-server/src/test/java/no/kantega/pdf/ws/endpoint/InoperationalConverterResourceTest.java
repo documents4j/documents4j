@@ -1,9 +1,9 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.job.MockConversion;
+import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.MimeType;
-import no.kantega.pdf.ws.WebServiceProtocol;
 import no.kantega.pdf.ws.application.WebConverterApplication;
 import no.kantega.pdf.ws.application.WebConverterTestConfigurationBinder;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -33,23 +33,23 @@ public class InoperationalConverterResourceTest extends JerseyTest {
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testFetchConverterServerInformation() throws Exception {
-        Response response = target(WebServiceProtocol.RESOURCE_PATH)
+        Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
                 .request(MediaType.APPLICATION_XML_TYPE)
                 .get();
-        assertEquals(WebServiceProtocol.Status.OK.getStatusCode(), response.getStatus());
+        assertEquals(ConverterNetworkProtocol.Status.OK.getStatusCode(), response.getStatus());
         assertEquals(MediaType.APPLICATION_XML, response.getMediaType().toString());
         ConverterServerInformation converterServerInformation = response.readEntity(ConverterServerInformation.class);
         assertEquals(DEFAULT_TIMEOUT, converterServerInformation.getTimeout());
         assertEquals(CONVERTER_IS_OPERATIONAL, converterServerInformation.isOperational());
-        assertEquals(WebServiceProtocol.CURRENT_PROTOCOL_VERSION, converterServerInformation.getProtocolVersion());
+        assertEquals(ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION, converterServerInformation.getProtocolVersion());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversion() throws Exception {
-        Response response = target(WebServiceProtocol.RESOURCE_PATH)
+        Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
                 .request(MimeType.APPLICATION_PDF)
                 .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), MimeType.WORD_ANY));
-        assertEquals(WebServiceProtocol.Status.CONVERTER_ERROR.getStatusCode(), response.getStatus());
+        assertEquals(ConverterNetworkProtocol.Status.CONVERTER_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));
     }

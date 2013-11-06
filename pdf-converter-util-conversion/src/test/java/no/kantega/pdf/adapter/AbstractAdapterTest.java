@@ -7,8 +7,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;

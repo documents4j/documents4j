@@ -37,7 +37,9 @@ public class Main {
             try {
                 sayHello(builder);
                 System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
-                System.in.read();
+                if(System.in.read() == -1) {
+                    LOGGER.warn("Console read terminated without receiving a user input");
+                }
                 sayGoodbye(builder);
             } catch (IOException e) {
                 LOGGER.error("Error when reading from the console", e);
@@ -225,8 +227,8 @@ public class Main {
     private static void logServerInfo(ConverterServerBuilder builder) {
         LOGGER.info(" --------- Server configuration --------- ");
         LOGGER.info("Listening at: {}", builder.getBaseUri());
-        LOGGER.info("All files are written to: {}", builder.getBaseFolder());
-        LOGGER.info("Worker threads: {} (+{]) - timeout: {} ms", builder.getCorePoolSize(),
+        LOGGER.info("All files are written to: {}", builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
+        LOGGER.info("Worker threads: {} (+{}) - timeout: {} ms", builder.getCorePoolSize(),
                 builder.getMaximumPoolSize(), builder.getKeepAliveTime());
         LOGGER.info("Process timeout: {}", builder.getProcessTimeout());
         LOGGER.info("Request timeout: {}", builder.getRequestTimeout());

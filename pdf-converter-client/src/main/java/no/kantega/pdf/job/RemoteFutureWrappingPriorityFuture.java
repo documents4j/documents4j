@@ -3,8 +3,8 @@ package no.kantega.pdf.job;
 import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
+import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.MimeType;
-import no.kantega.pdf.ws.WebServiceProtocol;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -46,11 +46,11 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     @Override
     protected RemoteConversionContext startConversion(InputStream fetchedSource) {
         return new RemoteConversionContext(webTarget
-                .path(WebServiceProtocol.RESOURCE_PATH)
+                .path(ConverterNetworkProtocol.RESOURCE_PATH)
                 .request(MimeType.APPLICATION_PDF)
-                .header(WebServiceProtocol.HEADER_JOB_PRIORITY, getPriority())
+                .header(ConverterNetworkProtocol.HEADER_JOB_PRIORITY, getPriority().getValue())
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), MimeType.WORD_DOCX)));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), MimeType.WORD_ANY)));
     }
 
     @Override

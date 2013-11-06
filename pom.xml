@@ -22,6 +22,7 @@
 
      Furthermore, for running the tests of the pdf-converter-server-standalone module, you require:
       (4) Your machine must have a free port and it must be possible to bind a server listener to this port
+          (the Jersey related tests suggest port 9998 to be available for testing)
 
      Many tests throughout all modules require:
       (5) Possibility to create temporary folders on the local file system and creating, deleting and executing
@@ -56,8 +57,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <version.java.ws.rs>2.0</version.java.ws.rs>
-        <version.javax.inject>1.0.0-PRD</version.javax.inject>
+        <version.javax.ws.rs>2.0</version.javax.ws.rs>
+        <version.javax.inject>1</version.javax.inject>
+        <version.javax.annotation>1.2</version.javax.annotation>
         <version.jersey>2.4</version.jersey>
         <version.guava>14.0.1</version.guava>
         <version.zt-exec>1.5</version.zt-exec>
@@ -80,20 +82,6 @@
         <dependencies>
             <!-- General -->
             <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>${version.jersey}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>inject-api</artifactId>
-                <version>${version.javax.inject}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${version.guava}</version>
@@ -111,17 +99,32 @@
                 <version>${version.jopt-simple}</version>
             </dependency>
 
-            <!-- JAX-RS / Jersey / HTTP -->
+            <!-- Jersey -->
+            <dependency>
+                <groupId>org.glassfish.jersey</groupId>
+                <artifactId>jersey-bom</artifactId>
+                <version>${version.jersey}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Java extensions -->
             <dependency>
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
-                <version>${version.java.ws.rs}</version>
+                <version>${version.javax.ws.rs}</version>
             </dependency>
 
             <dependency>
-                <groupId>org.glassfish.jersey.core</groupId>
-                <artifactId>jersey-client</artifactId>
-                <version>${version.jersey}</version>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${version.javax.inject}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${version.javax.annotation}</version>
             </dependency>
 
             <!-- Testing / Logging -->

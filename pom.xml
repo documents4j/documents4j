@@ -78,6 +78,36 @@
         <version.java.compiler>1.6</version.java.compiler>
     </properties>
 
+    <developers>
+        <developer>
+            <id>rafwin</id>
+            <name>Rafael Winterhalter</name>
+            <email>rafael.winterhalter@kantega.no</email>
+            <url>http://mydailyjava.blogspot.com</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+
+    <inceptionYear>2013</inceptionYear>
+    <url>http://www.kantega.no</url>
+
+    <name>pdf-converter</name>
+    <description>A converter tool for converting MS Word files to PDF in a Java application.</description>
+
+    <scm>
+        <connection>scm:git:git@github.com:kantega/pdf-converter.git</connection>
+        <developerConnection>scm:git:git@github.com:kantega/pdf-converter.git</developerConnection>
+        <url>git@github.com:kantega/pdf-converter.git</url>
+    </scm>
+
+    <issueManagement>
+        <system>github.com</system>
+        <url>https://github.com/kantega/pdf-converter/issues</url>
+    </issueManagement>
+
     <dependencyManagement>
         <dependencies>
             <!-- General -->

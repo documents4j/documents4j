@@ -50,6 +50,8 @@ Windows command prompt. This means that this Java application is not portable! T
 -   MS Word is not running when the `LocalConverter` starts. This is in particularly true for MS Word instances that
     are run by another instance of `LocalConverter`. (Be aware that this is also true for instances running on a
     different JVM or that are loaded by a different class loader.)
+-   MS Word is properly activated and configured for the user running the JVM. MS Word does therefore not require any
+    configuration on program startup.
 
 When these requirements are met, the construction of a `LocalConverter` is fairly easy. A preconfigured instance can
 be retrieved by calling the factory method `LocalConverter.make()`. A builder that allows for custom configuration is

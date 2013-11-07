@@ -16,6 +16,8 @@
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
       (3) Microsoft Word is not running when the built process is started and is neither started manually while the
           tests are running
+      (4) Microsoft Word is properly activated and does not require any startup configuration - if MS Word is querying
+          for configuration on program startup, any conversion attempts will fail
      If you cannot provide this setup, build this project with active "no-msoffice" profile and the corresponding
      tests will be skipped. In general, unit tests for the converters can fail since MS Word was not built for
      short-interval restarting. However, this happens rarely.

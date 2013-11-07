@@ -77,6 +77,7 @@
         <version.maven.javadoc-plugin>2.9.1</version.maven.javadoc-plugin>
         <version.maven.war-plugin>2.3</version.maven.war-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
+        <version.maven.release-plugin>2.4.1</version.maven.release-plugin>
         <version.java.compiler>1.6</version.java.compiler>
     </properties>
 
@@ -209,6 +210,17 @@
                 <configuration>
                     <source>${version.java.compiler}</source>
                     <target>${version.java.compiler}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Release configuration -->
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${version.maven.release-plugin}</version>
+                <configuration>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>extras</releaseProfiles>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
         </plugins>

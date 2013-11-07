@@ -163,8 +163,16 @@ public class RemoteConverter extends ConverterAdapter {
         this.client = makeClient(requestTimeout, maximumPoolSize);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        logConverterServerInformation();
+        tryLogConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
+    }
+
+    private void tryLogConverterServerInformation() {
+        try {
+            logConverterServerInformation();
+        } catch (Exception e) {
+            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
+        }
     }
 
     private static Client makeClient(long requestTimeout, int maxConnections) {
@@ -260,7 +268,7 @@ public class RemoteConverter extends ConverterAdapter {
         try {
             return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
         } catch (Exception e) {
-            LOGGER.info("Remote converter is not operational", e);
+            LOGGER.info("Converter @ {} is not operational", baseUri, e);
             return false;
         }
     }

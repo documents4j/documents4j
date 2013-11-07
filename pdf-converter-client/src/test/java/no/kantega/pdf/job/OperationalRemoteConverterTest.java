@@ -2,7 +2,6 @@ package no.kantega.pdf.job;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
 public class OperationalRemoteConverterTest extends AbstractOperationalConverterTest {
 
@@ -22,11 +21,5 @@ public class OperationalRemoteConverterTest extends AbstractOperationalConverter
     @Override
     protected IConverterTestDelegate getConverterTestDelegate() {
         return remoteConverterTestDelegate;
-    }
-
-    @Override
-    @Test
-    public void testFileToFileExecute() throws Exception {
-        super.testFileToFileExecute();
     }
 }

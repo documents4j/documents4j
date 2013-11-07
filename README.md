@@ -188,7 +188,7 @@ mvn clean package -Pno-office
 If Maven discovers that the build is not run on MS Windows, this profile will be activated by default. When you are testing
 native converters such as the MS Word bridge, do not forget to keep an eye on your task manager. Consider an alternative to
 the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx) for
-debugging purposes.
+debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx).
 
 Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar
 for the standalone server are only executed when the *extras* profile is active:

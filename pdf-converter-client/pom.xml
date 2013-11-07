@@ -10,6 +10,18 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
+    <!--
+     Among its main classes, this module contains a (dirty) patch to the Jersey client's ClientRuntime. The
+     original ClientRuntime provided in Jersey version 2.4 is not explicitly shutting down its underlying
+     ExecutorServices for asynchronous requests which causes the pooled threads to leak. Therefore, Java
+     applications that terminated all their original threads will not exit even if the Jersey client was shut
+     down by shutting down the hosting RemoteConverter. The customized ClientRuntime provided in this module
+     fixes this issue. It will be removed after the issue is resolved. The described issue is documented and
+     a patch is submitted. See:
+     - https://java.net/jira/browse/JERSEY-2205
+     - https://github.com/jersey/jersey/pull/38
+    -->
+
     <artifactId>pdf-converter-client</artifactId>
     <packaging>jar</packaging>
 

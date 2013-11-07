@@ -163,14 +163,23 @@ public class RemoteConverter extends ConverterAdapter {
         this.client = makeClient(requestTimeout, maximumPoolSize);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        logConverterServerInformation();
+        tryLogConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
+    }
+
+    private void tryLogConverterServerInformation() {
+        try {
+            logConverterServerInformation();
+        } catch (Exception e) {
+            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
+        }
     }
 
     private static Client makeClient(long requestTimeout, int maxConnections) {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.register(makeGZipFeature());
+        clientConfig.property(ClientProperties.ASYNC_THREADPOOL_SIZE, maxConnections);
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
@@ -260,7 +269,6 @@ public class RemoteConverter extends ConverterAdapter {
         try {
             return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
         } catch (Exception e) {
-            LOGGER.info("Remote converter is not operational", e);
             return false;
         }
     }
@@ -289,7 +297,11 @@ public class RemoteConverter extends ConverterAdapter {
     @Override
     public void shutDown() {
         try {
-            executorService.shutdown();
+            try {
+                client.close();
+            } finally {
+                executorService.shutdown();
+            }
         } finally {
             super.shutDown();
         }

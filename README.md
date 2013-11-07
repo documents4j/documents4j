@@ -50,10 +50,14 @@ Windows command prompt. This means that this Java application is not portable! T
 -   MS Word is not running when the `LocalConverter` starts. This is in particularly true for MS Word instances that
     are run by another instance of `LocalConverter`. (Be aware that this is also true for instances running on a
     different JVM or that are loaded by a different class loader.)
+-   MS Word is properly activated and configured for the user running the JVM. MS Word does therefore not require any
+    configuration on program startup.
 
 When these requirements are met, the construction of a `LocalConverter` is fairly easy. A preconfigured instance can
 be retrieved by calling the factory method `LocalConverter.make()`. A builder that allows for custom configuration is
-created via the factory method `LocalConverter.builder()`.
+created via the factory method `LocalConverter.builder()`. One feature of this builder is the customization of the size
+of a `LocalConverter`'s worker pool. Be aware that the maximum pool size implicitly determines the number of concurrent
+external operating system processes that invoked by a `RemoteConverter`.
 
 **Important**: Note that you have to manually add a dependency to the *no.kantega/pdf-converter-transformer-msoffice-word*
 module to the class path in order to convert files in the MS Word format. (A description of the different Maven modules can
@@ -68,7 +72,9 @@ sends files over a network in order to conduct a conversion via a `LocalConverte
 This does of course introduce a small time penalty compared to directly using a `LocalConverter`. A `RemoteConverter` can
 be constructed similarly to the `LocalConverter` by calling for example `RemoteConverter.make("http://myserver:9090/")`.
 The URI specified in the factory method's argument represents the remote location of the conversion server. Alternatively,
-`RemoteConverter.builder()` offers a richer set of configuration possibilities.
+`RemoteConverter.builder()` offers a richer set of configuration possibilities. One feature of this builder is the
+customization of the size of a `RemoteConverter`'s worker pool. Be aware that the maximum pool size implicitly determines
+the number of concurrent HTTP connections that are established by a `RemoteConverter`.
 
 Conversion server
 ---------------------
@@ -151,6 +157,16 @@ will then figure out by itself what data it requires and convert the data to the
 converter will also clean up after itself (e.g. closing streams, deleting temporary files). There is no performance
 advantage when input formats are converted manually.
 
+Configuring the JVM of a `LocalConverter` or a conversion server
+---------------------
+MS Word is (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant
+amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the
+JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run
+short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is
+difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the
+number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of
+a significant amount of memory to the JVM should be considered as a cause.
+
 Maven modules
 ---------------------
 The following modules are of interest for the end user:
@@ -188,7 +204,7 @@ mvn clean package -Pno-office
 If Maven discovers that the build is not run on MS Windows, this profile will be activated by default. When you are testing
 native converters such as the MS Word bridge, do not forget to keep an eye on your task manager. Consider an alternative to
 the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx) for
-debugging purposes.
+debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx).
 
 Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar
 for the standalone server are only executed when the *extras* profile is active:

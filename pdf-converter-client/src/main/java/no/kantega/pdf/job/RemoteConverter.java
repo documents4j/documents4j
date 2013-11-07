@@ -14,12 +14,15 @@ import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnector;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.filter.EncodingFeature;
+import org.glassfish.jersey.message.GZipEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.net.URI;
@@ -167,11 +170,17 @@ public class RemoteConverter extends ConverterAdapter {
     private static Client makeClient(long requestTimeout, int maxConnections) {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
+        clientConfig.register(makeGZipFeature());
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
         clientConfig.connector(new ApacheConnector(clientConfig));
         return ClientBuilder.newClient(clientConfig);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Feature makeGZipFeature() {
+        return new EncodingFeature(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, GZipEncoder.class);
     }
 
     private WebTarget makeTarget() {

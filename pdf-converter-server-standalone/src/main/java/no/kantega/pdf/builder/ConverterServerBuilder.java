@@ -4,11 +4,8 @@ import no.kantega.pdf.job.LocalConverter;
 import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 import no.kantega.pdf.ws.application.StandaloneWebConverterConfiguration;
 import no.kantega.pdf.ws.application.WebConverterApplication;
-import no.kantega.pdf.ws.application.WebConverterConfigrationBinder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.message.DeflateEncoder;
-import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.File;
@@ -157,11 +154,8 @@ public class ConverterServerBuilder {
         // The configuration has to be configured both by a binder to make it injectable
         // and directly in order to trigger life cycle methods on the deployment container.
         ResourceConfig resourceConfig = ResourceConfig
-                .forApplication(new WebConverterApplication())
-                .register(new WebConverterConfigrationBinder(configuration))
-                .register(configuration)
-                .register(GZipEncoder.class)
-                .register(DeflateEncoder.class);
+                .forApplication(new WebConverterApplication(configuration))
+                .register(configuration);
         return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
     }
 

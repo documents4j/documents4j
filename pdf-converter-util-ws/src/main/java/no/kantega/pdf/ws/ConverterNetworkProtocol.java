@@ -4,6 +4,8 @@ import com.google.common.base.Objects;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.util.Reaction;
 
+import javax.ws.rs.core.Response;
+
 /**
  * This class is a non-instantiable carrier for values that are used in network communication between a
  * conversion server and a remote converter.
@@ -30,17 +32,29 @@ public final class ConverterNetworkProtocol {
      */
     public static final String COMPRESSION_TYPE_GZIP = "gzip", COMPRESSION_TYPE_XGZIP = "x-gzip";
 
+    private static final int RESPONSE_STATUS_CODE_CANCEL = 530;
+
+    private static final int RESPONSE_STATUS_CODE_TIMEOUT = 522;
+
+    private static final int RESPONSE_STATUS_CODE_INPUT_ERROR = 422;
+
     /**
      * A collection of known status codes used for communication.
      */
     public static enum Status {
 
-        OK(200, Reaction.with(true)),
-        CANCEL(530, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The conversion attempt was cancelled"))),
-        TIMEOUT(522, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The conversion attempt timed out"))),
-        CONVERTER_ERROR(503, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The converter could not process the request"))),
-        INPUT_ERROR(422, Reaction.with(new Reaction.ConversionInputExceptionBuilder("The sent input is invalid"))),
-        UNKNOWN(500, Reaction.with(false));
+        OK(Response.Status.OK.getStatusCode(),
+                Reaction.with(true)),
+        CANCEL(RESPONSE_STATUS_CODE_CANCEL,
+                Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The conversion attempt was cancelled"))),
+        TIMEOUT(RESPONSE_STATUS_CODE_TIMEOUT,
+                Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The conversion attempt timed out"))),
+        CONVERTER_ERROR(Response.Status.SERVICE_UNAVAILABLE.getStatusCode(),
+                Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The converter could not process the request"))),
+        INPUT_ERROR(RESPONSE_STATUS_CODE_INPUT_ERROR,
+                Reaction.with(new Reaction.ConversionInputExceptionBuilder("The sent input is invalid"))),
+        UNKNOWN(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
+                Reaction.with(false));
 
         public static Status from(int statusCode) {
             for (Status status : Status.values()) {

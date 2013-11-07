@@ -56,9 +56,10 @@ be retrieved by calling the factory method `LocalConverter.make()`. A builder th
 created via the factory method `LocalConverter.builder()`.
 
 **Important**: Note that you have to manually add a dependency to the *no.kantega/pdf-converter-transformer-msoffice-word*
-module to the class path in order to convert files in the MS Word format. This decision was made in order to allow a more
-modular use of future versions of the converter. If you attempt to use the `LocalConverter` without this dependency, a
-`LinkageError` will be thrown when attempting to create an `LocalConverter` instance.
+module to the class path in order to convert files in the MS Word format. (A description of the different Maven modules can
+be found below.) This decision was made in order to allow a more modular use of future versions of the converter. If you
+attempt to use the `LocalConverter` without this dependency, a `LinkageError` will be thrown when attempting to create an
+instance of `LocalConverter`.
 
 Remote converter
 ---------------------

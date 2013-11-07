@@ -195,5 +195,5 @@ Credits
 ---------------------
 The [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handeling
 command line processes in a Java application. Also, I want to thank the makers of [*thread-weaver*](http://code.google.com/p/thread-weaver/)
-for their great framework for unit testing concurrent applications. Finally, without the help of [mockito](http://code.google.com/p/mockito/),
+for their great framework for unit testing concurrent applications. Finally, without the help of [*mockito*](http://code.google.com/p/mockito/),
 it would have been impossible to write proper unit tests that run without the integration of MS Word.

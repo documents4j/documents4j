@@ -1,6 +1,9 @@
 package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.ws.endpoint.ConverterResource;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.message.GZipEncoder;
+import org.glassfish.jersey.server.filter.EncodingFilter;
 
 import javax.ws.rs.core.Application;
 import java.util.Collections;
@@ -14,16 +17,41 @@ import java.util.Set;
  */
 public class WebConverterApplication extends Application {
 
-    private final Set<Class<?>> classes;
+    private static class WebConverterConfigurationBinder extends AbstractBinder {
 
-    public WebConverterApplication() {
+        private final IWebConverterConfiguration webConverterConfiguration;
+
+        private WebConverterConfigurationBinder(IWebConverterConfiguration webConverterConfiguration) {
+            this.webConverterConfiguration = webConverterConfiguration;
+        }
+
+        @Override
+        protected void configure() {
+            bind(webConverterConfiguration).to(IWebConverterConfiguration.class);
+        }
+    }
+
+    private final Set<Class<?>> classes;
+    private final Set<Object> singletons;
+
+    public WebConverterApplication(IWebConverterConfiguration webConverterConfiguration) {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ConverterResource.class);
+        classes.add(EncodingFilter.class);
+        classes.add(GZipEncoder.class);
         this.classes = Collections.unmodifiableSet(classes);
+        Set<Object> singletons = new HashSet<Object>();
+        singletons.add(new WebConverterConfigurationBinder(webConverterConfiguration));
+        this.singletons = Collections.unmodifiableSet(singletons);
     }
 
     @Override
     public Set<Class<?>> getClasses() {
         return classes;
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+        return singletons;
     }
 }

@@ -39,8 +39,8 @@
 
         <!-- Container dependencies -->
         <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-servlet</artifactId>
             <scope>provided</scope>
         </dependency>
 

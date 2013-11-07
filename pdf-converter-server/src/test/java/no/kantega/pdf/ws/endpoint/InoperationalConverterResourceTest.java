@@ -5,9 +5,8 @@ import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
 import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.application.WebConverterApplication;
-import no.kantega.pdf.ws.application.WebConverterTestConfigurationBinder;
+import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
@@ -18,7 +17,7 @@ import javax.ws.rs.core.Response;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class InoperationalConverterResourceTest extends JerseyTest {
+public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTest {
 
     private static final String MESSAGE = "Hello converter!";
     private static final boolean CONVERTER_IS_OPERATIONAL = false;
@@ -26,9 +25,8 @@ public class InoperationalConverterResourceTest extends JerseyTest {
 
     @Override
     protected Application configure() {
-        return ResourceConfig
-                .forApplication(new WebConverterApplication())
-                .register(new WebConverterTestConfigurationBinder(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT));
+        return ResourceConfig.forApplication(new WebConverterApplication(
+                new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT)));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)

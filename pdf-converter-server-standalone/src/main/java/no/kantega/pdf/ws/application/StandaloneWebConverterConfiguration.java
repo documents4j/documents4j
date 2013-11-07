@@ -8,9 +8,11 @@ import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.ext.Provider;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+@Provider
 public class StandaloneWebConverterConfiguration implements IWebConverterConfiguration, ContainerLifecycleListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StandaloneWebConverterConfiguration.class);

@@ -93,10 +93,10 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             // on this event and signal that the pending lock can be released.
             onConversionFinished(conversionContext);
             releasePendingState = true;
-        } catch (Exception e) {
+        } catch (Exception exception) {
             // The Future contract requires RuntimeExceptions to be wrapped in an ExecutionException. These
             // exceptions have to be unwrapped. Checked exceptions on the other hand need to be wrapped.
-            RuntimeException runtimeException = processException(e);
+            RuntimeException runtimeException = processException(exception);
             // An exception might also have occurred because a conversion was cancelled. In this case, error
             // processing is not necessary.
             if (isCancelled()) {
@@ -107,7 +107,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                 if (isCancelled()) {
                     return;
                 }
-                LOGGER.trace("Conversion caused an error", e);
+                LOGGER.trace("Conversion caused an error", exception);
                 // The underlying future might require external resources and should be canceled.
                 formerUnderlyingFuture = underlyingFuture;
                 underlyingFuture = new FailedConversionFuture(runtimeException);
@@ -119,7 +119,11 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             try {
                 formerUnderlyingFuture.cancel(true);
             } finally {
-                onConversionFailed(runtimeException);
+                try {
+                    onConversionFailed(runtimeException);
+                } catch (RuntimeException e) {
+                    LOGGER.error("Callback for failed conversion caused an exception", e);
+                }
             }
         } finally {
             // Make sure that all threads that are awaiting the conversion to leave its pending state are
@@ -170,6 +174,8 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         if (cancelled) {
             try {
                 onConversionCancelled();
+            } catch (RuntimeException e) {
+                LOGGER.error("Callback for failed conversion caused an exception", e);
             } finally {
                 LOGGER.trace("Threads waiting for the conversion to finish are released");
                 pendingCondition.countDown();

@@ -57,7 +57,11 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     protected void onConversionFinished(RemoteConversionContext conversionContext) throws Exception {
         Response response = conversionContext.getWebResponse().get();
         // We do not need to check the status again, this callback will only be triggered on a successful conversion.
-        consumer.onComplete(response.readEntity(InputStream.class));
+        try {
+            consumer.onComplete(response.readEntity(InputStream.class));
+        } finally {
+            response.close();
+        }
     }
 
     @Override

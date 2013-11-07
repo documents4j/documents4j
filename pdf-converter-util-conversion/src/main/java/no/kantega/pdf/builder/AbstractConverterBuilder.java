@@ -44,7 +44,16 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     }
 
     /**
-     * Configures a worker pool for the converter.
+     * Configures a worker pool for the converter. This worker pool implicitly sets a maximum
+     * number of conversions that are concurrently undertaken by the resulting converter. When a
+     * converter is requested to concurrently execute more conversions than {@code maximumPoolSize},
+     * it will queue excess conversions until capacities are available again.
+     * <p/>
+     * If this number is set too low, the concurrent performance of the resulting converter will be weak
+     * compared to a higher number. If this number is set too high, the converter might <i>overheat</i>
+     * when accessing the underlying external resource (such as for example an external process or a
+     * HTTP connection). A remote converter that shares a conversion server with another converter might
+     * also starve these other remote converters.
      *
      * @param corePoolSize    The core pool size of the worker pool.
      * @param maximumPoolSize The maximum pool size of the worker pool.
@@ -55,8 +64,9 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     @SuppressWarnings("unchecked")
     public T workerPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
         assertNumericArgument(corePoolSize, true);
-        assertNumericArgument(maximumPoolSize, true);
-        assertNumericArgument(corePoolSize + maximumPoolSize, false);
+        assertNumericArgument(maximumPoolSize, false);
+        assertSmallerEquals(corePoolSize, maximumPoolSize);
+        assertNumericArgument(keepAliveTime, true);
         assertNumericArgument(keepAliveTime, true);
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
@@ -73,7 +83,11 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
     }
 
     protected static void assertNumericArgument(long number, boolean zeroAllowed, long maximum) {
-        checkArgument((zeroAllowed && number == 0L) || number > 0L);
+        checkArgument(((zeroAllowed && number == 0L) || number > 0L) && number < maximum);
+    }
+
+    private static void assertSmallerEquals(int first, int second) {
+        checkArgument(first <= second);
     }
 
     /**

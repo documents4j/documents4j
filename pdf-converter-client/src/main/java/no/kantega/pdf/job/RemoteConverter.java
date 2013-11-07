@@ -179,6 +179,7 @@ public class RemoteConverter extends ConverterAdapter {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.register(makeGZipFeature());
+        clientConfig.property(ClientProperties.ASYNC_THREADPOOL_SIZE, maxConnections);
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
@@ -268,7 +269,6 @@ public class RemoteConverter extends ConverterAdapter {
         try {
             return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
         } catch (Exception e) {
-            LOGGER.info("Converter @ {} is not operational", baseUri, e);
             return false;
         }
     }
@@ -297,7 +297,11 @@ public class RemoteConverter extends ConverterAdapter {
     @Override
     public void shutDown() {
         try {
-            executorService.shutdown();
+            try {
+                client.close();
+            } finally {
+                executorService.shutdown();
+            }
         } finally {
             super.shutDown();
         }

@@ -55,7 +55,9 @@ Windows command prompt. This means that this Java application is not portable! T
 
 When these requirements are met, the construction of a `LocalConverter` is fairly easy. A preconfigured instance can
 be retrieved by calling the factory method `LocalConverter.make()`. A builder that allows for custom configuration is
-created via the factory method `LocalConverter.builder()`.
+created via the factory method `LocalConverter.builder()`. One feature of this builder is the customization of the size
+of a `LocalConverter`'s worker pool. Be aware that the maximum pool size implicitly determines the number of concurrent
+external operating system processes that invoked by a `RemoteConverter`.
 
 **Important**: Note that you have to manually add a dependency to the *no.kantega/pdf-converter-transformer-msoffice-word*
 module to the class path in order to convert files in the MS Word format. (A description of the different Maven modules can
@@ -70,7 +72,9 @@ sends files over a network in order to conduct a conversion via a `LocalConverte
 This does of course introduce a small time penalty compared to directly using a `LocalConverter`. A `RemoteConverter` can
 be constructed similarly to the `LocalConverter` by calling for example `RemoteConverter.make("http://myserver:9090/")`.
 The URI specified in the factory method's argument represents the remote location of the conversion server. Alternatively,
-`RemoteConverter.builder()` offers a richer set of configuration possibilities.
+`RemoteConverter.builder()` offers a richer set of configuration possibilities. One feature of this builder is the
+customization of the size of a `RemoteConverter`'s worker pool. Be aware that the maximum pool size implicitly determines
+the number of concurrent HTTP connections that are established by a `RemoteConverter`.
 
 Conversion server
 ---------------------
@@ -152,6 +156,16 @@ The end user should however always try to hand the available data to the `IConve
 will then figure out by itself what data it requires and convert the data to the desired format. In doing so, the
 converter will also clean up after itself (e.g. closing streams, deleting temporary files). There is no performance
 advantage when input formats are converted manually.
+
+Configuring the JVM of a `LocalConverter` or a conversion server
+---------------------
+MS Word is (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant
+amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the
+JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run
+short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is
+difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the
+number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of
+a significant amount of memory to the JVM should be considered as a cause.
 
 Maven modules
 ---------------------

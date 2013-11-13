@@ -104,16 +104,16 @@ whenever `Future#get()` or `Future#get(long, TimeUnit)` are invoked.
 The native exceptions thrown by an `IConverter` are either instances of `ConverterException` or its subclasses. Instances
 of `ConverterException` are only thrown when no specific cause for an error could be identified:
 
--  **ConversionInputException**: The source provided for a conversion was not found in the expected file format. This
+-  `ConversionInputException`: The source provided for a conversion was not found in the expected file format. This
    means that the input data either represents another file format or the input data is corrupt and cannot be read by
    MS Word.
--  **FileSystemInteractionException**: The source file does not exist or is locked by the JVM or another application.
+-  `FileSystemInteractionException`: The source file does not exist or is locked by the JVM or another application.
    (**Note**: You must not lock files in the JVM when using a `LocalConverter` since they eventually need to be shared with
    an instance of MS Word which is regarded as another application by MS Windows.) This exception is also thrown when the
    target is locked (unlocked, existing files are simply overwritten when a conversion is triggered in order to imitate the
    behaviour of MS Word even when using a `RemoteConverter`). Finally, the exception is also thrown when handeling a file
    stream causes an `IOException` where this exception gets wrapped before it is rethrown.
--  **ConverterAccessException**: This exception is thrown when a `IConverter` instance is in a bad state. This can happen
+-  `ConverterAccessException`: This exception is thrown when a `IConverter` instance is in a bad state. This can happen
    when MS Word is for example shut down by a third entity or when the `LocalConverter` is run on a Linux machine. The
    exception is also thrown when a remote conversion server is not reachable.
 
@@ -121,6 +121,22 @@ of `ConverterException` are only thrown when no specific cause for an error coul
 a non-existent file with a converter in a bad state, it cannot be guaranteed that this will always throw a
 `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ on different
 converters.
+
+Logging
+---------------------
+All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can therefore be processed independently of this
+application. The verbosity of this application's logging behavior is determined by the overall logging level where *info* or *warn* 
+are recommended as minimum logging levels in production. The different logging levels will determine the following events to be 
+logged:
+
+-  *trace*: On this level, all concurrent code will log the aquiration and release of monitors.
+-  *info*: On this level, non-exceptional state interactions with external ressources will be logged. A logging message will for
+   example expose when MS Word is started or stopped or when a conversion server is bound to a port.
+-  *debug*: This logging level is not used by this application.
+-  *warn*: On this level, non-fatal errors are logged such as the timeout of a HTTP conversion due to high traffic. Normally,
+   such log events are accompanied by an exception being thrown.
+-  *error*: On this level, all user errors are logged. For example, the attemt of converting a non-existant file would
+   cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
 
 Converter life cycle
 ---------------------

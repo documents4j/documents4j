@@ -4,7 +4,7 @@
 
     <groupId>no.kantega</groupId>
     <artifactId>pdf-converter-parent</artifactId>
-    <version>0.1.2</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!--

@@ -21,7 +21,7 @@ public class ConverterServerBuilderTest {
         PortAssert.assertPortFree(port);
         HttpServer httpServer = ConverterServerBuilder.make(String.format("http://localhost:%d", port));
         PortAssert.assertPortBusy(port);
-        httpServer.stop();
+        httpServer.shutdownNow();
         PortAssert.assertPortFree(port);
     }
 }

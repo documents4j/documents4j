@@ -8,10 +8,10 @@ import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.conn.HttpClientConnectionManager;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
-import org.glassfish.jersey.apache.connector.ApacheConnector;
+import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.filter.EncodingFeature;
@@ -107,7 +107,7 @@ public class RemoteConverter extends ConverterAdapter {
          * Gets the currently specified base URI.
          *
          * @return The current base URI of the remote conversion server or {@code null}
-         *         if no such URI was specified.
+         * if no such URI was specified.
          */
         public URI getBaseUri() {
             return baseUri;
@@ -163,16 +163,7 @@ public class RemoteConverter extends ConverterAdapter {
         this.client = makeClient(requestTimeout, maximumPoolSize);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        tryLogConverterServerInformation();
         LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
-    }
-
-    private void tryLogConverterServerInformation() {
-        try {
-            logConverterServerInformation();
-        } catch (Exception e) {
-            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
-        }
     }
 
     private static Client makeClient(long requestTimeout, int maxConnections) {
@@ -183,7 +174,7 @@ public class RemoteConverter extends ConverterAdapter {
         clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
-        clientConfig.connector(new ApacheConnector(clientConfig));
+        clientConfig.connectorProvider(new ApacheConnectorProvider());
         return ClientBuilder.newClient(clientConfig);
     }
 
@@ -196,11 +187,11 @@ public class RemoteConverter extends ConverterAdapter {
         return client.target(baseUri).path(ConverterNetworkProtocol.RESOURCE_PATH);
     }
 
-    private static ClientConnectionManager makeConnectionManager(int maxConnections) {
+    private static HttpClientConnectionManager makeConnectionManager(int maxConnections) {
         // Jersey requires an instance of the ClientConnectionManager interface which is deprecated in the latest
         // version of the Apache HttpComponents. In a future version, this implementation should be updated to
         // the PoolingHttpClientConnectionManager and the HttpClientConnectionManager.
-        PoolingClientConnectionManager connectionManager = new PoolingClientConnectionManager();
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
         connectionManager.setMaxTotal(maxConnections);
         connectionManager.setDefaultMaxPerRoute(maxConnections);
         return connectionManager;
@@ -269,29 +260,26 @@ public class RemoteConverter extends ConverterAdapter {
         try {
             return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
         } catch (Exception e) {
+            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
             return false;
         }
     }
 
     private ConverterServerInformation fetchConverterServerInformation() {
-        return makeTarget()
+        return logConverterServerInformation(makeTarget()
                 .request(MediaType.APPLICATION_XML_TYPE)
-                .get(ConverterServerInformation.class);
+                .get(ConverterServerInformation.class));
     }
 
-    private void logConverterServerInformation() {
-        try {
-            ConverterServerInformation converterServerInformation = fetchConverterServerInformation();
-            LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
-            LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
-            LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
-            if (converterServerInformation.getProtocolVersion() != ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION) {
-                LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
-                        converterServerInformation.getProtocolVersion(), ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Cannot connect to remote converter at {}", baseUri, e);
+    private ConverterServerInformation logConverterServerInformation(ConverterServerInformation converterServerInformation) {
+        LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
+        LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
+        LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
+        if (converterServerInformation.getProtocolVersion() != ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION) {
+            LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
+                    converterServerInformation.getProtocolVersion(), ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION);
         }
+        return converterServerInformation;
     }
 
     @Override

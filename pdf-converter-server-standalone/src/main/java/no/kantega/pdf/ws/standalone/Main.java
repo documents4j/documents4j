@@ -45,7 +45,7 @@ public class Main {
                 LOGGER.error("Error when reading from the console", e);
                 throw new RuntimeException("A console error occurred", e);
             } finally {
-                httpServer.stop();
+                httpServer.shutdownNow();
             }
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {

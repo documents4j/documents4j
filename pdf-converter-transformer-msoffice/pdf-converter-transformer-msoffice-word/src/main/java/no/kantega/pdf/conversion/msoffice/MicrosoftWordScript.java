@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 enum MicrosoftWordScript {
 
@@ -19,6 +20,7 @@ enum MicrosoftWordScript {
     WORD_ASSERT_SCRIPT("/word_assert.vbs");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordScript.class);
+    private static final Random RANDOM = new Random();
 
     private final String path;
 
@@ -30,10 +32,20 @@ enum MicrosoftWordScript {
         return path.substring(1);
     }
 
+    public String getRandomizedName() {
+        String name = getName();
+        int extensionIndex = name.lastIndexOf('.');
+        if (extensionIndex < 0) {
+            return String.format("%s%d", name, RANDOM.nextInt());
+        } else {
+            return String.format("%s%d.%s", name.substring(0, extensionIndex), Math.abs(RANDOM.nextInt()), name.substring(extensionIndex + 1));
+        }
+    }
+
     public File materializeIn(File folder) {
-        File script = new File(folder, getName());
+        File script = new File(folder, getRandomizedName());
         try {
-            if (!script.createNewFile() && !script.exists()) {
+            if (!script.createNewFile()) {
                 throw new IOException(String.format("Could not create file %s", script));
             }
             ByteStreams.copy(

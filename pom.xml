@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.kantega</groupId>
@@ -60,7 +61,7 @@
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <version.jersey>2.4</version.jersey>
+        <version.jersey>2.5.1</version.jersey>
         <version.guava>14.0.1</version.guava>
         <version.zt-exec>1.5</version.zt-exec>
         <version.jopt-simple>4.5</version.jopt-simple>
@@ -102,8 +103,8 @@
         <connection>scm:git:git@github.com:kantega/pdf-converter.git</connection>
         <developerConnection>scm:git:git@github.com:kantega/pdf-converter.git</developerConnection>
         <url>git@github.com:kantega/pdf-converter.git</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <issueManagement>
         <system>github.com</system>

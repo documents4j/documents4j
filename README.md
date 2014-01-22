@@ -229,6 +229,10 @@ for the standalone server are only executed when the *extras* profile is active:
 mvn clean package -Pextras
 ```
 
+Licensing
+---------------------
+This software is licensed under the [*Apache Licence, Version 2.0*](http://www.apache.org/licenses/LICENSE-2.0.html).
+
 Credits
 ---------------------
 The [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handeling

@@ -2,7 +2,6 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.PseudoConverter;
-import no.kantega.pdf.ws.ConverterNetworkProtocol;
 
 public class WebConverterTestConfiguration implements IWebConverterConfiguration {
 
@@ -22,10 +21,5 @@ public class WebConverterTestConfiguration implements IWebConverterConfiguration
     @Override
     public long getTimeout() {
         return timeout;
-    }
-
-    @Override
-    public int getProtocolVersion() {
-        return ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION;
     }
 }

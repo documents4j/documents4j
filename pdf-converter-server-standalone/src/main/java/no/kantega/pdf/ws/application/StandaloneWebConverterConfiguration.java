@@ -2,7 +2,6 @@ package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.job.LocalConverter;
-import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
@@ -45,11 +44,6 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
     @Override
     public long getTimeout() {
         return requestTimeout;
-    }
-
-    @Override
-    public int getProtocolVersion() {
-        return ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION;
     }
 
     @Override

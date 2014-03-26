@@ -30,11 +30,4 @@ public interface IWebConverterConfiguration {
      * @return The network request timeout in milliseconds.
      */
     long getTimeout();
-
-    /**
-     * Gets the protocol version.
-     *
-     * @return The protocol version.
-     */
-    int getProtocolVersion();
 }

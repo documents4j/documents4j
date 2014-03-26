@@ -22,8 +22,6 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class Main {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-
     /**
      * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
      * the application via the command line.
@@ -34,16 +32,15 @@ public class Main {
         try {
             ConverterServerBuilder builder = asBuilder(args);
             HttpServer httpServer = builder.build();
+            Logger logger = LoggerFactory.getLogger(Main.class);
             try {
-                sayHello(builder);
+                sayHello(builder, logger);
                 System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
-                if(System.in.read() == -1) {
-                    LOGGER.warn("Console read terminated without receiving a user input");
+                System.out.println("Converter is logging to: " + System.getenv(SimpleLogger.LOG_FILE_KEY));
+                if (System.in.read() == -1) {
+                    logger.warn("Console read terminated without receiving a user input");
                 }
-                sayGoodbye(builder);
-            } catch (IOException e) {
-                LOGGER.error("Error when reading from the console", e);
-                throw new RuntimeException("A console error occurred", e);
+                sayGoodbye(builder, logger);
             } finally {
                 httpServer.shutdownNow();
             }
@@ -122,9 +119,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<File> makeBaseFolderSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
-                        CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
-                        CommandDescription.DESCRIPTION_CONTEXT_BASE_FOLDER)
+                                CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
+                                CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
+                        CommandDescription.DESCRIPTION_CONTEXT_BASE_FOLDER
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_BASE_FOLDER)
                 .ofType(File.class);
@@ -134,9 +132,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Integer> makeCorePoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
-                        CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
-                        CommandDescription.DESCRIPTION_CONTEXT_CORE_POOL_SIZE)
+                                CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
+                                CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
+                        CommandDescription.DESCRIPTION_CONTEXT_CORE_POOL_SIZE
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_CORE_POOL_SIZE)
                 .ofType(Integer.class)
@@ -146,9 +145,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Integer> makeFallbackPoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
-                        CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
-                        CommandDescription.DESCRIPTION_CONTEXT_MAXIMUM_POOL_SIZE)
+                                CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
+                                CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
+                        CommandDescription.DESCRIPTION_CONTEXT_MAXIMUM_POOL_SIZE
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_MAXIMUM_POOL_SIZE)
                 .ofType(Integer.class)
@@ -158,9 +158,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Long> makeKeepAliveTimeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
-                        CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
-                        CommandDescription.DESCRIPTION_CONTEXT_KEEP_ALIVE_TIME)
+                                CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
+                                CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
+                        CommandDescription.DESCRIPTION_CONTEXT_KEEP_ALIVE_TIME
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_THREAD_POOL_FALLBACK_LIFE_TIME)
                 .ofType(Long.class)
@@ -170,9 +171,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Long> makeProcessTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
-                        CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
-                        CommandDescription.DESCRIPTION_CONTEXT_PROCESS_TIME_OUT)
+                                CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
+                                CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
+                        CommandDescription.DESCRIPTION_CONTEXT_PROCESS_TIME_OUT
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_PROCESS_TIME_OUT)
                 .ofType(Long.class)
@@ -182,9 +184,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_REQUEST_TIME_OUT,
-                        CommandDescription.ARGUMENT_SHORT_REQUEST_TIME_OUT),
-                        CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIME_OUT)
+                                CommandDescription.ARGUMENT_LONG_REQUEST_TIME_OUT,
+                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIME_OUT),
+                        CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIME_OUT
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIME_OUT)
                 .ofType(Long.class)
@@ -194,9 +197,10 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
-                        CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
-                        CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE)
+                                CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
+                                CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
+                        CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE
+                )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_TO_FILE)
                 .ofType(File.class);
@@ -210,35 +214,33 @@ public class Main {
     private static OptionSpec<Void> makeHelpSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_HELP,
-                        CommandDescription.ARGUMENT_SHORT_HELP),
-                        CommandDescription.DESCRIPTION_CONTEXT_HELP)
+                                CommandDescription.ARGUMENT_LONG_HELP,
+                                CommandDescription.ARGUMENT_SHORT_HELP),
+                        CommandDescription.DESCRIPTION_CONTEXT_HELP
+                )
                 .forHelp();
     }
 
-    private static void sayHello(ConverterServerBuilder builder) {
-        String serverStartupMessage = String.format("%tc: Started server on '%s'",
-                System.currentTimeMillis(), builder.getBaseUri());
-        LOGGER.info(serverStartupMessage);
-        logServerInfo(builder);
+    private static void sayHello(ConverterServerBuilder builder, Logger logger) {
+        String serverStartupMessage = String.format("%tc: Started server on '%s'", System.currentTimeMillis(), builder.getBaseUri());
+        logger.info(serverStartupMessage);
+        logServerInfo(builder, logger);
         System.out.println(serverStartupMessage);
     }
 
-    private static void logServerInfo(ConverterServerBuilder builder) {
-        LOGGER.info(" --------- Server configuration --------- ");
-        LOGGER.info("Listening at: {}", builder.getBaseUri());
-        LOGGER.info("All files are written to: {}", builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
-        LOGGER.info("Worker threads: {} (+{}) - timeout: {} ms", builder.getCorePoolSize(),
-                builder.getMaximumPoolSize(), builder.getKeepAliveTime());
-        LOGGER.info("Process timeout: {}", builder.getProcessTimeout());
-        LOGGER.info("Request timeout: {}", builder.getRequestTimeout());
-        LOGGER.info(" ---------------------------------------- ");
+    private static void logServerInfo(ConverterServerBuilder builder, Logger logger) {
+        logger.info(" --------- Server configuration --------- ");
+        logger.info("Listening at: {}", builder.getBaseUri());
+        logger.info("All files are written to: {}", builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
+        logger.info("Worker threads: {} (+{}) - timeout: {} ms", builder.getCorePoolSize(), builder.getMaximumPoolSize(), builder.getKeepAliveTime());
+        logger.info("Process timeout: {}", builder.getProcessTimeout());
+        logger.info("Request timeout: {}", builder.getRequestTimeout());
+        logger.info(" ---------------------------------------- ");
     }
 
-    private static void sayGoodbye(ConverterServerBuilder builder) {
-        String serverShutdownMessage = String.format("%tc: Shutting down server on '%s'",
-                System.currentTimeMillis(), builder.getBaseUri());
-        LOGGER.info(serverShutdownMessage);
+    private static void sayGoodbye(ConverterServerBuilder builder, Logger logger) {
+        String serverShutdownMessage = String.format("%tc: Shutting down server on '%s'", System.currentTimeMillis(), builder.getBaseUri());
+        logger.info(serverShutdownMessage);
         System.out.println(serverShutdownMessage);
     }
 }

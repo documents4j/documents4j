@@ -318,13 +318,13 @@ public class Main {
     }
 
     private static void logServerInfo(ConverterServerBuilder builder, Logger logger) {
-        logger.info("PDF-converter is listening at {}", builder.getBaseUri());
-        logger.info("PDF-converter is writing temporary files to: {}",
+        logger.info("PDF-conversion server is listening at {}", builder.getBaseUri());
+        logger.info("PDF-conversion server is writing temporary files to: {}",
                 builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
-        logger.info("PDF-converter worker threads: {} (+{}) - timeout: {} ms",
+        logger.info("PDF-conversion server worker threads: {} (+{}) - timeout: {} ms",
                 builder.getCorePoolSize(), builder.getMaximumPoolSize(), builder.getKeepAliveTime());
-        logger.info("PDF-converter process timeout: {}", builder.getProcessTimeout());
-        logger.info("PDF-converter request timeout: {}", builder.getRequestTimeout());
+        logger.info("PDF-conversion server process timeout: {}", builder.getProcessTimeout());
+        logger.info("PDF-conversion server request timeout: {}", builder.getRequestTimeout());
     }
 
     private static void sayGoodbye(ConverterServerBuilder builder, Logger logger) {

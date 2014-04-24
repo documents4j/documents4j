@@ -142,7 +142,6 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-
     /**
      * Creates a new {@link RemoteConverter} with default configuration.
      *

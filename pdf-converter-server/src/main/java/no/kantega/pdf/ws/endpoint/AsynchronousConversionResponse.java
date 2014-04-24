@@ -25,6 +25,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
         this.answerLock = new Object();
         asyncResponse.setTimeoutHandler(this);
         asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
+        LOGGER.info("Registered conversion request for {}", asyncResponse);
     }
 
     @Override
@@ -36,6 +37,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
+            LOGGER.info("Sending successful response for {}", asyncResponse);
             asyncResponse.resume(Response
                     .status(ConverterNetworkProtocol.Status.OK.getStatusCode())
                     .entity(inputStream)
@@ -46,6 +48,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
 
     @Override
     public void onCancel() {
+        LOGGER.info("Conversion was cancelled for {}", asyncResponse);
         onCancel(ConverterNetworkProtocol.Status.CANCEL);
     }
 
@@ -58,6 +61,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
+            LOGGER.info("Sending exceptional response for {}", asyncResponse, e);
             asyncResponse.resume(Response
                     .status(ConverterNetworkProtocol.Status.describe(e).getStatusCode())
                     .build());
@@ -66,7 +70,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
 
     @Override
     public void handleTimeout(AsyncResponse asyncResponse) {
-        LOGGER.warn("Conversion request timed out");
+        LOGGER.warn("Conversion request timed out for {}", this.asyncResponse);
         onCancel(ConverterNetworkProtocol.Status.TIMEOUT);
     }
 
@@ -78,6 +82,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             if (asyncResponse.isDone()) {
                 return;
             }
+            LOGGER.info("Sending cancellation response for {}", asyncResponse);
             asyncResponse.resume(Response
                     .status(status.getStatusCode())
                     .build());

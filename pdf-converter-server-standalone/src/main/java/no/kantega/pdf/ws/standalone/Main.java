@@ -1,5 +1,15 @@
 package no.kantega.pdf.ws.standalone;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
+import ch.qos.logback.classic.jul.LevelChangePropagator;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.OutputStreamAppender;
+import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
+import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import joptsimple.*;
 import no.kantega.pdf.builder.ConverterServerBuilder;
 import no.kantega.pdf.job.LocalConverter;
@@ -7,7 +17,7 @@ import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.SimpleLogger;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +31,11 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Entry point for a command-line invoked standalone conversion server.
  */
 public class Main {
+
+    private static final String LOG_PATTERN = "%date [%thread] %-5level %logger{42} - %message%n";
+
+    private static final int MAXIMUM_LOG_HISTORY_INDEX = 10;
+    private static final String MAXIMUM_LOG_FILE_SIZE = "10MB";
 
     /**
      * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
@@ -36,9 +51,8 @@ public class Main {
             try {
                 sayHello(builder, logger);
                 System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
-                System.out.println("Converter is logging to: " + System.getenv(SimpleLogger.LOG_FILE_KEY));
                 if (System.in.read() == -1) {
-                    logger.warn("Console read terminated without receiving a user input");
+                    logger.warn("Console read terminated without receiving user input");
                 }
                 sayGoodbye(builder, logger);
             } finally {
@@ -46,6 +60,7 @@ public class Main {
             }
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {
+            LoggerFactory.getLogger(Main.class).error("The PDF-conversion server terminated with an unexpected error", e);
             System.err.println(String.format("Error: %s", e.getMessage()));
             System.err.println("Use option -? to display a list of legal commands.");
             System.exit(-1);
@@ -68,6 +83,7 @@ public class Main {
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
+        ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
         OptionSet optionSet = optionParser.parse(args);
 
@@ -96,7 +112,8 @@ public class Main {
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
         File logFile = logFileSpec.value(optionSet);
-        configureLogging(logFile);
+        Level level = logLevelSpec.value(optionSet);
+        configureLogging(logFile, level);
 
         return ConverterServerBuilder.builder()
                 .baseUri(baseUri)
@@ -106,14 +123,61 @@ public class Main {
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS);
     }
 
-    private static void configureLogging(File logFile) {
-        String logKey;
+    private static void configureLogging(File logFile, Level level) {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        OutputStreamAppender<ILoggingEvent> appender;
         if (logFile == null) {
-            logKey = "System.err";
+            appender = configureConsoleLogging(loggerContext);
         } else {
-            logKey = logFile.getAbsolutePath();
+            appender = configureFileLogging(logFile, loggerContext);
         }
-        System.setProperty(SimpleLogger.LOG_FILE_KEY, logKey);
+        System.out.println("Logging: The log level is set to " + level);
+        PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
+        patternLayoutEncoder.setPattern(LOG_PATTERN);
+        patternLayoutEncoder.setContext(loggerContext);
+        patternLayoutEncoder.start();
+        appender.setEncoder(patternLayoutEncoder);
+        appender.start();
+        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
+        loggerContext.stop();
+        rootLogger.detachAndStopAllAppenders();
+        rootLogger.addAppender(appender);
+        rootLogger.setLevel(level);
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        SLF4JBridgeHandler.install();
+        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
+        levelChangePropagator.setResetJUL(true);
+        loggerContext.addListener(levelChangePropagator);
+        loggerContext.start();
+    }
+
+    private static OutputStreamAppender<ILoggingEvent> configureConsoleLogging(LoggerContext loggerContext) {
+        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<ILoggingEvent>();
+        consoleAppender.setName("no.kantega.pdf.logger.console");
+        consoleAppender.setContext(loggerContext);
+        System.out.println("Logging: The log is printed to the console");
+        return consoleAppender;
+    }
+
+    private static OutputStreamAppender<ILoggingEvent> configureFileLogging(File logFile, LoggerContext loggerContext) {
+        RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
+        rollingFileAppender.setFile(logFile.getAbsolutePath());
+        rollingFileAppender.setName("no.kantega.pdf.logger.file");
+        rollingFileAppender.setContext(loggerContext);
+        FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
+        fixedWindowRollingPolicy.setFileNamePattern(logFile.getAbsolutePath() + ".%i.gz");
+        fixedWindowRollingPolicy.setMaxIndex(MAXIMUM_LOG_HISTORY_INDEX);
+        fixedWindowRollingPolicy.setContext(loggerContext);
+        fixedWindowRollingPolicy.setParent(rollingFileAppender);
+        SizeBasedTriggeringPolicy<ILoggingEvent> sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
+        sizeBasedTriggeringPolicy.setMaxFileSize(MAXIMUM_LOG_FILE_SIZE);
+        sizeBasedTriggeringPolicy.setContext(loggerContext);
+        rollingFileAppender.setRollingPolicy(fixedWindowRollingPolicy);
+        rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
+        sizeBasedTriggeringPolicy.start();
+        fixedWindowRollingPolicy.start();
+        System.out.println("Logging: The log is written to " + logFile);
+        return rollingFileAppender;
     }
 
     private static ArgumentAcceptingOptionSpec<File> makeBaseFolderSpec(OptionParser optionParser) {
@@ -205,6 +269,19 @@ public class Main {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_TO_FILE)
                 .ofType(File.class);
         // defaults to null such that all log information is written to the console
+    }
+
+    private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                                CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
+                                CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
+                        CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
+                )
+                .withRequiredArg()
+                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_LEVEL)
+                .withValuesConvertedBy(new LogLevelValueConverter())
+                .defaultsTo(Level.WARN);
     }
 
     private static NonOptionArgumentSpec<URI> makeBaseUriSpec(OptionParser optionParser) {

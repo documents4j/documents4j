@@ -36,7 +36,6 @@ class CommandDescription {
             "and its maintenance imply the use of system resources. A too high number will result in too many idle threads while " +
             "a too low number will cause the constant creation and destruction of threads.";
 
-
     public static final String ARGUMENT_LONG_PROCESS_TIME_OUT = "process-timeout";
     public static final String ARGUMENT_SHORT_PROCESS_TIME_OUT = "P";
     public static final String DESCRIPTION_ARGUMENT_PROCESS_TIME_OUT = "The number of milliseconds until a " +
@@ -61,6 +60,14 @@ class CommandDescription {
             "not set, all log information will be written to the console.";
     public static final String DESCRIPTION_CONTEXT_LOG_TO_FILE = "This file will contain all log information instead of writing " +
             "the log output to the console. Make sure that this file can be written to and that no other application holds locks to it.";
+
+    public static final String ARGUMENT_LONG_LOG_LEVEL = "level";
+    public static final String ARGUMENT_SHORT_LOG_LEVEL = "V";
+    public static final String DESCRIPTION_ARGUMENT_LOG_LEVEL = "The log level which determines the verbosity of the log messages. " +
+            "If this property is not set, only warnings and error messages are logged to the console.";
+    public static final String DESCRIPTION_CONTEXT_LOG_LEVEL = "The log level determines the verbosity of the logging that is enforced " +
+            "by the converter. Valid log levels are 'off', 'error', 'warn', 'info', 'debug' and 'trace'. Without explicit configuration, " +
+            "the 'warn' level is activated which is also the recommended level for production use of the converter.";
 
     public static final String ARGUMENT_LONG_HELP = "help";
     public static final String ARGUMENT_SHORT_HELP = "?";

@@ -13,14 +13,15 @@ import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractExternalConverter implements IExternalConverter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExternalConverter.class);
-
     private static final Joiner ARGUMENT_JOINER = Joiner.on(' ');
+
+    private final Logger logger;
 
     private final long processTimeout;
     private final File baseFolder;
 
     public AbstractExternalConverter(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
+        this.logger = LoggerFactory.getLogger(getClass());
         this.baseFolder = baseFolder;
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
     }
@@ -35,8 +36,8 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
 
     protected ProcessExecutor makePresetProcessExecutor() {
         return new ProcessExecutor()
-                .redirectOutputAsInfo(LOGGER)
-                .redirectErrorAsInfo(LOGGER)
+                .redirectOutputAsInfo(logger)
+                .redirectErrorAsInfo(logger)
                 .readOutput(true)
                 .directory(getBaseFolder())
                 .timeout(getProcessTimeout(), TimeUnit.MILLISECONDS)
@@ -44,6 +45,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
     }
 
     protected int runNoArgumentScript(File script) {
+        logger.trace("Execute no-argument script {}", script);
         try {
             // Do not kill this process on a JVM shut down! A script for e.g. shutting down MS Word
             // would typically be triggered from a shut down hook. Therefore, the shut down process
@@ -54,15 +56,15 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
                     .execute().exitValue();
         } catch (IOException e) {
             String message = String.format("Unable to run script: %s", script);
-            LOGGER.error(message, e);
+            logger.error(message, e);
             throw new ConverterAccessException(message, e);
         } catch (InterruptedException e) {
             String message = String.format("Thread responsible for running script was interrupted: %s", script);
-            LOGGER.error(message, e);
+            logger.error(message, e);
             throw new ConverterAccessException(message, e);
         } catch (TimeoutException e) {
             String message = String.format("Thread responsible for running script timed out: %s", script);
-            LOGGER.error(message, e);
+            logger.error(message, e);
             throw new ConverterAccessException(message, e);
         }
     }
@@ -71,9 +73,9 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         return String.format("\"%s\"", ARGUMENT_JOINER.join(args));
     }
 
-    protected static void tryDelete(File file) {
+    protected void tryDelete(File file) {
         if (!file.delete()) {
-            LOGGER.warn("Cannot delete file: {}", file);
+            logger.warn("Cannot delete file: {}", file);
         }
     }
 }

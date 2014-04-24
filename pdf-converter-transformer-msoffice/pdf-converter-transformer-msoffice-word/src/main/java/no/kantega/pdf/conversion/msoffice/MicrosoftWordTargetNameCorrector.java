@@ -11,7 +11,7 @@ import java.io.File;
 
 class MicrosoftWordTargetNameCorrector extends ProcessListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordTargetNameCorrector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
 
     private static final String PDF_FILE_EXTENSION = "pdf";
 
@@ -25,8 +25,10 @@ class MicrosoftWordTargetNameCorrector extends ProcessListener {
     public void afterStop(Process process) {
         if (conversionSuccessful(process) && targetHasNoFileExtension()) {
             File renamedTarget = makeRenamedTarget();
+            LOGGER.trace("Rename file {} to {}", renamedTarget, target);
             tryCleanTarget(renamedTarget);
             if (!renamedTarget.renameTo(target)) {
+                LOGGER.error("Failed to rename {} to {}", renamedTarget, target);
                 throw new FileSystemInteractionException(String.format("Could not write target file %s", target));
             }
         }

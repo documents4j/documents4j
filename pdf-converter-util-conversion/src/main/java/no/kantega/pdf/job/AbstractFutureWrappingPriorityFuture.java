@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionContext>
         implements RunnableFuture<Boolean>, IPendingConditionedFuture<Boolean>, Comparable<Runnable> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFutureWrappingPriorityFuture.class);
+    private final Logger logger;
 
     private final Priority priority;
 
@@ -24,6 +24,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
     }
 
     protected AbstractFutureWrappingPriorityFuture(int priority) {
+        this.logger = LoggerFactory.getLogger(getClass());
         this.priority = new Priority(priority);
         this.futureExchangeLock = new Object();
         this.pendingCondition = new CountDownLatch(1);
@@ -50,7 +51,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
 
     @Override
     public void run() {
-        LOGGER.trace("Attempt to execute conversion");
+        logger.trace("Attempt to execute conversion");
         // If this conversion was already cancelled, abort this conversion without acquiring a lock.
         if (isCancelled()) {
             return;
@@ -58,26 +59,27 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         boolean releasePendingState = false;
         try {
             T source = fetchSource();
-            LOGGER.trace("Source fetched: {}", source);
+            logger.trace("Source fetched: {}", source);
             S conversionContext;
             boolean conversionSuccessful;
             try {
                 synchronized (futureExchangeLock) {
-                    LOGGER.trace("Run method locked wrapped future");
+                    logger.trace("Run method locked wrapped future for source {}", source);
                     // In order to avoid a racing condition, check if the job was cancelled before acquiring the lock.
                     if (isCancelled()) {
                         return;
                     }
                     conversionContext = startConversion(source);
-                    LOGGER.trace("Context fetched: {}", conversionContext);
+                    logger.trace("Context fetched for source {}: {}", source, conversionContext);
                     underlyingFuture = conversionContext.asFuture();
-                    LOGGER.trace("Underlying future created: {}", underlyingFuture);
+                    logger.trace("Underlying future created for source {}: {}", source, underlyingFuture);
                 }
                 // In order to introduce a natural barrier for a maximum number of simultaneous conversions, the
                 // worker thread that executes this conversion needs to block until this conversion is complete.
-                LOGGER.trace("Blocking during external conversion: {}", underlyingFuture);
+                logger.trace("Blocking during external conversion for source {}: {}", source, underlyingFuture);
                 conversionSuccessful = underlyingFuture.get();
-                LOGGER.trace("Blocking during external conversion is over, result: {}, {}", conversionSuccessful, underlyingFuture);
+                logger.trace("Blocking during external conversion is over for source {}: {} (successful: {})",
+                        source, underlyingFuture, conversionSuccessful);
             } finally {
                 // Report that the (generated) source file was consumed. In general, this is possible only after the
                 // conversion returned. If a consumption can be reported earlier, the implementing class needs to assure
@@ -107,7 +109,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                 if (isCancelled()) {
                     return;
                 }
-                LOGGER.trace("Conversion caused an error", exception);
+                logger.trace("Conversion caused an error", exception);
                 // The underlying future might require external resources and should be canceled.
                 formerUnderlyingFuture = underlyingFuture;
                 underlyingFuture = new FailedConversionFuture(runtimeException);
@@ -122,7 +124,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                 try {
                     onConversionFailed(runtimeException);
                 } catch (RuntimeException e) {
-                    LOGGER.error("Callback for failed conversion caused an exception", e);
+                    logger.error("Callback for failed conversion caused an exception", e);
                 }
             }
         } finally {
@@ -132,7 +134,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             // would result in a failed conversion. Therefore, the lock must never be attempted to be opened
             // within the try block. Otherwise, the lock might be released prematurely!
             if (releasePendingState) {
-                LOGGER.trace("Threads waiting for the conversion to finish are released");
+                logger.trace("Threads waiting for the conversion to finish are released");
                 getPendingCondition().countDown();
             }
         }
@@ -152,7 +154,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        LOGGER.trace("Attempt to cancel conversion (interrupt running: {})", mayInterruptIfRunning);
+        logger.trace("Attempt to cancel conversion (interrupt running: {})", mayInterruptIfRunning);
         // If the conversion was already cancelled, we avoid acquiring a lock.
         if (isCancelled()) {
             return false;
@@ -161,12 +163,12 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         // The cancellation must be synchronized in order to avoid that a pending conversion is
         // started concurrently to the cancellation.
         synchronized (futureExchangeLock) {
-            LOGGER.trace("Cancel method locked wrapped future");
+            logger.trace("Cancel method locked wrapped future");
             // It is not worth to double check the cancellation state to avoid a racing
             // condition since the following method call will implicitly check for an already
             // cancelled Future when Future#cancle(boolean) is called.
             cancelled = underlyingFuture.cancel(mayInterruptIfRunning);
-            LOGGER.trace("Conversion was cancelled: {}", cancelled);
+            logger.trace("Conversion was cancelled: {}", cancelled);
         }
         // If the future was successfully cancelled, invoke the callback and open the pending
         // lock in an error-safe manner in order to inform waiting threads that the conversion
@@ -175,9 +177,9 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
             try {
                 onConversionCancelled();
             } catch (RuntimeException e) {
-                LOGGER.error("Callback for failed conversion caused an exception", e);
+                logger.error("Callback for failed conversion caused an exception", e);
             } finally {
-                LOGGER.trace("Threads waiting for the conversion to finish are released");
+                logger.trace("Threads waiting for the conversion to finish are released");
                 pendingCondition.countDown();
             }
         }

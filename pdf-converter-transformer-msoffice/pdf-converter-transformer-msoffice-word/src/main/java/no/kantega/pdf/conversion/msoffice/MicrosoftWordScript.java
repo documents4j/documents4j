@@ -19,7 +19,7 @@ enum MicrosoftWordScript {
     WORD_SHUTDOWN_SCRIPT("/word_shutdown.vbs"),
     WORD_ASSERT_SCRIPT("/word_assert.vbs");
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordScript.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
     private static final Random RANDOM = new Random();
 
     private final String path;

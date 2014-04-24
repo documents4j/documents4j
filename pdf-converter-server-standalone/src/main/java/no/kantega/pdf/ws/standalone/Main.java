@@ -156,6 +156,7 @@ public class Main {
         SLF4JBridgeHandler.install();
         LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
         levelChangePropagator.setResetJUL(true);
+        levelChangePropagator.start();
         loggerContext.addListener(levelChangePropagator);
         loggerContext.start();
     }

@@ -61,6 +61,7 @@ public class Main {
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {
             LoggerFactory.getLogger(Main.class).error("The PDF-conversion server terminated with an unexpected error", e);
+            e.printStackTrace();
             System.err.println(String.format("Error: %s", e.getMessage()));
             System.err.println("Use option -? to display a list of legal commands.");
             System.exit(-1);
@@ -156,6 +157,7 @@ public class Main {
         SLF4JBridgeHandler.install();
         LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
         levelChangePropagator.setResetJUL(true);
+        levelChangePropagator.setContext(loggerContext);
         levelChangePropagator.start();
         loggerContext.addListener(levelChangePropagator);
         loggerContext.start();
@@ -316,13 +318,13 @@ public class Main {
     }
 
     private static void logServerInfo(ConverterServerBuilder builder, Logger logger) {
-        logger.info(" --------- Server configuration --------- ");
-        logger.info("Listening at: {}", builder.getBaseUri());
-        logger.info("All files are written to: {}", builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
-        logger.info("Worker threads: {} (+{}) - timeout: {} ms", builder.getCorePoolSize(), builder.getMaximumPoolSize(), builder.getKeepAliveTime());
-        logger.info("Process timeout: {}", builder.getProcessTimeout());
-        logger.info("Request timeout: {}", builder.getRequestTimeout());
-        logger.info(" ---------------------------------------- ");
+        logger.info("PDF-converter is listening at {}", builder.getBaseUri());
+        logger.info("PDF-converter is writing temporary files to: {}",
+                builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
+        logger.info("PDF-converter worker threads: {} (+{}) - timeout: {} ms",
+                builder.getCorePoolSize(), builder.getMaximumPoolSize(), builder.getKeepAliveTime());
+        logger.info("PDF-converter process timeout: {}", builder.getProcessTimeout());
+        logger.info("PDF-converter request timeout: {}", builder.getRequestTimeout());
     }
 
     private static void sayGoodbye(ConverterServerBuilder builder, Logger logger) {

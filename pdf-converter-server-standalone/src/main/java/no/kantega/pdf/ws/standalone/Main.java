@@ -85,7 +85,15 @@ public class Main {
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
-        OptionSet optionSet = optionParser.parse(args);
+        OptionSet optionSet;
+        try {
+            optionSet = optionParser.parse(args);
+        } catch (OptionException e) {
+            System.out.println("The converter was started with unknown arguments: " + e.options());
+            optionParser.printHelpOn(System.out);
+            System.exit(-1);
+            throw e; // In theory, System.exit does not guarantee a JVM exit.
+        }
 
         if (optionSet.has(helpSpec)) {
             optionParser.printHelpOn(System.out);
@@ -94,7 +102,8 @@ public class Main {
 
         URI baseUri = baseUriSpec.value(optionSet);
         if (baseUri == null) {
-            throw new NullPointerException("No base URI parameter specified. (Use: <command> <base URI>)");
+            System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
+            System.exit(-1);
         }
 
         File baseFolder = baseFolderSpec.value(optionSet);

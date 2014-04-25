@@ -18,7 +18,7 @@ import static no.kantega.pdf.builder.AbstractConverterBuilder.assertNumericArgum
 /**
  * Builds a standalone remote conversion server. This builder is usually run from the command line.
  *
- * @see no.kantega.pdf.ws.standalone.Main#main(String[])
+ * @see no.kantega.pdf.standalone.StandaloneServer#main(String[])
  */
 public class ConverterServerBuilder {
 
@@ -57,7 +57,7 @@ public class ConverterServerBuilder {
     private int maximumPoolSize = LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE;
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
-    private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIME_OUT;
+    private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
 
     private ConverterServerBuilder() {
         /* empty */

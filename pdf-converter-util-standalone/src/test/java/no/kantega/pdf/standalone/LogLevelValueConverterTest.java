@@ -1,4 +1,4 @@
-package no.kantega.pdf.ws.standalone;
+package no.kantega.pdf.standalone;
 
 import ch.qos.logback.classic.Level;
 import joptsimple.ValueConverter;
@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
-
 
 @RunWith(Parameterized.class)
 public class LogLevelValueConverterTest {

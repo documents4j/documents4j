@@ -1,4 +1,4 @@
-package no.kantega.pdf.ws.standalone;
+package no.kantega.pdf.standalone;
 
 import ch.qos.logback.classic.Level;
 import joptsimple.ValueConversionException;

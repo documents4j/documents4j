@@ -1,4 +1,4 @@
-package no.kantega.pdf.ws.standalone;
+package no.kantega.pdf.standalone;
 
 class CommandDescription {
 
@@ -45,10 +45,10 @@ class CommandDescription {
             "the Java Virtual Machine. Therefore, a timeout needs determine the maximum time for a shell process to terminate " +
             "regularly. This time out is applied per file and counts only the time of actual conversion by an MS Office product.";
 
-    public static final String ARGUMENT_LONG_REQUEST_TIME_OUT = "request-timeout";
-    public static final String ARGUMENT_SHORT_REQUEST_TIME_OUT = "R";
-    public static final String DESCRIPTION_ARGUMENT_REQUEST_TIME_OUT = "The number of milliseconds until a web request times out.";
-    public static final String DESCRIPTION_CONTEXT_REQUEST_TIME_OUT = "If a web request cannot be answered in the specified amount of " +
+    public static final String ARGUMENT_LONG_REQUEST_TIMEOUT = "request-timeout";
+    public static final String ARGUMENT_SHORT_REQUEST_TIMEOUT = "R";
+    public static final String DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT = "The number of milliseconds until a web request times out.";
+    public static final String DESCRIPTION_CONTEXT_REQUEST_TIMEOUT = "If a web request cannot be answered in the specified amount of " +
             "time, the request and the corresponding conversion will be cancelled. This timeout also applies, if the requesting entity " +
             "fails to confirm an answer within this time frame. This value should be set considerably higher than the timeout " +
             "of a conversion process. A too low value will result in requesting entities to be denied file conversion if the server " +
@@ -71,9 +71,9 @@ class CommandDescription {
 
     public static final String ARGUMENT_LONG_HELP = "help";
     public static final String ARGUMENT_SHORT_HELP = "?";
-    public static final String DESCRIPTION_CONTEXT_HELP = "Displays information about this program.";
+    public static final String DESCRIPTION_CONTEXT_HELP = "Displays information about this application.";
 
-    public static final String DESCRIPTION_BASE_URI = "The base URI of this server instance. (e.g. http://localhost:8080)";
+    public static final String DESCRIPTION_BASE_URI = "The base URI of the conversion server. (e.g. http://localhost:8080)";
 
     private CommandDescription() {
         throw new AssertionError();

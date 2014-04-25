@@ -15,7 +15,7 @@ public interface IWebConverterConfiguration {
     /**
      * The default network request timeout.
      */
-    static final long DEFAULT_REQUEST_TIME_OUT = TimeUnit.MINUTES.toMillis(2);
+    static final long DEFAULT_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(2);
 
     /**
      * Gets the underlying converter to which conversion requests are delegated.

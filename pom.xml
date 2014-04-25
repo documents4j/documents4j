@@ -53,10 +53,13 @@
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
         <module>pdf-converter-test</module>
+        <module>pdf-converter-client-standalone</module>
+        <module>pdf-converter-util-standalone</module>
     </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <shaded.classifier>standalone</shaded.classifier>
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>

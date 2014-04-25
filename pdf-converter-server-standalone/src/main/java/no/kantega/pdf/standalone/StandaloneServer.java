@@ -1,4 +1,4 @@
-package no.kantega.pdf.ws.standalone;
+package no.kantega.pdf.standalone;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -30,12 +30,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 /**
  * Entry point for a command-line invoked standalone conversion server.
  */
-public class Main {
-
-    private static final String LOG_PATTERN = "%date [%thread] %-5level %logger{42} - %message%n";
-
-    private static final int MAXIMUM_LOG_HISTORY_INDEX = 10;
-    private static final String MAXIMUM_LOG_FILE_SIZE = "10MB";
+public class StandaloneServer {
 
     /**
      * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
@@ -47,7 +42,7 @@ public class Main {
         try {
             ConverterServerBuilder builder = asBuilder(args);
             HttpServer httpServer = builder.build();
-            Logger logger = LoggerFactory.getLogger(Main.class);
+            Logger logger = LoggerFactory.getLogger(StandaloneServer.class);
             try {
                 sayHello(builder, logger);
                 System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
@@ -60,8 +55,7 @@ public class Main {
             }
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {
-            LoggerFactory.getLogger(Main.class).error("The PDF-conversion server terminated with an unexpected error", e);
-            e.printStackTrace();
+            LoggerFactory.getLogger(StandaloneServer.class).error("The PDF-conversion server terminated with an unexpected error", e);
             System.err.println(String.format("Error: %s", e.getMessage()));
             System.err.println("Use option -? to display a list of legal commands.");
             System.exit(-1);
@@ -143,7 +137,7 @@ public class Main {
         }
         System.out.println("Logging: The log level is set to " + level);
         PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
-        patternLayoutEncoder.setPattern(LOG_PATTERN);
+        patternLayoutEncoder.setPattern(LogDescription.LOG_PATTERN);
         patternLayoutEncoder.setContext(loggerContext);
         patternLayoutEncoder.start();
         appender.setEncoder(patternLayoutEncoder);
@@ -165,7 +159,7 @@ public class Main {
 
     private static OutputStreamAppender<ILoggingEvent> configureConsoleLogging(LoggerContext loggerContext) {
         ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<ILoggingEvent>();
-        consoleAppender.setName("no.kantega.pdf.logger.console");
+        consoleAppender.setName("no.kantega.pdf.logger.server.console");
         consoleAppender.setContext(loggerContext);
         System.out.println("Logging: The log is printed to the console");
         return consoleAppender;
@@ -174,15 +168,15 @@ public class Main {
     private static OutputStreamAppender<ILoggingEvent> configureFileLogging(File logFile, LoggerContext loggerContext) {
         RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
         rollingFileAppender.setFile(logFile.getAbsolutePath());
-        rollingFileAppender.setName("no.kantega.pdf.logger.file");
+        rollingFileAppender.setName("no.kantega.pdf.logger.server.file");
         rollingFileAppender.setContext(loggerContext);
         FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
         fixedWindowRollingPolicy.setFileNamePattern(logFile.getAbsolutePath() + ".%i.gz");
-        fixedWindowRollingPolicy.setMaxIndex(MAXIMUM_LOG_HISTORY_INDEX);
+        fixedWindowRollingPolicy.setMaxIndex(LogDescription.MAXIMUM_LOG_HISTORY_INDEX);
         fixedWindowRollingPolicy.setContext(loggerContext);
         fixedWindowRollingPolicy.setParent(rollingFileAppender);
         SizeBasedTriggeringPolicy<ILoggingEvent> sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-        sizeBasedTriggeringPolicy.setMaxFileSize(MAXIMUM_LOG_FILE_SIZE);
+        sizeBasedTriggeringPolicy.setMaxFileSize(LogDescription.MAXIMUM_LOG_FILE_SIZE);
         sizeBasedTriggeringPolicy.setContext(loggerContext);
         rollingFileAppender.setRollingPolicy(fixedWindowRollingPolicy);
         rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
@@ -260,14 +254,14 @@ public class Main {
     private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_REQUEST_TIME_OUT,
-                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIME_OUT),
-                        CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIME_OUT
+                                CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
+                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
+                        CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIMEOUT
                 )
                 .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIME_OUT)
+                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT)
                 .ofType(Long.class)
-                .defaultsTo(IWebConverterConfiguration.DEFAULT_REQUEST_TIME_OUT);
+                .defaultsTo(IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT);
     }
 
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {

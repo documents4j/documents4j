@@ -29,12 +29,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class StandaloneClient {
 
-    private static class ConversionResponse implements IFileConsumer {
+    private static class LoggingFileConsumer implements IFileConsumer {
 
         private final File sourceFile;
         private final Logger logger;
 
-        private ConversionResponse(File sourceFile, Logger logger) {
+        private LoggingFileConsumer(File sourceFile, Logger logger) {
             this.sourceFile = sourceFile;
             this.logger = logger;
         }
@@ -68,25 +68,31 @@ public class StandaloneClient {
                 sayHello(converter, logger);
                 System.out.println("Enter '\\q' for exiting this application. Enter '<source> [-> <target>]' for converting a file.");
                 String argument;
-                while ((argument = console.readLine()) != null) {
-                    if (argument.equals("\\q")) {
-                        break;
+                fileLoop:
+                do {
+                    console.printf("> ");
+                    while ((argument = console.readLine()) != null) {
+                        if (argument.equals("\\q")) {
+                            break fileLoop;
+                        }
+                        int targetIndex = argument.indexOf("->");
+                        String source = targetIndex == -1 ? argument : argument.substring(0, targetIndex);
+                        File sourceFile = normalize(source);
+                        if (!sourceFile.isFile()) {
+                            console.printf("Input file does not exist: %s%n", source);
+                            continue fileLoop;
+                        }
+                        String target = targetIndex == -1 ? source + ".pdf" : argument.substring(targetIndex + 1);
+                        File targetFile = normalize(target);
+                        converter.convert(sourceFile).to(targetFile, new LoggingFileConsumer(sourceFile, logger)).schedule();
+                        console.printf("Scheduled: %s -> %s%n", source, target);
                     }
-                    int targetIndex = argument.indexOf("->");
-                    String source = targetIndex == -1 ? argument : argument.substring(0, targetIndex);
-                    File sourceFile = new File(source);
-                    if (!sourceFile.isFile()) {
-                        System.out.println("Input file does not exist: " + source);
-                        continue;
-                    }
-                    String target = targetIndex == -1 ? source + ".pdf" : argument.substring(targetIndex + 1);
-                    File targetFile = new File(target);
-                    converter.convert(sourceFile).to(targetFile, new ConversionResponse(sourceFile, logger)).schedule();
-                }
+                } while (argument != null);
                 sayGoodbye(converter, logger);
             } finally {
                 converter.shutDown();
             }
+            System.out.println("The connection was successfully closed. Goodbye!");
         } catch (Exception e) {
             LoggerFactory.getLogger(StandaloneClient.class).error("The PDF-conversion client terminated with an unexpected error", e);
             System.err.println(String.format("Error: %s", e.getMessage()));
@@ -95,6 +101,14 @@ public class StandaloneClient {
         }
     }
 
+    private static File normalize(String path) {
+        File absolute = new File(path);
+        if (absolute.isAbsolute()) {
+            return absolute;
+        } else {
+            return new File(System.getProperty("user.dir"), path);
+        }
+    }
 
     private static IConverter asConverter(String[] args) throws IOException {
 

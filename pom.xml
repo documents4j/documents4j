@@ -59,7 +59,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <shaded.classifier>standalone</shaded.classifier>
+        <shaded.classifier>shaded</shaded.classifier>
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>

@@ -45,7 +45,7 @@ public class StandaloneServer {
             Logger logger = LoggerFactory.getLogger(StandaloneServer.class);
             try {
                 sayHello(builder, logger);
-                System.out.println("PDF-conversion server is up and running. Hit enter to shut down...");
+                System.out.println("PDF-conversion server is up and running. Hit any key to shut down...");
                 if (System.in.read() == -1) {
                     logger.warn("Console read terminated without receiving user input");
                 }

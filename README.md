@@ -1,5 +1,5 @@
 A reliable Word to PDF converter for Java applications
-=============
+======================================================
 This converter is a tool for converting MS Word files to PDF in a Java application. This is achieved by delegating
 the conversion to a running instance of MS Word. This does however not mean that MS Word must be installed on the
 local machine. Besides running locally, the converter can be run from a server which offers a REST-API to a converter
@@ -12,7 +12,7 @@ feasible for converting large amounts of files. (We tried quite a few alternativ
 require minor changes in its API in the future. These changes will be announced and documented.
 
 The API
----------------------
+-------
 The converter is implemented using a fluent API which hides any details of a converter's implementation. The entry point
 to a conversion is represented by an implementation of the `IConverter` interface which offers an overloaded `convert`
 method. This method either takes an `InputStream` or a `File` as its argument. Alternatively, `IInputStreamSource` and
@@ -39,7 +39,7 @@ specified conversion. Alternatively, calling `execute` will block and return a p
 conversion's success.
 
 Local converter
----------------------
+---------------
 The `LocalConverter` implementation of `IConverter` runs an instance of MS Word on the local machine. This is achieved
 by communicating with MS Word via a collection of VBS scripts which are triggered by the Java application on the MS
 Windows command prompt. This means that this Java application is not portable! The local converter can only be run if:
@@ -52,6 +52,7 @@ Windows command prompt. This means that this Java application is not portable! T
     different JVM or that are loaded by a different class loader.)
 -   MS Word is properly activated and configured for the user running the JVM. MS Word does therefore not require any
     configuration on program startup.
+-   When an application that uses this converter is run as a service, note the information below.
 
 When these requirements are met, the construction of a `LocalConverter` is fairly easy. A preconfigured instance can
 be retrieved by calling the factory method `LocalConverter.make()`. A builder that allows for custom configuration is
@@ -66,7 +67,7 @@ attempt to use the `LocalConverter` without this dependency, a `LinkageError` wi
 instance of `LocalConverter`.
 
 Remote converter
----------------------
+----------------
 The `RemoteConverter` implementation of `IConverter` connects to a conversion server (described below). This implementation
 sends files over a network in order to conduct a conversion via a `LocalConverter` that is running on a different machine.
 This does of course introduce a small time penalty compared to directly using a `LocalConverter`. A `RemoteConverter` can
@@ -77,16 +78,16 @@ customization of the size of a `RemoteConverter`'s worker pool. Be aware that th
 the number of concurrent HTTP connections that are established by a `RemoteConverter`.
 
 Conversion server
----------------------
+-----------------
 The easiest way of setting up a conversion server is running a prepacked standalone version via the command line. The
 *no.kantega/pdf-converter-server-standalone* (a summary of Maven modules is given below) module is configured to build a
 shaded jar that can be executed directly. For example:
 
 ```
-java -jar conversion-server-standalone.jar http://myserver:9090/
+java -jar conversion-server-standalone.jar http://localhost:9090/
 ```
 
-The former command starts a server that listens for requests at *myserver:9090*. A richer set of configuration is offered
+The former command starts a server that listens for requests at *localhost:9090*. A richer set of configuration is offered
 by several arguments that can be passed on the command line. For a comprehensive description, you can print a summary via:
 
 ```
@@ -94,7 +95,7 @@ java -jar conversion-server-standalone.jar -?
 ```
 
 Exceptions
----------------------
+----------
 The exception hierarchy was intentionally kept simple in order to hide the details of an `IConverter` implementation from
 the end user. All exceptions thrown by the converters [are unchecked](http://www.artima.com/intv/handcuffs.html). This is
 of course not true for futures which fulfill the [`Future` interface contract](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html)
@@ -123,7 +124,7 @@ a non-existent file with a converter in a bad state, it cannot be guaranteed tha
 converters.
 
 Logging
----------------------
+-------
 All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can therefore be processed independently of this
 application. The verbosity of this application's logging behavior is determined by the overall logging level where *info* or *warn* 
 are recommended as minimum logging levels in production. The different logging levels will determine the following events to be 
@@ -139,7 +140,7 @@ logged:
    cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
 
 Converter life cycle
----------------------
+--------------------
 Each converter should be down via the `IConverter#shutDown()` method when it is not used any more. This will free external
 resources (such as the running instance of MS Word which is quite a heavy external resource) and clean up any temporary files
 that were created such as the VBS scripts that need to be saved on the local file system.
@@ -155,13 +156,13 @@ For diagnostic purposes, the `IConverter` interface offers the `isOperational` m
 `IConverter` was not yet shut down and is currently functional (i.e. MS Word was not shut down by a third entity or
 the network connection to a remote conversion server is functional).
 
-### Why is the MS Word process not automatically killed when the JVM gets killed?
+### Why is the MS Word process not automatically killed when the JVM process is killed?
 Apparently, the MS Windows process model requires GUI processes (such as MS Word) to be started as a child of a specific 
 MS Windows process which is not a child process of the JVM process that started the MS Word instance. For this reason, 
 the MS Word process lives beneath a different root of the MS Windows process tree and does not die with the JVM process.
 
 Efficiency considerations
----------------------
+-------------------------
 The API intents to hide the implementation details of a specific `IConverter` implementation from the end user. However,
 a `RemoteConverter` needs to send data as a stream which requires reading it to memory. This is why a `RemoteConverter`
 will always perform better when handed instances of `InputStream` and `OutputStream` as source and target compared to
@@ -173,8 +174,23 @@ will then figure out by itself what data it requires and convert the data to the
 converter will also clean up after itself (e.g. closing streams, deleting temporary files). There is no performance
 advantage when input formats are converted manually.
 
+Running MS Office as a Windows service
+--------------------------------------
+Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service
+context. When run as a service, MS Office is always started with MS Window's local service account which does not
+configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop
+configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run
+in a service context, there are two possible approaches of which the first approach is more recommended:
+1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*.
+   On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*.
+   [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).
+2. You can manipulate MS Window's registry such that MS Office applications are run with another account than
+   the local service account. [This approach is documented on MSDN](http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy).
+   Note that this breaks MS Window's sandbox model and imposes additional security threats to the machine that runs
+   MS Office.
+
 Configuring the JVM of a `LocalConverter` or a conversion server
----------------------
+----------------------------------------------------------------
 MS Word is (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant
 amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the
 JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run
@@ -184,8 +200,8 @@ number of concurrent conversion. However, if one observes conversion to be criti
 a significant amount of memory to the JVM should be considered as a cause.
 
 Maven modules
----------------------
-The following modules are of interest for the end user:
+-------------
+The following modules are usually of interest to the end user:
 
 -  The *no.kantega/pdf-converter-api* module contains the API required for converting files. It is advised to build
    applications against this API only and to provide an application-wide implementation by a dependency injection
@@ -199,6 +215,8 @@ The following modules are of interest for the end user:
    that allows to create a conversion server programmatically. (If you are using the `ConverterServerBuilder`, make sure
    to include the unshaded jar into your project when building with Maven.) Other than the `LocalConverter`, the shaded
    jar comes bundled with the *no.kantega/pdf-converter-transformer-msoffice-word* dependency.
+-  The *no.kantega/pdf-converter-client-standalone* module contains a shaded jar with a converter backend which connects
+   to a given conversion server. Its main intention is to test the connection to a conversion server.
 -  The *no.kantega/pdf-converter-local-demo* includes a demo application which allows to run a `LocalConverter` from
    a simple application in the browser. Simply run the application for example by calling `mvn jetty:run` and go to
    for example *http://localhost:8080*. You can then upload MS Word files and view the resulting PDF documents.
@@ -207,7 +225,7 @@ The following modules are of interest for the end user:
    down gently. (Of course, you can always remove leaked instances later via the Windows task manager.)
 
 Building the project
----------------------
+--------------------
 This project was set up to allow running as many tests as possible without requiring MS Word. For this purpose, the project
 includes several rich stubs that step in place of the MS Word bridge. When you are building this project on a machine that
 does not run MS Windows or MS Word, you should build the project with the *no-office* profile which skips any tests that
@@ -232,10 +250,17 @@ mvn clean package -Pextras
 Licensing
 ---------------------
 This software is licensed under the [*Apache Licence, Version 2.0*](http://www.apache.org/licenses/LICENSE-2.0.html).
+When using this converter in correspondence with MS Office products, please note Microsoft's commentary on [the use
+of MS Office in a server context](http://support.microsoft.com/kb/257757) which is not officially supported. Also note
+the legal requirements for using MS Office in a server context. Microsoft states:
+
+> Current licensing guidelines prevent Office applications from being used on a server to service client requests,
+> unless those clients themselves have licensed copies of Office. Using server-side Automation to provide Office
+> functionality to unlicensed workstations is not covered by the End User License Agreement (EULA).
 
 Credits
 ---------------------
-The [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handeling
+The [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handling
 command line processes in a Java application. Also, I want to thank the makers of [*thread-weaver*](http://code.google.com/p/thread-weaver/)
 for their great framework for unit testing concurrent applications. Finally, without the help of [*mockito*](http://code.google.com/p/mockito/),
 it would have been impossible to write proper unit tests that run without the integration of MS Word. This application was developed on order of the

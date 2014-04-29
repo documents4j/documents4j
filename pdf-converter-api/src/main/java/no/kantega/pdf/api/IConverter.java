@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.InputStream;
 
 /**
- * A converter that allows the conversion of MS Word files to PDF.
+ * A converter that allows the conversion of MS Word files to PDF. A converter might have an active life cycle such
+ * that its {@link IConverter#shutDown()} method must be called when a converter is not longer used. After a converter
+ * is shut down, it cannot be reused.
  */
 public interface IConverter {
 

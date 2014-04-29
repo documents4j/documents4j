@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.kantega</groupId>
@@ -28,15 +29,31 @@
       (5) Possibility to create temporary folders on the local file system and creating, deleting and executing
           files in these folders
 
+     Please note that Microsoft does not recommend or officially supports MS Office automation. Also note the legal
+     requirements to run MS Office in a server context on 'http://support.microsoft.com/kb/257757'.
+
      Also, be careful when running a local MS Word transformer since it requires synchronization with MS Word.
-     When the JVM running this program exits abnormally (for example by a user interrupt causing a TerminateProcess
+     When the JVM running this program exits abnormally (for example by a user interrupt causing a process termination
      signal), the application cannot run any shut down hooks to terminate MS Word. The MS Word process will
      therefore leak. When developing and testing this application, always keep an eye on your machine's task manager.
 
      Profile summary:
       (1) no-office: All tests that require MS Word are skipped. (Automatically activated when the build is run
-          on a non-Windows operating system.
+          on a non-Windows operating system.)
       (2) extras: Build a shaded jar for the standalone conversion server as well as javadoc and source artifacts.
+
+     Note that MS Office does not officially support its execution in a service context. When run as a service, MS
+     Office is always started with MS Window's local service account which does not configure a desktop. However, MS
+     Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will
+     start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there
+     are two possible approaches of which the first approach is more recommended:
+      (1) On a 32-bit system, create the folder 'C:\Windows\System32\config\systemprofile\Desktop'.
+          On a 64-bit system, create the folder 'C:\Windows\SysWOW64\config\systemprofile\Desktop'.
+          For more information, see
+          'http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice'.
+      (2) You can manipulate MS Window's registry such that MS Office applications are run with another account than
+          the local service account. For an explanation of this approach, see
+          'http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy'.
     -->
 
     <modules>
@@ -47,13 +64,13 @@
         <module>pdf-converter-transformer-api</module>
         <module>pdf-converter-transformer-msoffice</module>
         <module>pdf-converter-client</module>
+        <module>pdf-converter-client-standalone</module>
         <module>pdf-converter-server</module>
         <module>pdf-converter-server-standalone</module>
         <module>pdf-converter-util-all</module>
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
         <module>pdf-converter-test</module>
-        <module>pdf-converter-client-standalone</module>
         <module>pdf-converter-util-standalone</module>
     </modules>
 
@@ -96,8 +113,13 @@
         </developer>
     </developers>
 
+    <organization>
+        <name>Kantega AS</name>
+        <url>http://www.kantega.no</url>
+    </organization>
+
     <inceptionYear>2013</inceptionYear>
-    <url>http://www.kantega.no</url>
+    <url>https://github.com/kantega/pdf-converter</url>
 
     <name>pdf-converter</name>
     <description>A converter tool for converting MS Word files to PDF in a Java application.</description>
@@ -183,9 +205,9 @@
             </dependency>
 
             <dependency>
-              <groupId>org.slf4j</groupId>
-              <artifactId>jul-to-slf4j</artifactId>
-              <version>${version.slf4j}</version>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${version.slf4j}</version>
             </dependency>
 
             <dependency>

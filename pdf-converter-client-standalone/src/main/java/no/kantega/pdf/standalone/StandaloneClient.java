@@ -68,24 +68,26 @@ public class StandaloneClient {
                 sayHello(converter, logger);
                 System.out.println("Enter '\\q' for exiting this application. Enter '<source> [-> <target>]' for converting a file.");
                 String argument;
-                fileLoop:
                 do {
                     console.printf("> ");
-                    while ((argument = console.readLine()) != null) {
+                    argument = console.readLine();
+                    if (argument != null) {
                         if (argument.equals("\\q")) {
-                            break fileLoop;
+                            break;
                         }
                         int targetIndex = argument.indexOf("->");
                         String source = targetIndex == -1 ? argument : argument.substring(0, targetIndex);
                         File sourceFile = normalize(source);
                         if (!sourceFile.isFile()) {
-                            console.printf("Input file does not exist: %s%n", source);
-                            continue fileLoop;
+                            console.printf("Input file does not exist: %s%n", sourceFile);
+                            continue;
                         }
                         String target = targetIndex == -1 ? source + ".pdf" : argument.substring(targetIndex + 1);
                         File targetFile = normalize(target);
                         converter.convert(sourceFile).to(targetFile, new LoggingFileConsumer(sourceFile, logger)).schedule();
-                        console.printf("Scheduled: %s -> %s%n", source, target);
+                        console.printf("Scheduled conversion: %s -> %s%n", sourceFile, targetFile);
+                    } else {
+                        logger.error("Could not read from console.");
                     }
                 } while (argument != null);
                 sayGoodbye(converter, logger);

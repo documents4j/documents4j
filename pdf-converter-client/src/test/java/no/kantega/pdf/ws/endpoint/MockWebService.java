@@ -1,6 +1,7 @@
 package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.base.Charsets;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.job.AbstractConverterTest;
 import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
@@ -46,8 +47,8 @@ public class MockWebService {
                            @HeaderParam(HttpHeaders.ACCEPT) String responseType,
                            @DefaultValue("" + MOCK_PRIORITY) @HeaderParam(ConverterNetworkProtocol.HEADER_JOB_PRIORITY) int priority) {
         assertNotEquals(MOCK_PRIORITY, priority);
-        MockWebServiceCallback mockWebServiceCallback = new MockWebServiceCallback();
-        if (!inputType.equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !responseType.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
+        MockWebServiceCallback mockWebServiceCallback = new MockWebServiceCallback(new DocumentType(responseType));
+        if (!new DocumentType(inputType).equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !new DocumentType(responseType).equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
             MockConversion.FORMAT_ERROR.handle("Format not supported", mockWebServiceCallback);
         } else if (operational) {
             MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8))).applyTo(mockWebServiceCallback);

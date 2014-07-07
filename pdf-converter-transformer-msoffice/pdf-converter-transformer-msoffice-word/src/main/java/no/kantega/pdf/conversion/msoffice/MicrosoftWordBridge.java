@@ -14,9 +14,11 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import static no.kantega.pdf.api.DocumentType.Value.*;
+
 @ViableConversion(
-        from = {MicrosoftWordFileType.WORD_DOC, MicrosoftWordFileType.WORD_DOCX, MicrosoftWordFileType.WORD_ANY},
-        to = MicrosoftWordFileType.APPLICATION_PDF)
+        from = {APPLICATION + "/" + DOC, APPLICATION + "/" + DOCX, APPLICATION + "/" + WORD_ANY},
+        to = APPLICATION + "/" + PDF)
 public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);

@@ -18,6 +18,7 @@ class LocalConverterTestDelegate implements IConverterTestDelegate {
     private final boolean operational;
     private File temporaryFolder;
     private IConverter converter;
+
     public LocalConverterTestDelegate(boolean operational) {
         this.operational = operational;
     }

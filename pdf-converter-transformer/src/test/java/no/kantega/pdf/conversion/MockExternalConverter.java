@@ -11,7 +11,7 @@ import static org.mockito.Mockito.mock;
 @ViableConversion(from = MockExternalConverter.SOURCE_FORMAT, to = MockExternalConverter.TARGET_FORMAT)
 public class MockExternalConverter implements IExternalConverter {
 
-    public static final String SOURCE_FORMAT = "foo", TARGET_FORMAT = "bar";
+    public static final String SOURCE_FORMAT = "foo/bar", TARGET_FORMAT = "qux/baz";
 
     private final IExternalConverter delegate;
 

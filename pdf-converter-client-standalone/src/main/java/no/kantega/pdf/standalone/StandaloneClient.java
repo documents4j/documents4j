@@ -11,10 +11,10 @@ import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import joptsimple.*;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.job.RemoteConverter;
-import no.kantega.pdf.ws.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -63,8 +63,8 @@ public class StandaloneClient {
                         }
                         String target = targetIndex == -1 ? source + ".pdf" : argument.substring(targetIndex + 1);
                         File targetFile = normalize(target);
-                        converter.convert(sourceFile).as(MimeType.WORD_ANY)
-                                .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(MimeType.APPLICATION_PDF)
+                        converter.convert(sourceFile).as(DocumentType.MS_WORD)
+                                .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(DocumentType.PDF)
                                 .schedule();
                         console.printf("Scheduled conversion: %s -> %s%n", sourceFile, targetFile);
                     } else {

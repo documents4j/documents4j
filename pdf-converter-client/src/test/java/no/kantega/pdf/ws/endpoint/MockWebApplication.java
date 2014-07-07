@@ -23,6 +23,7 @@ public class MockWebApplication extends Application {
     private static final int LOWEST_PRIORITY = 0;
     private final Set<Class<?>> classes;
     private final Set<Object> singletons;
+
     public MockWebApplication(boolean operational, long timeout) {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(EncodingFilter.class);

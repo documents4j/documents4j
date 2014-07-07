@@ -3,7 +3,6 @@ package no.kantega.pdf.ws.endpoint;
 import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
-import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.application.WebConverterApplication;
 import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -31,7 +30,7 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
     @Override
     protected Application configure() {
         return ResourceConfig.forApplication(new WebConverterApplication(
-                new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT)));
+                new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT, SOURCE_FORMAT, TARGET_FORMAT)));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -50,18 +49,18 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversionSuccess() throws Exception {
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.OK.getStatusCode(), response.getStatus());
-        assertEquals(MimeType.APPLICATION_PDF, response.getMediaType().toString());
+        assertEquals(TARGET_FORMAT.toString(), response.getMediaType().toString());
         assertEquals(MockConversion.OK.asReply(MESSAGE), response.readEntity(String.class));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversionInputError() throws Exception {
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.INPUT_ERROR.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.INPUT_ERROR.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.INPUT_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));
@@ -70,8 +69,8 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversionConverterError() throws Exception {
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.CONVERTER_ERROR.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.CONVERTER_ERROR.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.CONVERTER_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));
@@ -80,8 +79,8 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversionCancel() throws Exception {
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.CANCEL.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.CANCEL.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.CANCEL.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));
@@ -92,9 +91,29 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
         LOGGER.info("Testing web request timeout handling: waiting for maximal {} milliseconds",
                 DEFAULT_TIMEOUT + ADDITIONAL_TIMEOUT);
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.TIMEOUT.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.TIMEOUT.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.TIMEOUT.getStatusCode(), response.getStatus());
+        assertNull(response.getMediaType());
+        assertNull(response.readEntity(Object.class));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testConversionIllegalSourceFormat() throws Exception {
+        Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), TARGET_FORMAT.toString()));
+        assertEquals(ConverterNetworkProtocol.Status.FORMAT_ERROR.getStatusCode(), response.getStatus());
+        assertNull(response.getMediaType());
+        assertNull(response.readEntity(Object.class));
+    }
+
+    @Test(timeout = DEFAULT_TIMEOUT)
+    public void testConversionIllegalTargetFormat() throws Exception {
+        Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
+                .request(SOURCE_FORMAT.toString())
+                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
+        assertEquals(ConverterNetworkProtocol.Status.FORMAT_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));
     }

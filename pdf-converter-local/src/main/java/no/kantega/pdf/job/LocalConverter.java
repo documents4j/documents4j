@@ -142,7 +142,7 @@ public class LocalConverter extends ConverterAdapter {
         }
 
         @Override
-        public IConversionJobWithSourceSpecified as(String sourceFormat) {
+        public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
             return new LocalConversionJobWithSourceSpecified(source, sourceFormat);
         }
     }
@@ -151,9 +151,9 @@ public class LocalConverter extends ConverterAdapter {
 
         private final IFileSource source;
 
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
 
-        private LocalConversionJobWithSourceSpecified(IFileSource source, String sourceFormat) {
+        private LocalConversionJobWithSourceSpecified(IFileSource source, DocumentType sourceFormat) {
             this.source = source;
             this.sourceFormat = sourceFormat;
         }
@@ -173,13 +173,13 @@ public class LocalConverter extends ConverterAdapter {
 
         private final IFileSource source;
 
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
 
         private final File target;
 
         private final IFileConsumer callback;
 
-        public LocalConversionJobWithTargetUnspecified(IFileSource source, String sourceFormat, File target, IFileConsumer callback) {
+        public LocalConversionJobWithTargetUnspecified(IFileSource source, DocumentType sourceFormat, File target, IFileConsumer callback) {
             this.source = source;
             this.sourceFormat = sourceFormat;
             this.target = target;
@@ -187,7 +187,7 @@ public class LocalConverter extends ConverterAdapter {
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
             return new LocalConversionJob(source, sourceFormat, target, callback, targetFormat, IConverter.JOB_PRIORITY_NORMAL);
         }
     }
@@ -195,13 +195,13 @@ public class LocalConverter extends ConverterAdapter {
     private class LocalConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
 
         private final IFileSource source;
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
         private final File target;
         private final IFileConsumer callback;
-        private final String targetFormat;
+        private final DocumentType targetFormat;
         private final int priority;
 
-        private LocalConversionJob(IFileSource source, String sourceFormat, File target, IFileConsumer callback, String targetFormat, int priority) {
+        private LocalConversionJob(IFileSource source, DocumentType sourceFormat, File target, IFileConsumer callback, DocumentType targetFormat, int priority) {
             this.source = source;
             this.sourceFormat = sourceFormat;
             this.target = target;

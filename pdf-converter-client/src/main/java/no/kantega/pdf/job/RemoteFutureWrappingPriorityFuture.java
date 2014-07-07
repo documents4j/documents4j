@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
@@ -16,18 +17,18 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     private final WebTarget webTarget;
 
     private final IInputStreamSource source;
-    private final String sourceFormat;
+    private final DocumentType sourceFormat;
 
     private final IInputStreamConsumer consumer;
-    private final String targetFormat;
+    private final DocumentType targetFormat;
 
     private final AtomicBoolean consumptionMark;
 
     RemoteFutureWrappingPriorityFuture(WebTarget webTarget,
                                        IInputStreamSource source,
-                                       String sourceFormat,
+                                       DocumentType sourceFormat,
                                        IInputStreamConsumer consumer,
-                                       String targetFormat,
+                                       DocumentType targetFormat,
                                        int priority) {
         super(priority);
         this.webTarget = webTarget;
@@ -54,10 +55,10 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     protected RemoteConversionContext startConversion(InputStream fetchedSource) {
         return new RemoteConversionContext(webTarget
                 .path(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(targetFormat)
+                .request(targetFormat.toString())
                 .header(ConverterNetworkProtocol.HEADER_JOB_PRIORITY, getPriority().getValue())
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), sourceFormat)));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), sourceFormat.toString())));
     }
 
     @Override

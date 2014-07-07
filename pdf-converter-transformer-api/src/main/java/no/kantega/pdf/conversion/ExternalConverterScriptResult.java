@@ -15,6 +15,7 @@ public enum ExternalConverterScriptResult {
     UNKNOWN(null, Reaction.with(false));
     private final Integer exitValue;
     private final Reaction reaction;
+
     private ExternalConverterScriptResult(Integer exitValue, Reaction reaction) {
         this.exitValue = exitValue;
         this.reaction = reaction;

@@ -29,6 +29,7 @@ public class ConverterServerBuilder {
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
+
     private ConverterServerBuilder() {
         /* empty */
     }

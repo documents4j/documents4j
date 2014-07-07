@@ -17,9 +17,13 @@ public class PseudoConverter extends ConverterAdapter {
 
     private final boolean operational;
 
-    public PseudoConverter(boolean operational) {
+    private final DocumentType legalSourceFormat, legalTargetFormat;
+
+    public PseudoConverter(boolean operational, DocumentType legalSourceFormat, DocumentType legalTargetFormat) {
         super(Files.createTempDir());
         this.operational = operational;
+        this.legalSourceFormat = legalSourceFormat;
+        this.legalTargetFormat = legalTargetFormat;
     }
 
     @Override
@@ -57,22 +61,24 @@ public class PseudoConverter extends ConverterAdapter {
         }
 
         @Override
-        public IConversionJobWithSourceSpecified as(String sourceFormat) {
-            return new PseudoConversionJobWithSourceSpecified(source);
+        public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
+            return new PseudoConversionJobWithSourceSpecified(source, sourceFormat);
         }
     }
 
     private class PseudoConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IInputStreamSource source;
+        private final DocumentType sourceFormat;
 
-        private PseudoConversionJobWithSourceSpecified(IInputStreamSource source) {
+        private PseudoConversionJobWithSourceSpecified(IInputStreamSource source, DocumentType sourceFormat) {
             this.source = source;
+            this.sourceFormat = sourceFormat;
         }
 
         @Override
         public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
-            return new PseudoConversionJobWithTargetUnspecified(source, callback);
+            return new PseudoConversionJobWithTargetUnspecified(source, sourceFormat, callback);
         }
 
         @Override
@@ -84,41 +90,35 @@ public class PseudoConverter extends ConverterAdapter {
     private class PseudoConversionJobWithTargetUnspecified implements IConversionJobWithTargetUnspecified {
 
         private final IInputStreamSource source;
+        private final DocumentType sourceFormat;
 
         private final IInputStreamConsumer callback;
 
-        public PseudoConversionJobWithTargetUnspecified(IInputStreamSource source, IInputStreamConsumer callback) {
+        public PseudoConversionJobWithTargetUnspecified(IInputStreamSource source, DocumentType sourceFormat, IInputStreamConsumer callback) {
             this.source = source;
+            this.sourceFormat = sourceFormat;
             this.callback = callback;
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
-            return new PseudoConversionJobWithPriorityUnspecified(source, callback);
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return new PseudoConversionJob(source, sourceFormat, callback, targetFormat, IConverter.JOB_PRIORITY_NORMAL);
         }
     }
 
-    private class PseudoConversionJobWithPriorityUnspecified extends PseudoConversionJob implements IConversionJobWithPriorityUnspecified {
-
-        private PseudoConversionJobWithPriorityUnspecified(IInputStreamSource source, IInputStreamConsumer callback) {
-            super(source, callback, IConverter.JOB_PRIORITY_NORMAL);
-        }
-
-        @Override
-        public IConversionJob prioritizeWith(int priority) {
-            return new PseudoConversionJob(source, callback, priority);
-        }
-    }
-
-    private class PseudoConversionJob extends ConversionJobAdapter {
+    private class PseudoConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
 
         protected final IInputStreamSource source;
         protected final IInputStreamConsumer callback;
         protected final int priority;
+        private final DocumentType sourceFormat;
+        private final DocumentType targetFormat;
 
-        private PseudoConversionJob(IInputStreamSource source, IInputStreamConsumer callback, int priority) {
+        private PseudoConversionJob(IInputStreamSource source, DocumentType sourceFormat, IInputStreamConsumer callback, DocumentType targetFormat, int priority) {
             this.source = source;
+            this.sourceFormat = sourceFormat;
             this.callback = callback;
+            this.targetFormat = targetFormat;
             this.priority = priority;
         }
 
@@ -128,7 +128,9 @@ public class PseudoConverter extends ConverterAdapter {
             InputStream inputStream = source.getInputStream();
             try {
                 IStrategyCallback strategyCallback = new InputStreamConsumerStrategyCallbackAdapter(callback);
-                if (operational) {
+                if (!legalSourceFormat.equals(sourceFormat) || !legalTargetFormat.equals(targetFormat)) {
+                    MockConversion.from(inputStream).overrideWith(MockConversion.FORMAT_ERROR).applyTo(strategyCallback);
+                } else if (operational) {
                     MockConversion.from(inputStream).applyTo(strategyCallback);
                 } else {
                     MockConversion.from(inputStream).overrideWith(MockConversion.CONVERTER_ERROR).applyTo(strategyCallback);
@@ -137,6 +139,11 @@ public class PseudoConverter extends ConverterAdapter {
                 source.onConsumed(inputStream);
             }
             return mock(Future.class);
+        }
+
+        @Override
+        public IConversionJob prioritizeWith(int priority) {
+            return new PseudoConversionJob(source, sourceFormat, callback, targetFormat, priority);
         }
     }
 }

@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.conversion.IConversionManager;
@@ -10,20 +11,20 @@ import java.io.File;
 class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture<File, LocalConversionContext> {
 
     private final IFileSource source;
-    private final String sourceFormat;
+    private final DocumentType sourceFormat;
 
     private final File target;
     private final IFileConsumer callback;
-    private final String targetFormat;
+    private final DocumentType targetFormat;
 
     private final IConversionManager conversionManager;
 
     LocalFutureWrappingPriorityFuture(IConversionManager conversionManager,
                                       IFileSource source,
-                                      String sourceFormat,
+                                      DocumentType sourceFormat,
                                       File target,
                                       IFileConsumer callback,
-                                      String targetFormat,
+                                      DocumentType targetFormat,
                                       int priority) {
         super(priority);
         this.conversionManager = conversionManager;

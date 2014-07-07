@@ -1,6 +1,7 @@
 package no.kantega.pdf.conversion;
 
 import com.google.common.io.Files;
+import no.kantega.pdf.api.DocumentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +57,10 @@ public class DefaultConversionManagerTest {
         DefaultConversionManager conversionManager = makeConversionManager(false);
 
         File source = mock(File.class), target = mock(File.class);
-        conversionManager.startConversion(source, MockExternalConverter.SOURCE_FORMAT, target, MockExternalConverter.TARGET_FORMAT);
+        conversionManager.startConversion(source,
+                new DocumentType(MockExternalConverter.SOURCE_FORMAT),
+                target,
+                new DocumentType(MockExternalConverter.TARGET_FORMAT));
         conversionManager.shutDown();
 
         MockExternalConverter bridge = extractConverter(conversionManager);

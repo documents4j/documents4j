@@ -55,7 +55,7 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
         verifyNoMoreInteractions(fileConsumer);
     }
 
-    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
+    @Test//(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileSourceToFileConsumerFuture() throws Exception {
         File source = validFile(true), target = makeTarget(true);
         IFileSource fileSource = mock(IFileSource.class);

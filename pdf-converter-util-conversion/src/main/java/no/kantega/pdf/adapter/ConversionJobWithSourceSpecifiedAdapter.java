@@ -1,6 +1,9 @@
 package no.kantega.pdf.adapter;
 
-import no.kantega.pdf.api.*;
+import no.kantega.pdf.api.IConversionJobWithSourceSpecified;
+import no.kantega.pdf.api.IConversionJobWithTargetUnspecified;
+import no.kantega.pdf.api.IFileConsumer;
+import no.kantega.pdf.api.IInputStreamConsumer;
 
 import java.io.File;
 import java.io.OutputStream;

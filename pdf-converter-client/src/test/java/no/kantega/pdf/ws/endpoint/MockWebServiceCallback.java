@@ -1,20 +1,22 @@
 package no.kantega.pdf.ws.endpoint;
 
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.job.IStrategyCallback;
 import no.kantega.pdf.throwables.ConversionFormatException;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.throwables.ConverterException;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
-import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 
 class MockWebServiceCallback implements IStrategyCallback {
 
+    private final DocumentType targetType;
     private Response.ResponseBuilder responseBuilder;
 
-    MockWebServiceCallback() {
+    MockWebServiceCallback(DocumentType targetType) {
+        this.targetType = targetType;
         responseBuilder = Response.status(-1);
     }
 
@@ -23,7 +25,7 @@ class MockWebServiceCallback implements IStrategyCallback {
         responseBuilder = Response
                 .status(ConverterNetworkProtocol.Status.OK.getStatusCode())
                 .entity(inputStream)
-                .type(MimeType.APPLICATION_PDF);
+                .type(targetType.toString());
     }
 
     @Override
@@ -36,7 +38,7 @@ class MockWebServiceCallback implements IStrategyCallback {
         int statusCode;
         if (e instanceof ConversionInputException) {
             statusCode = ConverterNetworkProtocol.Status.INPUT_ERROR.getStatusCode();
-        } else if(e instanceof ConversionFormatException) {
+        } else if (e instanceof ConversionFormatException) {
             statusCode = ConverterNetworkProtocol.Status.FORMAT_ERROR.getStatusCode();
         } else if (e instanceof ConverterException) {
             statusCode = ConverterNetworkProtocol.Status.CONVERTER_ERROR.getStatusCode();

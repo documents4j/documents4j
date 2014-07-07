@@ -19,6 +19,7 @@ public class WebConverterApplication extends Application {
 
     private final Set<Class<?>> classes;
     private final Set<Object> singletons;
+
     public WebConverterApplication(IWebConverterConfiguration webConverterConfiguration) {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ConverterResource.class);

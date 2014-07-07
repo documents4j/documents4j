@@ -250,7 +250,7 @@ public class RemoteConverter extends ConverterAdapter {
         }
 
         @Override
-        public IConversionJobWithSourceSpecified as(String sourceFormat) {
+        public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
             return new RemoteConversionJobWithSourceSpecified(source, sourceFormat);
         }
     }
@@ -259,9 +259,9 @@ public class RemoteConverter extends ConverterAdapter {
 
         private final IInputStreamSource source;
 
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
 
-        private RemoteConversionJobWithSourceSpecified(IInputStreamSource source, String sourceFormat) {
+        private RemoteConversionJobWithSourceSpecified(IInputStreamSource source, DocumentType sourceFormat) {
             this.source = source;
             this.sourceFormat = sourceFormat;
         }
@@ -281,18 +281,18 @@ public class RemoteConverter extends ConverterAdapter {
 
         private final IInputStreamSource source;
 
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
 
         private final IInputStreamConsumer callback;
 
-        private RemoteConversionJobWithTargetUnspecified(IInputStreamSource source, String sourceFormat, IInputStreamConsumer callback) {
+        private RemoteConversionJobWithTargetUnspecified(IInputStreamSource source, DocumentType sourceFormat, IInputStreamConsumer callback) {
             this.source = source;
             this.sourceFormat = sourceFormat;
             this.callback = callback;
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
             return new RemoteConversionJob(source, sourceFormat, callback, targetFormat, IConverter.JOB_PRIORITY_NORMAL);
         }
     }
@@ -300,12 +300,12 @@ public class RemoteConverter extends ConverterAdapter {
     private class RemoteConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
 
         private final IInputStreamSource source;
-        private final String sourceFormat;
+        private final DocumentType sourceFormat;
         private final IInputStreamConsumer callback;
-        private final String targetFormat;
+        private final DocumentType targetFormat;
         private final int priority;
 
-        private RemoteConversionJob(IInputStreamSource source, String sourceFormat, IInputStreamConsumer callback, String targetFormat, int priority) {
+        private RemoteConversionJob(IInputStreamSource source, DocumentType sourceFormat, IInputStreamConsumer callback, DocumentType targetFormat, int priority) {
             this.source = source;
             this.sourceFormat = sourceFormat;
             this.callback = callback;

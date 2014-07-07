@@ -3,7 +3,6 @@ package no.kantega.pdf.ws.endpoint;
 import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
-import no.kantega.pdf.ws.MimeType;
 import no.kantega.pdf.ws.application.WebConverterApplication;
 import no.kantega.pdf.ws.application.WebConverterTestConfiguration;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -26,7 +25,7 @@ public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTe
     @Override
     protected Application configure() {
         return ResourceConfig.forApplication(new WebConverterApplication(
-                new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT)));
+                new WebConverterTestConfiguration(CONVERTER_IS_OPERATIONAL, DEFAULT_TIMEOUT, SOURCE_FORMAT, TARGET_FORMAT)));
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)
@@ -45,8 +44,8 @@ public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTe
     @Test(timeout = DEFAULT_TIMEOUT)
     public void testConversion() throws Exception {
         Response response = target(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
-                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), MimeType.WORD_ANY));
+                .request(TARGET_FORMAT.toString())
+                .post(Entity.entity(MockConversion.OK.toInputStream(MESSAGE), SOURCE_FORMAT.toString()));
         assertEquals(ConverterNetworkProtocol.Status.CONVERTER_ERROR.getStatusCode(), response.getStatus());
         assertNull(response.getMediaType());
         assertNull(response.readEntity(Object.class));

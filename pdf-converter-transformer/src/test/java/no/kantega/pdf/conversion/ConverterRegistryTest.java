@@ -1,5 +1,6 @@
 package no.kantega.pdf.conversion;
 
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.throwables.ConversionInputException;
 import org.junit.Test;
 
@@ -11,7 +12,39 @@ import static org.junit.Assert.assertEquals;
 
 public class ConverterRegistryTest {
 
-    private static final String FOO = "foo", BAR = "bar", QUX = "qux", BAZ = "baz";
+    private static final String FOO = "foo/foo", BAR = "bar/bar", QUX = "qux/qux", BAZ = "baz/baz";
+
+    @Test
+    public void testViableConversionAnnotation() throws Exception {
+        IExternalConverter externalConverter = new ViableAnnotationMock();
+        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(FOO), new DocumentType(BAR)));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(FOO), new DocumentType(BAZ)));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(QUX), new DocumentType(BAR)));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(QUX), new DocumentType(BAZ)));
+    }
+
+    @Test(expected = ConversionInputException.class)
+    public void testViableConversionsAnnotationThrowsException() throws Exception {
+        IExternalConverter externalConverter = new ViableAnnotationMock();
+        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(FOO), new DocumentType(QUX)));
+    }
+
+    @Test
+    public void testViableConversionsAnnotation() throws Exception {
+        IExternalConverter externalConverter = new ViableAnnotationsMock();
+        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(FOO), new DocumentType(BAR)));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(QUX), new DocumentType(BAZ)));
+    }
+
+    @Test(expected = ConversionInputException.class)
+    public void testViableConversionsAnnotationsThrowsException() throws Exception {
+        IExternalConverter externalConverter = new ViableAnnotationsMock();
+        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
+        assertEquals(externalConverter, converterRegistry.lookup(new DocumentType(FOO), new DocumentType(BAZ)));
+    }
 
     @ViableConversion(from = {FOO, QUX}, to = {BAR, BAZ})
     private static class ViableAnnotationMock implements IExternalConverter {
@@ -32,23 +65,6 @@ public class ConverterRegistryTest {
         }
     }
 
-    @Test
-    public void testViableConversionAnnotation() throws Exception {
-        IExternalConverter externalConverter = new ViableAnnotationMock();
-        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
-        assertEquals(externalConverter, converterRegistry.lookup(FOO, BAR));
-        assertEquals(externalConverter, converterRegistry.lookup(FOO, BAZ));
-        assertEquals(externalConverter, converterRegistry.lookup(QUX, BAR));
-        assertEquals(externalConverter, converterRegistry.lookup(QUX, BAZ));
-    }
-
-    @Test(expected = ConversionInputException.class)
-    public void testViableConversionsAnnotationThrowsException() throws Exception {
-        IExternalConverter externalConverter = new ViableAnnotationMock();
-        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
-        converterRegistry.lookup(FOO, QUX);
-    }
-
     @ViableConversions({@ViableConversion(from = FOO, to = BAR), @ViableConversion(from = QUX, to = BAZ)})
     private static class ViableAnnotationsMock implements IExternalConverter {
 
@@ -66,20 +82,5 @@ public class ConverterRegistryTest {
         public void shutDown() {
             throw new AssertionError();
         }
-    }
-
-    @Test
-    public void testViableConversionsAnnotation() throws Exception {
-        IExternalConverter externalConverter = new ViableAnnotationsMock();
-        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
-        assertEquals(externalConverter, converterRegistry.lookup(FOO, BAR));
-        assertEquals(externalConverter, converterRegistry.lookup(QUX, BAZ));
-    }
-
-    @Test(expected = ConversionInputException.class)
-    public void testViableConversionsAnnotationsThrowsException() throws Exception {
-        IExternalConverter externalConverter = new ViableAnnotationsMock();
-        ConverterRegistry converterRegistry = new ConverterRegistry(Collections.singleton(externalConverter));
-        converterRegistry.lookup(FOO, BAZ);
     }
 }

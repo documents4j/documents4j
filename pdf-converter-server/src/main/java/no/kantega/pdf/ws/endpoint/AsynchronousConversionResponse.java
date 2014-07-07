@@ -1,8 +1,8 @@
 package no.kantega.pdf.ws.endpoint;
 
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
-import no.kantega.pdf.ws.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +17,13 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
     private static final Logger LOGGER = LoggerFactory.getLogger(AsynchronousConversionResponse.class);
 
     private final AsyncResponse asyncResponse;
+    private final DocumentType targetType;
 
     private final Object answerLock;
 
-    public AsynchronousConversionResponse(AsyncResponse asyncResponse, long requestTimeout) {
+    public AsynchronousConversionResponse(AsyncResponse asyncResponse, DocumentType targetType, long requestTimeout) {
         this.asyncResponse = asyncResponse;
+        this.targetType = targetType;
         this.answerLock = new Object();
         asyncResponse.setTimeoutHandler(this);
         asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
@@ -41,7 +43,7 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
             asyncResponse.resume(Response
                     .status(ConverterNetworkProtocol.Status.OK.getStatusCode())
                     .entity(inputStream)
-                    .type(MimeType.APPLICATION_PDF)
+                    .type(targetType.toString())
                     .build());
         }
     }

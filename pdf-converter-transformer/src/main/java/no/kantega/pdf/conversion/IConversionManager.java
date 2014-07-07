@@ -1,11 +1,13 @@
 package no.kantega.pdf.conversion;
 
+import no.kantega.pdf.api.DocumentType;
+
 import java.io.File;
 import java.util.concurrent.Future;
 
 public interface IConversionManager {
 
-    Future<Boolean> startConversion(File source, String inputFormat, File target, String outputFormat);
+    Future<Boolean> startConversion(File source, DocumentType inputFormat, File target, DocumentType outputFormat);
 
     boolean isOperational();
 

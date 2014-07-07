@@ -1,6 +1,7 @@
 package no.kantega.pdf.job;
 
 import com.google.common.io.Files;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.throwables.ConversionFormatException;
@@ -22,15 +23,11 @@ import static org.mockito.Mockito.*;
 
 public abstract class AbstractConverterTest {
 
+    public static final DocumentType MOCK_INPUT_TYPE = new DocumentType("foo", "bar");
+    public static final DocumentType MOCK_RESPONSE_TYPE = new DocumentType("qux", "baz");
     protected static final long DEFAULT_CONVERSION_TIMEOUT = 2500L;
-
-    public static final String MOCK_INPUT_TYPE = "foo/bar";
-    public static final String MOCK_RESPONSE_TYPE = "qux/baz";
-
-    private static final String UNKNOWN_TYPE = "foo/baz";
-
     protected static final String MESSAGE = "This is a sample message!";
-
+    private static final DocumentType UNKNOWN_TYPE = new DocumentType("foo", "baz");
     private static final String NAME_PREFIX = "file";
     private static final String SOURCE_SUFFIX = "source";
     private static final String TARGET_SUFFIX = "target";
@@ -144,11 +141,11 @@ public abstract class AbstractConverterTest {
         return makeFile(delete, TARGET_SUFFIX);
     }
 
-    protected String validInputType() {
+    protected DocumentType validInputType() {
         return MOCK_INPUT_TYPE;
     }
 
-    protected String validTargetType() {
+    protected DocumentType validTargetType() {
         return MOCK_RESPONSE_TYPE;
     }
 

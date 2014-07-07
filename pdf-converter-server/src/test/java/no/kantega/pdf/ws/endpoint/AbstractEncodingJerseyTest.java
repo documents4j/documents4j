@@ -1,5 +1,6 @@
 package no.kantega.pdf.ws.endpoint;
 
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.filter.EncodingFeature;
@@ -21,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractEncodingJerseyTest extends JerseyTest {
 
+    protected static final DocumentType SOURCE_FORMAT = new DocumentType("foo", "bar"), TARGET_FORMAT = new DocumentType("qux", "baz");
     private static final int HIGHEST_PRIORITY = Integer.MAX_VALUE;
 
     @Override

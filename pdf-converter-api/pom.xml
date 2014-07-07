@@ -11,4 +11,13 @@
 
     <artifactId>pdf-converter-api</artifactId>
     <packaging>jar</packaging>
+
+    <dependencies>
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>

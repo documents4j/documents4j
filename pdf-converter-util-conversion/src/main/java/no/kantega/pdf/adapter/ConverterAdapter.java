@@ -1,6 +1,9 @@
 package no.kantega.pdf.adapter;
 
-import no.kantega.pdf.api.*;
+import no.kantega.pdf.api.IConversionJobWithSourceUnspecified;
+import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.api.IFileSource;
+import no.kantega.pdf.api.IInputStreamSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

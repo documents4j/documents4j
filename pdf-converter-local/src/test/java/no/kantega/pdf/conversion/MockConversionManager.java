@@ -2,6 +2,7 @@ package no.kantega.pdf.conversion;
 
 import com.google.common.base.Objects;
 import com.google.common.io.Closeables;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.job.AbstractConverterTest;
 import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.throwables.ConversionFormatException;
@@ -34,7 +35,7 @@ public abstract class MockConversionManager implements IConversionManager {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, String inputFormat, File target, String outputFormat) {
+    public Future<Boolean> startConversion(File source, DocumentType inputFormat, File target, DocumentType outputFormat) {
         if (!inputFormat.equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !outputFormat.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
             return MockProcessResult.indicating(new ConversionFormatException("Unknown input/output format conversion"));
         }

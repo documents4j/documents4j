@@ -40,7 +40,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     private void testConversionValid(File docx, File pdf) throws Exception {
         assertTrue(docx.exists());
         assertFalse(pdf.exists());
-        StartedProcess conversion = getExternalConverter().startConversion(docx, pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(docx, pdf);
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -100,7 +100,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionCorrupt() throws Exception {
         File pdf = makeTarget(false);
-        StartedProcess conversion = getExternalConverter().startConversion(corruptDocx(true), pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(corruptDocx(true), pdf);
         assertEquals(
                 ExternalConverterScriptResult.ILLEGAL_INPUT.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -110,7 +110,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionInexistent() throws Exception {
         File pdf = makeTarget(false);
-        StartedProcess conversion = getExternalConverter().startConversion(inexistentDocx(), pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(inexistentDocx(), pdf);
         assertEquals(
                 ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -128,7 +128,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         fileOutputStream.close();
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue());
+                getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue());
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
@@ -139,7 +139,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         try {
             assertEquals(
                     ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                    getExternalConverter().startConversion(docx, makeTarget(true)).future().get().exitValue());
+                    getExternalConverter().doStartConversion(docx, makeTarget(true)).future().get().exitValue());
         } finally {
             fileInputStream.close();
         }
@@ -154,7 +154,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         try {
             assertEquals(
                     ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitValue().intValue(),
-                    getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue());
+                    getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue());
         } finally {
             fileOutputStream.close();
         }

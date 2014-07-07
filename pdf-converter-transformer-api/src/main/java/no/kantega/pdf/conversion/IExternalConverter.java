@@ -1,12 +1,11 @@
 package no.kantega.pdf.conversion;
 
-import org.zeroturnaround.exec.StartedProcess;
-
 import java.io.File;
+import java.util.concurrent.Future;
 
 public interface IExternalConverter {
 
-    StartedProcess startConversion(File source, File target);
+    Future<Boolean> startConversion(File source, File target);
 
     boolean isOperational();
 

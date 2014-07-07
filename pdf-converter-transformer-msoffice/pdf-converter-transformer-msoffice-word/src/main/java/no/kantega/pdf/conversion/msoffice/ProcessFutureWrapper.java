@@ -1,5 +1,6 @@
-package no.kantega.pdf.conversion;
+package no.kantega.pdf.conversion.msoffice;
 
+import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import no.kantega.pdf.throwables.ConverterException;
 import org.zeroturnaround.exec.StartedProcess;
 

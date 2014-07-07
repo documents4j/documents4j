@@ -27,6 +27,12 @@
             <artifactId>pdf-converter-transformer-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-util-transformer-process</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <profiles>

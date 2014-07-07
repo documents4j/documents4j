@@ -5,7 +5,7 @@ import no.kantega.pdf.adapter.ConversionJobWithSourceSpecifiedAdapter;
 import no.kantega.pdf.adapter.ConverterAdapter;
 import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
-import no.kantega.pdf.conversion.ConversionManager;
+import no.kantega.pdf.conversion.DefaultConversionManager;
 import no.kantega.pdf.conversion.IConversionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +60,7 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
-        return new ConversionManager(baseFolder, processTimeout, unit);
+        return new DefaultConversionManager(baseFolder, processTimeout, unit);
     }
 
     @Override

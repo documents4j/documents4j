@@ -20,7 +20,7 @@ public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
         new MicrosoftWordBridge(otherFolder, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS).shutDown();
         assertTrue(otherFolder.delete());
         File pdf = makeTarget(false);
-        assertEquals(getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue(),
+        assertEquals(getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue(),
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
         assertFalse(pdf.exists());
     }

@@ -3,6 +3,7 @@ package no.kantega.pdf.conversion.msoffice;
 import com.google.common.base.Objects;
 import no.kantega.pdf.conversion.AbstractExternalConverter;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.ViableConversion;
 import no.kantega.pdf.throwables.ConverterAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,8 +11,12 @@ import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@ViableConversion(
+        from = {MicrosoftWordFileType.WORD_DOC, MicrosoftWordFileType.WORD_DOCX, MicrosoftWordFileType.WORD_ANY},
+        to = MicrosoftWordFileType.APPLICATION_PDF)
 public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
@@ -67,13 +72,20 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
     }
 
     @Override
-    public StartedProcess startConversion(File source, File target) {
+    public Future<Boolean> startConversion(File source, File target) {
+        return new ProcessFutureWrapper(doStartConversion(source, target));
+    }
+
+    public StartedProcess doStartConversion(File source, File target) {
         LOGGER.info("Requested conversion from {} to {}", source, target);
         try {
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
-            return makePresetProcessExecutor().command("cmd", "/C",
-                    quote(conversionScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()))
-                    .destroyOnExit().addListener(new MicrosoftWordTargetNameCorrector(target)).start();
+            return makePresetProcessExecutor()
+                    .command("cmd", "/C",
+                            quote(conversionScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()))
+                    .destroyOnExit()
+                    .addListener(new MicrosoftWordTargetNameCorrector(target))
+                    .start();
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' to '%s' ",
                     conversionScript, source, target);

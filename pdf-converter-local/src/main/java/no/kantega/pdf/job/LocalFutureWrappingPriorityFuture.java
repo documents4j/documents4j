@@ -36,7 +36,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
 
     @Override
     protected LocalConversionContext startConversion(File fetchedSource) {
-        return new LocalConversionContext(conversionManager.startConversion(fetchedSource, target));
+        return new LocalConversionContext(conversionManager.startConversion(fetchedSource, null, target, null)); // TODO
     }
 
     @Override

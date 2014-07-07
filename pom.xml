@@ -70,8 +70,9 @@
         <module>pdf-converter-util-all</module>
         <module>pdf-converter-util-conversion</module>
         <module>pdf-converter-util-ws</module>
-        <module>pdf-converter-test</module>
         <module>pdf-converter-util-standalone</module>
+        <module>pdf-converter-util-transformer-process</module>
+        <module>pdf-converter-test</module>
     </modules>
 
     <properties>

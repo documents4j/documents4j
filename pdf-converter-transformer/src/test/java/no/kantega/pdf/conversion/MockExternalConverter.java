@@ -1,14 +1,17 @@
 package no.kantega.pdf.conversion;
 
 import com.google.common.base.Objects;
-import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 
+@ViableConversion(from = MockExternalConverter.SOURCE_FORMAT, to = MockExternalConverter.TARGET_FORMAT)
 public class MockExternalConverter implements IExternalConverter {
+
+    public static final String SOURCE_FORMAT = "foo", TARGET_FORMAT = "bar";
 
     private final IExternalConverter delegate;
 
@@ -27,7 +30,7 @@ public class MockExternalConverter implements IExternalConverter {
     }
 
     @Override
-    public StartedProcess startConversion(File source, File target) {
+    public Future<Boolean> startConversion(File source, File target) {
         return delegate.startConversion(source, target);
     }
 

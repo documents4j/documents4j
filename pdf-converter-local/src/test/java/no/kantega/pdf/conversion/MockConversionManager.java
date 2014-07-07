@@ -32,7 +32,8 @@ public abstract class MockConversionManager implements IConversionManager {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, File target) {
+    public Future<Boolean> startConversion(File source, String inputFormat, File target, String outputFormat) {
+        // TODO
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(source);

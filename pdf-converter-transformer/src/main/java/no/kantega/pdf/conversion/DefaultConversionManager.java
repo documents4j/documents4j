@@ -1,0 +1,39 @@
+package no.kantega.pdf.conversion;
+
+import java.io.File;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+public class DefaultConversionManager implements IConversionManager {
+
+    private final ConverterRegistry converterRegistry;
+
+    public DefaultConversionManager(File baseFolder, long processTimeout, TimeUnit timeUnit) {
+        this(baseFolder, processTimeout, timeUnit, Collections.<Class<? extends IExternalConverter>, Boolean>emptyMap());
+    }
+
+    public DefaultConversionManager(File baseFolder,
+                                    long processTimeout,
+                                    TimeUnit timeUnit,
+                                    Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
+        converterRegistry = new ConverterRegistry(ExternalConverterDiscovery
+                .loadConfiguration(externalConverterRegistration, baseFolder, processTimeout, timeUnit));
+    }
+
+    @Override
+    public Future<Boolean> startConversion(File source, String inputFormat, File target, String outputFormat) {
+        return converterRegistry.lookup(inputFormat, outputFormat).startConversion(source, target);
+    }
+
+    @Override
+    public boolean isOperational() {
+        return converterRegistry.isOperational();
+    }
+
+    @Override
+    public void shutDown() {
+        converterRegistry.shutDown();
+    }
+}

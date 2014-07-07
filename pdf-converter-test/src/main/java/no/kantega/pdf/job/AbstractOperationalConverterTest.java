@@ -21,72 +21,72 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileToFileExecute() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
-        assertTrue(getConverter().convert(docx).to(pdf).execute());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        File source = validFile(true), target = makeTarget(true);
+        assertTrue(getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).execute());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileToFileFuture() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
-        assertTrue(getConverter().convert(docx).to(pdf).schedule().get());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        File source = validFile(true), target = makeTarget(true);
+        assertTrue(getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).schedule().get());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileSourceToFileConsumerExecute() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
+        File source = validFile(true), target = makeTarget(true);
         IFileSource fileSource = mock(IFileSource.class);
-        when(fileSource.getFile()).thenReturn(docx);
+        when(fileSource.getFile()).thenReturn(source);
 
         IFileConsumer fileConsumer = mock(IFileConsumer.class);
 
-        assertTrue(getConverter().convert(fileSource).to(pdf, fileConsumer).execute());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        assertTrue(getConverter().convert(fileSource).as(validInputType()).to(target, fileConsumer).as(validTargetType()).execute());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
 
         verify(fileSource, times(1)).getFile();
-        verify(fileSource, times(1)).onConsumed(docx);
+        verify(fileSource, times(1)).onConsumed(source);
         verifyNoMoreInteractions(fileSource);
 
-        verify(fileConsumer, times(1)).onComplete(pdf);
+        verify(fileConsumer, times(1)).onComplete(target);
         verifyNoMoreInteractions(fileConsumer);
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileSourceToFileConsumerFuture() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
+        File source = validFile(true), target = makeTarget(true);
         IFileSource fileSource = mock(IFileSource.class);
-        when(fileSource.getFile()).thenReturn(docx);
+        when(fileSource.getFile()).thenReturn(source);
 
         IFileConsumer fileConsumer = mock(IFileConsumer.class);
 
-        assertTrue(getConverter().convert(fileSource).to(pdf, fileConsumer).schedule().get());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        assertTrue(getConverter().convert(fileSource).as(validInputType()).to(target, fileConsumer).as(validTargetType()).schedule().get());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
 
         verify(fileSource, times(1)).getFile();
-        verify(fileSource, times(1)).onConsumed(docx);
+        verify(fileSource, times(1)).onConsumed(source);
         verifyNoMoreInteractions(fileSource);
 
-        verify(fileConsumer, times(1)).onComplete(pdf);
+        verify(fileConsumer, times(1)).onComplete(target);
         verifyNoMoreInteractions(fileConsumer);
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testInputStreamToOutputStreamExecute() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
+        File source = validFile(true), target = makeTarget(true);
 
-        InputStream inputStream = spy(new FileInputStream(docx));
+        InputStream inputStream = spy(new FileInputStream(source));
 
-        assertTrue(pdf.createNewFile());
-        OutputStream outputStream = spy(new FileOutputStream(pdf));
+        assertTrue(target.createNewFile());
+        OutputStream outputStream = spy(new FileOutputStream(target));
 
-        assertTrue(getConverter().convert(inputStream).to(outputStream).execute());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        assertTrue(getConverter().convert(inputStream).as(validInputType()).to(outputStream).as(validTargetType()).execute());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
 
         verify(inputStream, times(1)).close();
         verify(outputStream, times(1)).close();
@@ -94,16 +94,16 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testInputStreamToOutputStreamFuture() throws Exception {
-        File docx = validFile(true), pdf = makeTarget(true);
+        File source = validFile(true), target = makeTarget(true);
 
-        InputStream inputStream = spy(new FileInputStream(docx));
+        InputStream inputStream = spy(new FileInputStream(source));
 
-        assertTrue(pdf.createNewFile());
-        OutputStream outputStream = spy(new FileOutputStream(pdf));
+        assertTrue(target.createNewFile());
+        OutputStream outputStream = spy(new FileOutputStream(target));
 
-        assertTrue(getConverter().convert(inputStream).to(outputStream).schedule().get());
-        assertTrue(docx.exists());
-        assertTrue(pdf.exists());
+        assertTrue(getConverter().convert(inputStream).as(validInputType()).to(outputStream).as(validTargetType()).schedule().get());
+        assertTrue(source.exists());
+        assertTrue(target.exists());
 
         verify(inputStream, times(1)).close();
         verify(outputStream, times(1)).close();
@@ -111,9 +111,9 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testInputStreamSourceToInputStreamConsumerExecute() throws Exception {
-        File docx = validFile(true);
+        File source = validFile(true);
 
-        InputStream inputStream = spy(new FileInputStream(docx));
+        InputStream inputStream = spy(new FileInputStream(source));
         IInputStreamSource inputStreamSource = mock(IInputStreamSource.class);
         when(inputStreamSource.getInputStream()).thenReturn(inputStream);
 
@@ -121,8 +121,8 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
         doAnswer(new CloseStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
 
-        assertTrue(getConverter().convert(inputStreamSource).to(inputStreamConsumer).execute());
-        assertTrue(docx.exists());
+        assertTrue(getConverter().convert(inputStreamSource).as(validInputType()).to(inputStreamConsumer).as(validTargetType()).execute());
+        assertTrue(source.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
         verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
@@ -136,9 +136,9 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testInputStreamSourceToInputStreamConsumerFuture() throws Exception {
-        File docx = validFile(true);
+        File source = validFile(true);
 
-        InputStream inputStream = spy(new FileInputStream(docx));
+        InputStream inputStream = spy(new FileInputStream(source));
         IInputStreamSource inputStreamSource = mock(IInputStreamSource.class);
         when(inputStreamSource.getInputStream()).thenReturn(inputStream);
 
@@ -146,8 +146,8 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
         doAnswer(new CloseStreamAnswer()).when(inputStreamConsumer).onComplete(any(InputStream.class));
 
-        assertTrue(getConverter().convert(inputStreamSource).to(inputStreamConsumer).schedule().get());
-        assertTrue(docx.exists());
+        assertTrue(getConverter().convert(inputStreamSource).as(validInputType()).to(inputStreamConsumer).as(validTargetType()).schedule().get());
+        assertTrue(source.exists());
 
         verify(inputStreamSource, times(1)).getInputStream();
         verify(inputStreamSource, times(1)).onConsumed(any(InputStream.class));
@@ -161,48 +161,48 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT, expected = ConversionInputException.class)
     public void testCorruptInputFileExecute() throws Exception {
-        File docx = invalidFile(true), pdf = makeTarget(false);
+        File source = invalidFile(true), target = makeTarget(false);
         try {
-            getConverter().convert(docx).to(pdf).execute();
+            getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).execute();
         } catch (ConversionInputException e) {
-            assertTrue(docx.exists());
-            assertFalse(pdf.exists());
+            assertTrue(source.exists());
+            assertFalse(target.exists());
             throw e;
         }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT, expected = ConversionInputException.class)
     public void testCorruptInputFileFuture() throws Exception {
-        File docx = invalidFile(true), pdf = makeTarget(false);
+        File source = invalidFile(true), target = makeTarget(false);
         try {
-            getConverter().convert(docx).to(pdf).schedule().get();
+            getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).schedule().get();
         } catch (ExecutionException e) {
-            assertTrue(docx.exists());
-            assertFalse(pdf.exists());
+            assertTrue(source.exists());
+            assertFalse(target.exists());
             throw (Exception) e.getCause();
         }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT, expected = FileSystemInteractionException.class)
     public void testInexistentInputFileExecute() throws Exception {
-        File docx = inexistentFile(false), pdf = makeTarget(false);
+        File source = inexistentFile(false), target = makeTarget(false);
         try {
-            getConverter().convert(docx).to(pdf).execute();
+            getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).execute();
         } catch (FileSystemInteractionException e) {
-            assertFalse(docx.exists());
-            assertFalse(pdf.exists());
+            assertFalse(source.exists());
+            assertFalse(target.exists());
             throw e;
         }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT, expected = FileSystemInteractionException.class)
     public void testInexistentInputFileFuture() throws Exception {
-        File docx = inexistentFile(false), pdf = makeTarget(false);
+        File source = inexistentFile(false), target = makeTarget(false);
         try {
-            getConverter().convert(docx).to(pdf).schedule().get();
+            getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).schedule().get();
         } catch (ExecutionException e) {
-            assertFalse(docx.exists());
-            assertFalse(pdf.exists());
+            assertFalse(source.exists());
+            assertFalse(target.exists());
             throw (Exception) e.getCause();
         }
     }

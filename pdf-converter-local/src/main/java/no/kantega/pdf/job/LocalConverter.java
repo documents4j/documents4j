@@ -64,8 +64,8 @@ public class LocalConverter extends ConverterAdapter {
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(IFileSource source) {
-        return new LocalConversionJobWithSourceSpecified(source);
+    public IConversionJobWithSourceUnspecified convert(IFileSource source) {
+        return new LocalConversionJobWithSourceUnspecified(source);
     }
 
     @Override
@@ -133,17 +133,34 @@ public class LocalConverter extends ConverterAdapter {
         }
     }
 
-    private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
+    private class LocalConversionJobWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
 
         private final IFileSource source;
 
-        private LocalConversionJobWithSourceSpecified(IFileSource source) {
+        private LocalConversionJobWithSourceUnspecified(IFileSource source) {
             this.source = source;
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified to(File file, IFileConsumer callback) {
-            return new LocalConversionJobWithPriorityUnspecified(source, file, callback);
+        public IConversionJobWithSourceSpecified as(String sourceFormat) {
+            return new LocalConversionJobWithSourceSpecified(source, sourceFormat);
+        }
+    }
+
+    private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
+
+        private final IFileSource source;
+
+        private final String sourceFormat;
+
+        private LocalConversionJobWithSourceSpecified(IFileSource source, String sourceFormat) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(File target, IFileConsumer callback) {
+            return new LocalConversionJobWithTargetUnspecified(source, sourceFormat, target, callback);
         }
 
         @Override
@@ -152,41 +169,60 @@ public class LocalConverter extends ConverterAdapter {
         }
     }
 
-    private class LocalConversionJob extends ConversionJobAdapter {
+    private class LocalConversionJobWithTargetUnspecified implements IConversionJobWithTargetUnspecified {
 
-        protected final IFileSource source;
-        protected final File target;
-        protected final IFileConsumer callback;
-        private final int priority;
+        private final IFileSource source;
 
-        private LocalConversionJob(IFileSource source, File target, IFileConsumer callback, int priority) {
+        private final String sourceFormat;
+
+        private final File target;
+
+        private final IFileConsumer callback;
+
+        public LocalConversionJobWithTargetUnspecified(IFileSource source, String sourceFormat, File target, IFileConsumer callback) {
             this.source = source;
+            this.sourceFormat = sourceFormat;
             this.target = target;
             this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
+            return new LocalConversionJob(source, sourceFormat, target, callback, targetFormat, IConverter.JOB_PRIORITY_NORMAL);
+        }
+    }
+
+    private class LocalConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
+
+        private final IFileSource source;
+        private final String sourceFormat;
+        private final File target;
+        private final IFileConsumer callback;
+        private final String targetFormat;
+        private final int priority;
+
+        private LocalConversionJob(IFileSource source, String sourceFormat, File target, IFileConsumer callback, String targetFormat, int priority) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.target = target;
+            this.callback = callback;
+            this.targetFormat = targetFormat;
             this.priority = priority;
         }
 
         @Override
         public Future<Boolean> schedule() {
-            RunnableFuture<Boolean> job = new LocalFutureWrappingPriorityFuture(
-                    conversionManager, source, target, callback, priority);
+            RunnableFuture<Boolean> job = new LocalFutureWrappingPriorityFuture(conversionManager, source, sourceFormat, target, callback, targetFormat, priority);
             // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
-            // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
+            // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue as this wrapper
+            // does not allow comparison.
             executorService.execute(job);
             return job;
-        }
-    }
-
-    private class LocalConversionJobWithPriorityUnspecified extends LocalConversionJob implements IConversionJobWithPriorityUnspecified {
-
-        private LocalConversionJobWithPriorityUnspecified(IFileSource source, File target, IFileConsumer callback) {
-            super(source, target, callback, JOB_PRIORITY_NORMAL);
         }
 
         @Override
         public IConversionJob prioritizeWith(int priority) {
-            return new LocalConversionJob(source, target, callback, priority);
+            return new LocalConversionJob(source, sourceFormat, target, callback, targetFormat, priority);
         }
     }
-
 }

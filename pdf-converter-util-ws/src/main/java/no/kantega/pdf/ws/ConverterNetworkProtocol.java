@@ -1,6 +1,7 @@
 package no.kantega.pdf.ws;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.throwables.ConversionFormatException;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.util.Reaction;
 
@@ -57,6 +58,8 @@ public final class ConverterNetworkProtocol {
                 Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The converter could not process the request"))),
         INPUT_ERROR(RESPONSE_STATUS_CODE_INPUT_ERROR,
                 Reaction.with(new Reaction.ConversionInputExceptionBuilder("The sent input is invalid"))),
+        FORMAT_ERROR(Response.Status.UNSUPPORTED_MEDIA_TYPE.getStatusCode(),
+                Reaction.with(new Reaction.ConversionFormatExceptionBuilder("The given input/output format combination is not supported"))),
         UNKNOWN(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
                 Reaction.with(false));
         private final Integer statusCode;
@@ -79,6 +82,8 @@ public final class ConverterNetworkProtocol {
         public static Status describe(Exception e) {
             if (e instanceof ConversionInputException) {
                 return INPUT_ERROR;
+            } else if (e instanceof ConversionFormatException) {
+                return FORMAT_ERROR;
             } else {
                 return CONVERTER_ERROR;
             }

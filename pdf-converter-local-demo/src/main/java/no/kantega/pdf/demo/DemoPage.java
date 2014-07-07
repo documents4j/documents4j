@@ -1,6 +1,7 @@
 package no.kantega.pdf.demo;
 
 import no.kantega.pdf.api.IFileConsumer;
+import no.kantega.pdf.conversion.msoffice.MicrosoftWordFileType;
 import no.kantega.pdf.throwables.ConverterException;
 import org.apache.wicket.Component;
 import org.apache.wicket.feedback.FeedbackMessage;
@@ -89,7 +90,10 @@ public class DemoPage extends WebPage {
                     long conversionDuration;
                     try {
                         conversionDuration = System.currentTimeMillis();
-                        DemoApplication.get().getConverter().convert(newFile).to(target, conductor).execute();
+                        DemoApplication.get().getConverter()
+                                .convert(newFile).as(MicrosoftWordFileType.WORD_ANY)
+                                .to(target, conductor).as(MicrosoftWordFileType.APPLICATION_PDF)
+                                .execute();
                         conversionDuration = System.currentTimeMillis() - conversionDuration;
                         properties.setProperty(FileRow.CONVERSION_DURATION_PROPERTY_KEY, String.valueOf(conversionDuration));
                         writeProperties(properties, transactionFolder);

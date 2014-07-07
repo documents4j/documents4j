@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -29,9 +30,10 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
         try {
             getConverter()
-                    .convert(inputStream)
-                    .to(inputStreamConsumer)
+                    .convert(inputStream).as(validInputType())
+                    .to(inputStreamConsumer).as(validTargetType())
                     .execute();
+            fail();
         } catch (ConverterAccessException e) {
             verify(inputStreamConsumer).onException(any(ConverterAccessException.class));
             verifyNoMoreInteractions(inputStreamConsumer);
@@ -46,9 +48,10 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
         try {
             getConverter()
-                    .convert(inputStream)
-                    .to(inputStreamConsumer)
+                    .convert(inputStream).as(validInputType())
+                    .to(inputStreamConsumer).as(validTargetType())
                     .schedule().get();
+            fail();
         } catch (ExecutionException e) {
             verify(inputStreamConsumer).onException(any(ConverterAccessException.class));
             verifyNoMoreInteractions(inputStreamConsumer);
@@ -63,9 +66,10 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
         File target = makeTarget(false);
         try {
             getConverter()
-                    .convert(validFile(true))
-                    .to(target, fileConsumer)
+                    .convert(validFile(true)).as(validInputType())
+                    .to(target, fileConsumer).as(validTargetType())
                     .execute();
+            fail();
         } catch (ConverterAccessException e) {
             verify(fileConsumer).onException(eq(target), any(ConverterAccessException.class));
             verifyNoMoreInteractions(fileConsumer);
@@ -80,9 +84,10 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
         File target = makeTarget(false);
         try {
             getConverter()
-                    .convert(validFile(true))
-                    .to(target, fileConsumer)
+                    .convert(validFile(true)).as(validInputType())
+                    .to(target, fileConsumer).as(validTargetType())
                     .schedule().get();
+            fail();
         } catch (ExecutionException e) {
             verify(fileConsumer).onException(eq(target), any(ConverterAccessException.class));
             verifyNoMoreInteractions(fileConsumer);

@@ -23,8 +23,8 @@ public class PseudoConverter extends ConverterAdapter {
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
-        return new PseudoConversionJobWithSourceSpecified(source);
+    public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
+        return new PseudoConversionJobWithSourceUnspecified(source);
     }
 
     @Override
@@ -48,6 +48,20 @@ public class PseudoConverter extends ConverterAdapter {
         /* do nothing */
     }
 
+    private class PseudoConversionJobWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
+
+        private final IInputStreamSource source;
+
+        public PseudoConversionJobWithSourceUnspecified(IInputStreamSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public IConversionJobWithSourceSpecified as(String sourceFormat) {
+            return new PseudoConversionJobWithSourceSpecified(source);
+        }
+    }
+
     private class PseudoConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IInputStreamSource source;
@@ -57,13 +71,30 @@ public class PseudoConverter extends ConverterAdapter {
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified to(IInputStreamConsumer callback) {
-            return new PseudoConversionJobWithPriorityUnspecified(source, callback);
+        public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
+            return new PseudoConversionJobWithTargetUnspecified(source, callback);
         }
 
         @Override
         protected File makeTemporaryFile(String suffix) {
             return PseudoConverter.this.makeTemporaryFile(suffix);
+        }
+    }
+
+    private class PseudoConversionJobWithTargetUnspecified implements IConversionJobWithTargetUnspecified {
+
+        private final IInputStreamSource source;
+
+        private final IInputStreamConsumer callback;
+
+        public PseudoConversionJobWithTargetUnspecified(IInputStreamSource source, IInputStreamConsumer callback) {
+            this.source = source;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
+            return new PseudoConversionJobWithPriorityUnspecified(source, callback);
         }
     }
 

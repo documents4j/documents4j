@@ -16,7 +16,7 @@ public interface IConversionJobWithSourceSpecified {
      *               the conversion will abort with an error.
      * @return The current conversion specification.
      */
-    IConversionJobWithPriorityUnspecified to(File target);
+    IConversionJobWithTargetUnspecified to(File target);
 
     /**
      * Configures the current conversion to write the result to the specified file target. Addtionally,
@@ -28,7 +28,7 @@ public interface IConversionJobWithSourceSpecified {
      * @param callback A callback that is invoked when the conversion terminates.
      * @return The current conversion specification.
      */
-    IConversionJobWithPriorityUnspecified to(File target, IFileConsumer callback);
+    IConversionJobWithTargetUnspecified to(File target, IFileConsumer callback);
 
     /**
      * Configures the current conversion to write the result to the specified {@link OutputStream}. The stream
@@ -37,7 +37,7 @@ public interface IConversionJobWithSourceSpecified {
      * @param target The output stream to which the conversion result is written to.
      * @return The current conversion specification.
      */
-    IConversionJobWithPriorityUnspecified to(OutputStream target);
+    IConversionJobWithTargetUnspecified to(OutputStream target);
 
     /**
      * Configures the current conversion to write the result to the specified {@link OutputStream}.
@@ -46,7 +46,7 @@ public interface IConversionJobWithSourceSpecified {
      * @param closeStream Determines whether the output stream is closed after writting the result.
      * @return The current conversion specification.
      */
-    IConversionJobWithPriorityUnspecified to(OutputStream target, boolean closeStream);
+    IConversionJobWithTargetUnspecified to(OutputStream target, boolean closeStream);
 
     /**
      * Configures the current conversion to write the result to invoke the given callback when the conversion
@@ -55,5 +55,5 @@ public interface IConversionJobWithSourceSpecified {
      * @param callback A callback that is invoked when the conversion terminates.
      * @return The current conversion specification.
      */
-    IConversionJobWithPriorityUnspecified to(IInputStreamConsumer callback);
+    IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback);
 }

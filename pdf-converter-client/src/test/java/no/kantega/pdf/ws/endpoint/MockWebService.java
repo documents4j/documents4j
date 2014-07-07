@@ -1,15 +1,18 @@
 package no.kantega.pdf.ws.endpoint;
 
 import com.google.common.base.Charsets;
+import no.kantega.pdf.job.AbstractConverterTest;
 import no.kantega.pdf.job.MockConversion;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
 import no.kantega.pdf.ws.ConverterServerInformation;
-import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+
+import static org.junit.Assert.assertNotEquals;
 
 @Path(ConverterNetworkProtocol.RESOURCE_PATH)
 public class MockWebService {
@@ -38,15 +41,16 @@ public class MockWebService {
     }
 
     @POST
-    @Consumes({MimeType.WORD_DOC, MimeType.WORD_DOCX, MimeType.WORD_ANY})
-    @Produces(MimeType.APPLICATION_PDF)
     public Response answer(String message,
+                           @HeaderParam(HttpHeaders.CONTENT_TYPE) String inputType,
+                           @HeaderParam(HttpHeaders.ACCEPT) String responseType,
                            @DefaultValue("" + MOCK_PRIORITY) @HeaderParam(ConverterNetworkProtocol.HEADER_JOB_PRIORITY) int priority) {
-//        assertNotEquals(MOCK_PRIORITY, priority);
+        assertNotEquals(MOCK_PRIORITY, priority);
         MockWebServiceCallback mockWebServiceCallback = new MockWebServiceCallback();
-        if (operational) {
-            MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8)))
-                    .applyTo(mockWebServiceCallback);
+        if (!inputType.equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !responseType.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
+            MockConversion.FORMAT_ERROR.handle("Format not supported", mockWebServiceCallback);
+        } else if (operational) {
+            MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8))).applyTo(mockWebServiceCallback);
         } else {
             MockConversion.CONVERTER_ERROR.handle("Converter is inoperational", mockWebServiceCallback);
         }

@@ -3,10 +3,7 @@ package no.kantega.pdf.job;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
-import no.kantega.pdf.throwables.ConversionInputException;
-import no.kantega.pdf.throwables.ConverterAccessException;
-import no.kantega.pdf.throwables.ConverterException;
-import no.kantega.pdf.throwables.FileSystemInteractionException;
+import no.kantega.pdf.throwables.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -22,9 +19,10 @@ public enum MockConversion {
     CANCEL(20),
     CONVERTER_ERROR(30),
     INPUT_ERROR(40),
-    FILE_SYSTEM_ERROR(50),
-    GENERIC_ERROR(60),
-    TIMEOUT(70);
+    FORMAT_ERROR(50),
+    FILE_SYSTEM_ERROR(60),
+    GENERIC_ERROR(70),
+    TIMEOUT(80);
 
     // Two one byte delimiters plus two byte status code.
     private static final char DELIMITER = '@';
@@ -75,6 +73,9 @@ public enum MockConversion {
                 case INPUT_ERROR:
                     onError(new ConversionInputException(asReply(message)), callback);
                     break;
+                case FORMAT_ERROR:
+                    onError(new ConversionFormatException(asReply(message)), callback);
+                    break;
                 case FILE_SYSTEM_ERROR:
                     onError(new FileSystemInteractionException(asReply(message)), callback);
                     break;
@@ -82,7 +83,7 @@ public enum MockConversion {
                     onError(new ConverterException(asReply(message)), callback);
                     break;
                 case TIMEOUT:
-                    // Emulate timeout: Do nothing.
+                    // Emulate timeout: Do not answer at all.
                     break;
                 default:
                     throw new AssertionError(String.format("Unexpected conversion result: %s", this));

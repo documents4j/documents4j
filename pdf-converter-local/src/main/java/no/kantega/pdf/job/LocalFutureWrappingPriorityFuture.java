@@ -10,18 +10,28 @@ import java.io.File;
 class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture<File, LocalConversionContext> {
 
     private final IFileSource source;
+    private final String sourceFormat;
+
     private final File target;
     private final IFileConsumer callback;
+    private final String targetFormat;
 
     private final IConversionManager conversionManager;
 
-    LocalFutureWrappingPriorityFuture(IConversionManager conversionManager, IFileSource source,
-                                      File target, IFileConsumer callback, int priority) {
+    LocalFutureWrappingPriorityFuture(IConversionManager conversionManager,
+                                      IFileSource source,
+                                      String sourceFormat,
+                                      File target,
+                                      IFileConsumer callback,
+                                      String targetFormat,
+                                      int priority) {
         super(priority);
         this.conversionManager = conversionManager;
         this.source = source;
+        this.sourceFormat = sourceFormat;
         this.target = target;
         this.callback = callback;
+        this.targetFormat = targetFormat;
     }
 
     @Override
@@ -36,7 +46,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
 
     @Override
     protected LocalConversionContext startConversion(File fetchedSource) {
-        return new LocalConversionContext(conversionManager.startConversion(fetchedSource, null, target, null)); // TODO
+        return new LocalConversionContext(conversionManager.startConversion(fetchedSource, sourceFormat, target, targetFormat));
     }
 
     @Override

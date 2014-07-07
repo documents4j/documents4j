@@ -1,9 +1,6 @@
 package no.kantega.pdf.adapter;
 
-import no.kantega.pdf.api.IConversionJobWithSourceSpecified;
-import no.kantega.pdf.api.IConverter;
-import no.kantega.pdf.api.IFileSource;
-import no.kantega.pdf.api.IInputStreamSource;
+import no.kantega.pdf.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,27 +51,27 @@ public abstract class ConverterAdapter implements IConverter {
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(File source) {
+    public IConversionJobWithSourceUnspecified convert(File source) {
         return convert(new FileSourceFromFile(source));
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(InputStream source) {
+    public IConversionJobWithSourceUnspecified convert(InputStream source) {
         return convert(source, true);
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(InputStream source, boolean close) {
+    public IConversionJobWithSourceUnspecified convert(InputStream source, boolean close) {
         return convert(new InputStreamSourceFromInputStream(source, close));
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(IFileSource source) {
+    public IConversionJobWithSourceUnspecified convert(IFileSource source) {
         return convert(new InputStreamSourceFromFileSource(source));
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
+    public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
         return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
     }
 

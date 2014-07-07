@@ -1,10 +1,7 @@
 package no.kantega.pdf.util;
 
 import com.google.common.base.Objects;
-import no.kantega.pdf.throwables.ConversionInputException;
-import no.kantega.pdf.throwables.ConverterAccessException;
-import no.kantega.pdf.throwables.ConverterException;
-import no.kantega.pdf.throwables.FileSystemInteractionException;
+import no.kantega.pdf.throwables.*;
 
 public abstract class Reaction {
 
@@ -107,6 +104,27 @@ public abstract class Reaction {
         @Override
         public String toString() {
             return Objects.toStringHelper(ConverterAccessExceptionBuilder.class)
+                    .add("message", message)
+                    .toString();
+        }
+    }
+
+    public static class ConversionFormatExceptionBuilder implements IExceptionBuilder {
+
+        private final String message;
+
+        public ConversionFormatExceptionBuilder(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public RuntimeException make() {
+            return new ConversionFormatException(message);
+        }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(ConversionFormatExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }

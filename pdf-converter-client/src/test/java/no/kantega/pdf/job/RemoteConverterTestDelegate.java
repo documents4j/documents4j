@@ -21,6 +21,7 @@ class RemoteConverterTestDelegate implements IConverterTestDelegate {
     private final boolean operational;
     private final ConfiguredJerseyTest jerseyTest;
     private IConverter converter;
+
     public RemoteConverterTestDelegate(boolean operational) throws TestContainerException {
         this.operational = operational;
         this.jerseyTest = new ConfiguredJerseyTest();

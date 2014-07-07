@@ -33,7 +33,7 @@ public interface IConverter {
      * @param source The conversion input as an input stream.
      * @return The current conversion specification.
      */
-    IConversionJobWithSourceSpecified convert(InputStream source);
+    IConversionJobWithSourceUnspecified convert(InputStream source);
 
     /**
      * Converts a source that is represented as a {@link InputStream}.
@@ -42,7 +42,7 @@ public interface IConverter {
      * @param close  Whether the {@link InputStream} is closed after the conversion terminates.
      * @return The current conversion specification.
      */
-    IConversionJobWithSourceSpecified convert(InputStream source, boolean close);
+    IConversionJobWithSourceUnspecified convert(InputStream source, boolean close);
 
     /**
      * Invokes a callback for the dynamic generation of a input stream source which is additionally
@@ -51,7 +51,7 @@ public interface IConverter {
      * @param source The input stream source generator.
      * @return The current conversion specification.
      */
-    IConversionJobWithSourceSpecified convert(IInputStreamSource source);
+    IConversionJobWithSourceUnspecified convert(IInputStreamSource source);
 
     /**
      * Converts a source file that is stored on the local file system.
@@ -59,7 +59,7 @@ public interface IConverter {
      * @param source The conversion input as a file.
      * @return The current conversion specification.
      */
-    IConversionJobWithSourceSpecified convert(File source);
+    IConversionJobWithSourceUnspecified convert(File source);
 
     /**
      * Invokes a callback for the dynamic generation of a file source which is additionally informed
@@ -68,7 +68,7 @@ public interface IConverter {
      * @param source The file source generator.
      * @return The current conversion specification.
      */
-    IConversionJobWithSourceSpecified convert(IFileSource source);
+    IConversionJobWithSourceUnspecified convert(IFileSource source);
 
     /**
      * Checks if this converter is currently operational.

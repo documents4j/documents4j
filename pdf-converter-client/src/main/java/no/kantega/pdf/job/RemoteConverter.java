@@ -113,8 +113,8 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     @Override
-    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
-        return new RemoteConversionWithJobSourceSpecified(source);
+    public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
+        return new RemoteConversionJobWithSourceUnspecified(source);
     }
 
     @Override
@@ -241,17 +241,34 @@ public class RemoteConverter extends ConverterAdapter {
         }
     }
 
-    private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
+    private class RemoteConversionJobWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
 
         private final IInputStreamSource source;
 
-        private RemoteConversionWithJobSourceSpecified(IInputStreamSource source) {
+        private RemoteConversionJobWithSourceUnspecified(IInputStreamSource source) {
             this.source = source;
         }
 
         @Override
-        public IConversionJobWithPriorityUnspecified to(IInputStreamConsumer callback) {
-            return new RemoteConversionJobWithPriorityUnspecified(source, callback);
+        public IConversionJobWithSourceSpecified as(String sourceFormat) {
+            return new RemoteConversionJobWithSourceSpecified(source, sourceFormat);
+        }
+    }
+
+    private class RemoteConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
+
+        private final IInputStreamSource source;
+
+        private final String sourceFormat;
+
+        private RemoteConversionJobWithSourceSpecified(IInputStreamSource source, String sourceFormat) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
+            return new RemoteConversionJobWithTargetUnspecified(source, sourceFormat, callback);
         }
 
         @Override
@@ -260,37 +277,54 @@ public class RemoteConverter extends ConverterAdapter {
         }
     }
 
-    private class RemoteConversionJob extends ConversionJobAdapter {
+    private class RemoteConversionJobWithTargetUnspecified implements IConversionJobWithTargetUnspecified {
 
-        protected final IInputStreamSource source;
-        protected final IInputStreamConsumer callback;
+        private final IInputStreamSource source;
+
+        private final String sourceFormat;
+
+        private final IInputStreamConsumer callback;
+
+        private RemoteConversionJobWithTargetUnspecified(IInputStreamSource source, String sourceFormat, IInputStreamConsumer callback) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(String targetFormat) {
+            return new RemoteConversionJob(source, sourceFormat, callback, targetFormat, IConverter.JOB_PRIORITY_NORMAL);
+        }
+    }
+
+    private class RemoteConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
+
+        private final IInputStreamSource source;
+        private final String sourceFormat;
+        private final IInputStreamConsumer callback;
+        private final String targetFormat;
         private final int priority;
 
-        private RemoteConversionJob(IInputStreamSource source, IInputStreamConsumer callback, int priority) {
+        private RemoteConversionJob(IInputStreamSource source, String sourceFormat, IInputStreamConsumer callback, String targetFormat, int priority) {
             this.source = source;
+            this.sourceFormat = sourceFormat;
             this.callback = callback;
+            this.targetFormat = targetFormat;
             this.priority = priority;
         }
 
         @Override
         public Future<Boolean> schedule() {
-            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(makeTarget(), source, callback, priority);
+            RunnableFuture<Boolean> job = new RemoteFutureWrappingPriorityFuture(makeTarget(), source, sourceFormat, callback, targetFormat, priority);
             // Note: Do not call ExecutorService#submit(Runnable) - this will wrap the job in another RunnableFuture which will
             // eventually cause a ClassCastException and a NullPointerException in the PriorityBlockingQueue.
             executorService.execute(job);
             return job;
         }
-    }
-
-    private class RemoteConversionJobWithPriorityUnspecified extends RemoteConversionJob implements IConversionJobWithPriorityUnspecified {
-
-        private RemoteConversionJobWithPriorityUnspecified(IInputStreamSource source, IInputStreamConsumer callback) {
-            super(source, callback, JOB_PRIORITY_NORMAL);
-        }
 
         @Override
         public IConversionJob prioritizeWith(int priority) {
-            return new RemoteConversionJob(source, callback, priority);
+            return new RemoteConversionJob(source, sourceFormat, callback, targetFormat, priority);
         }
     }
 }

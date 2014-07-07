@@ -1,6 +1,7 @@
 package no.kantega.pdf.ws.endpoint;
 
 import no.kantega.pdf.job.IStrategyCallback;
+import no.kantega.pdf.throwables.ConversionFormatException;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.throwables.ConverterException;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
@@ -35,6 +36,8 @@ class MockWebServiceCallback implements IStrategyCallback {
         int statusCode;
         if (e instanceof ConversionInputException) {
             statusCode = ConverterNetworkProtocol.Status.INPUT_ERROR.getStatusCode();
+        } else if(e instanceof ConversionFormatException) {
+            statusCode = ConverterNetworkProtocol.Status.FORMAT_ERROR.getStatusCode();
         } else if (e instanceof ConverterException) {
             statusCode = ConverterNetworkProtocol.Status.CONVERTER_ERROR.getStatusCode();
         } else {

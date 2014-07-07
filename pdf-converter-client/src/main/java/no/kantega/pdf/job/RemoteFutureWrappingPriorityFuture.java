@@ -4,7 +4,6 @@ import com.google.common.base.Objects;
 import no.kantega.pdf.api.IInputStreamConsumer;
 import no.kantega.pdf.api.IInputStreamSource;
 import no.kantega.pdf.ws.ConverterNetworkProtocol;
-import no.kantega.pdf.ws.MimeType;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -17,17 +16,25 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     private final WebTarget webTarget;
 
     private final IInputStreamSource source;
+    private final String sourceFormat;
+
     private final IInputStreamConsumer consumer;
+    private final String targetFormat;
 
     private final AtomicBoolean consumptionMark;
 
     RemoteFutureWrappingPriorityFuture(WebTarget webTarget,
-                                       IInputStreamSource source, IInputStreamConsumer consumer,
+                                       IInputStreamSource source,
+                                       String sourceFormat,
+                                       IInputStreamConsumer consumer,
+                                       String targetFormat,
                                        int priority) {
         super(priority);
         this.webTarget = webTarget;
         this.source = source;
+        this.sourceFormat = sourceFormat;
         this.consumer = consumer;
+        this.targetFormat = targetFormat;
         this.consumptionMark = new AtomicBoolean(false);
     }
 
@@ -47,10 +54,10 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     protected RemoteConversionContext startConversion(InputStream fetchedSource) {
         return new RemoteConversionContext(webTarget
                 .path(ConverterNetworkProtocol.RESOURCE_PATH)
-                .request(MimeType.APPLICATION_PDF)
+                .request(targetFormat)
                 .header(ConverterNetworkProtocol.HEADER_JOB_PRIORITY, getPriority().getValue())
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), MimeType.WORD_ANY)));
+                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), sourceFormat)));
     }
 
     @Override

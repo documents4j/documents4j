@@ -23,6 +23,9 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
 
     private static File EXTERNAL_CONVERTER_DIRECTORY;
     private static IExternalConverter EXTERNAL_CONVERTER;
+    private AtomicInteger nameGenerator;
+    private File files;
+    private Set<File> fileCopies;
 
     @BeforeClass
     public static void setUpConverter() throws Exception {
@@ -47,10 +50,6 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
     public static IExternalConverter getExternalConverter() {
         return EXTERNAL_CONVERTER;
     }
-
-    private AtomicInteger nameGenerator;
-    private File files;
-    private Set<File> fileCopies;
 
     @Before
     public void setUpFiles() throws Exception {

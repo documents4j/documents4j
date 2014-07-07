@@ -32,6 +32,10 @@ import static com.google.common.base.Preconditions.checkArgument;
  */
 public class StandaloneServer {
 
+    private StandaloneServer() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
      * the application via the command line.

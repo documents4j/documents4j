@@ -9,12 +9,12 @@ class NoopFileConsumer implements IFileConsumer {
 
     private static final NoopFileConsumer INSTANCE = new NoopFileConsumer();
 
-    public static IFileConsumer getInstance() {
-        return INSTANCE;
-    }
-
     private NoopFileConsumer() {
         /* empty */
+    }
+
+    public static IFileConsumer getInstance() {
+        return INSTANCE;
     }
 
     @Override

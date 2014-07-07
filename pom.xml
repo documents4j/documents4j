@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>no.kantega</groupId>
@@ -37,9 +38,9 @@
      therefore leak. When developing and testing this application, always keep an eye on your machine's task manager.
 
      Profile summary:
-      (1) no-office: All tests that require MS Word are skipped. (Automatically activated when the build is run
-          on a non-Windows operating system.)
+      (1) ms-office: Runs tests that require MS Word and MS Windows.
       (2) extras: Build a shaded jar for the standalone conversion server as well as javadoc and source artifacts.
+      (3) checks: Perform additional source code checks (activated by default)
 
      Note that MS Office does not officially support its execution in a service context. When run as a service, MS
      Office is always started with MS Window's local service account which does not configure a desktop. However, MS
@@ -96,7 +97,13 @@
         <version.maven.war-plugin>2.3</version.maven.war-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
         <version.maven.release-plugin>2.4.1</version.maven.release-plugin>
-        <version.java.compiler>1.6</version.java.compiler>
+        <version.maven.cobertura>2.6</version.maven.cobertura>
+        <version.maven.coveralls>2.2.0</version.maven.coveralls>
+        <version.maven.checkstyle>2.12.1</version.maven.checkstyle>
+        <version.maven.resources>2.6</version.maven.resources>
+        <version.maven.compiler>3.1</version.maven.compiler>
+        <version.maven.install>2.5.1</version.maven.install>
+        <version.java>1.6</version.java>
     </properties>
 
     <developers>
@@ -237,18 +244,6 @@
 
     <build>
         <plugins>
-            <!-- Set Java version -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${version.maven.compiler-plugin}</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>${version.java.compiler}</source>
-                    <target>${version.java.compiler}</target>
-                </configuration>
-            </plugin>
-
             <!-- Release configuration -->
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
@@ -259,7 +254,55 @@
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
+
+            <!-- Cobertura test case coverage -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${version.maven.cobertura}</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <formats>
+                        <format>html</format>
+                        <format>xml</format>
+                    </formats>
+                    <check/>
+                </configuration>
+            </plugin>
+
+            <!-- Generate coveralls reports from Travis -->
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>${version.maven.coveralls}</version>
+            </plugin>
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${version.maven.resources}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${version.maven.install}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${version.maven.compiler}</version>
+                    <inherited>true</inherited>
+                    <configuration>
+                        <source>${version.java}</source>
+                        <target>${version.java}</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <profiles>
@@ -281,6 +324,7 @@
                             </execution>
                         </executions>
                     </plugin>
+
                     <!-- Create javadoc artifacts -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -292,6 +336,58 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Check style on build -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${version.maven.checkstyle}</version>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <configLocation>checkstyle.xml</configLocation>
+                                    <consoleOutput>true</consoleOutput>
+                                    <failsOnError>true</failsOnError>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>checks</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Check style on build -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>${version.maven.checkstyle}</version>
+                        <executions>
+                            <execution>
+                                <id>validate</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <configLocation>checkstyle.xml</configLocation>
+                                    <consoleOutput>true</consoleOutput>
+                                    <failsOnError>true</failsOnError>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

@@ -12,6 +12,11 @@ import static com.google.common.base.Preconditions.checkState;
 enum ExternalConverterDiscovery {
 
     MICROSOFT_WORD("no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge");
+    private final String className;
+
+    private ExternalConverterDiscovery(String className) {
+        this.className = className;
+    }
 
     private static IExternalConverter make(Class<? extends IExternalConverter> externalConverterClass,
                                            File baseFolder, long processTimeout, TimeUnit timeUnit) {
@@ -72,12 +77,6 @@ enum ExternalConverterDiscovery {
     public static Set<IExternalConverter> loadConfiguration(Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration,
                                                             File baseFolder, long processTimeout, TimeUnit timeUnit) {
         return makeAll(validate(discover(externalConverterRegistration)), baseFolder, processTimeout, timeUnit);
-    }
-
-    private final String className;
-
-    private ExternalConverterDiscovery(String className) {
-        this.className = className;
     }
 
     protected String getClassName() {

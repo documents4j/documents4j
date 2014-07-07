@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A converter that relies on an external converter such as MS Word on the local file system.
- * <p/>
+ * <p>&nbsp;</p>
  * <i>Important</i>: There should only exist <b>one</b> {@link LocalConverter} per <b>physical machine</b>!
  * This instance needs to communicate with external applications via command line and needs to shut down
  * and start up applications. This cannot be done in a safely manner without introducing a major latency. It
@@ -29,10 +29,64 @@ import java.util.concurrent.TimeUnit;
 public class LocalConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
+    private final IConversionManager conversionManager;
+    private final ExecutorService executorService;
+
+    protected LocalConverter(File baseFolder,
+                             int corePoolSize, int maximumPoolSize, long keepAliveTime,
+                             long processTimeout, TimeUnit processTimeoutUnit) {
+        super(baseFolder);
+        this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        LOGGER.info("Local To-PDF converter has started successfully");
+    }
+
+    /**
+     * Creates a new builder instance.
+     *
+     * @return A new builder instance.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a new {@link LocalConverter} with default configuration.
+     *
+     * @return A {@link LocalConverter} with default configuration.
+     */
+    public static IConverter make() {
+        return builder().build();
+    }
+
+    protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
+        return new ConversionManager(baseFolder, processTimeout, unit);
+    }
+
+    @Override
+    public IConversionJobWithSourceSpecified convert(IFileSource source) {
+        return new LocalConversionJobWithSourceSpecified(source);
+    }
+
+    @Override
+    public boolean isOperational() {
+        return !executorService.isShutdown() && conversionManager.isOperational();
+    }
+
+    @Override
+    public void shutDown() {
+        try {
+            conversionManager.shutDown();
+            executorService.shutdownNow();
+        } finally {
+            super.shutDown();
+        }
+        LOGGER.info("Local To-PDF converter has shut down successfully");
+    }
 
     /**
      * A builder for constructing a {@link LocalConverter}.
-     * <p/>
+     * <p>&nbsp;</p>
      * <i>Note</i>: This builder is not thread safe.
      */
     public static final class Builder extends AbstractConverterBuilder<Builder> {
@@ -77,40 +131,6 @@ public class LocalConverter extends ConverterAdapter {
         public long getProcessTimeout() {
             return processTimeout;
         }
-    }
-
-    /**
-     * Creates a new builder instance.
-     *
-     * @return A new builder instance.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Creates a new {@link LocalConverter} with default configuration.
-     *
-     * @return A {@link LocalConverter} with default configuration.
-     */
-    public static IConverter make() {
-        return builder().build();
-    }
-
-    private final IConversionManager conversionManager;
-    private final ExecutorService executorService;
-
-    protected LocalConverter(File baseFolder,
-                             int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                             long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder);
-        this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
-        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        LOGGER.info("Local To-PDF converter has started successfully");
-    }
-
-    protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
-        return new ConversionManager(baseFolder, processTimeout, unit);
     }
 
     private class LocalConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
@@ -167,27 +187,6 @@ public class LocalConverter extends ConverterAdapter {
         public IConversionJob prioritizeWith(int priority) {
             return new LocalConversionJob(source, target, callback, priority);
         }
-    }
-
-    @Override
-    public IConversionJobWithSourceSpecified convert(IFileSource source) {
-        return new LocalConversionJobWithSourceSpecified(source);
-    }
-
-    @Override
-    public boolean isOperational() {
-        return !executorService.isShutdown() && conversionManager.isOperational();
-    }
-
-    @Override
-    public void shutDown() {
-        try {
-            conversionManager.shutDown();
-            executorService.shutdownNow();
-        } finally {
-            super.shutDown();
-        }
-        LOGGER.info("Local To-PDF converter has shut down successfully");
     }
 
 }

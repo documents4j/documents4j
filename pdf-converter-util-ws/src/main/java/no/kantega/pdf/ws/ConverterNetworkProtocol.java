@@ -38,6 +38,10 @@ public final class ConverterNetworkProtocol {
 
     private static final int RESPONSE_STATUS_CODE_INPUT_ERROR = 422;
 
+    private ConverterNetworkProtocol() {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * A collection of known status codes used for communication.
      */
@@ -55,6 +59,13 @@ public final class ConverterNetworkProtocol {
                 Reaction.with(new Reaction.ConversionInputExceptionBuilder("The sent input is invalid"))),
         UNKNOWN(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(),
                 Reaction.with(false));
+        private final Integer statusCode;
+        private final Reaction reaction;
+
+        private Status(Integer statusCode, Reaction reaction) {
+            this.statusCode = statusCode;
+            this.reaction = reaction;
+        }
 
         public static Status from(int statusCode) {
             for (Status status : Status.values()) {
@@ -73,14 +84,6 @@ public final class ConverterNetworkProtocol {
             }
         }
 
-        private final Integer statusCode;
-        private final Reaction reaction;
-
-        private Status(Integer statusCode, Reaction reaction) {
-            this.statusCode = statusCode;
-            this.reaction = reaction;
-        }
-
         public int getStatusCode() {
             return statusCode;
         }
@@ -96,9 +99,5 @@ public final class ConverterNetworkProtocol {
                     .add("reaction", reaction)
                     .toString();
         }
-    }
-
-    private ConverterNetworkProtocol() {
-        throw new AssertionError();
     }
 }

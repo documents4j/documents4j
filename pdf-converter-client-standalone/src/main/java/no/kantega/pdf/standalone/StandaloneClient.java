@@ -29,30 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class StandaloneClient {
 
-    private static class LoggingFileConsumer implements IFileConsumer {
-
-        private final File sourceFile;
-        private final Logger logger;
-
-        private LoggingFileConsumer(File sourceFile, Logger logger) {
-            this.sourceFile = sourceFile;
-            this.logger = logger;
-        }
-
-        @Override
-        public void onComplete(File file) {
-            logger.info("Successfully converted {} to {}", sourceFile, file);
-        }
-
-        @Override
-        public void onCancel(File file) {
-            logger.warn("Conversion from {} to {} was cancelled", sourceFile, file);
-        }
-
-        @Override
-        public void onException(File file, Exception e) {
-            logger.error("Could not convert {} to {}", sourceFile, file, e);
-        }
+    private StandaloneClient() {
+        throw new UnsupportedOperationException();
     }
 
     public static void main(String[] args) {
@@ -285,5 +263,31 @@ public class StandaloneClient {
     private static void sayGoodbye(IConverter converter, Logger logger) {
         System.out.println("Disconnecting converter client...");
         logger.info("Converter {} is disconnecting", converter);
+    }
+
+    private static class LoggingFileConsumer implements IFileConsumer {
+
+        private final File sourceFile;
+        private final Logger logger;
+
+        private LoggingFileConsumer(File sourceFile, Logger logger) {
+            this.sourceFile = sourceFile;
+            this.logger = logger;
+        }
+
+        @Override
+        public void onComplete(File file) {
+            logger.info("Successfully converted {} to {}", sourceFile, file);
+        }
+
+        @Override
+        public void onCancel(File file) {
+            logger.warn("Conversion from {} to {} was cancelled", sourceFile, file);
+        }
+
+        @Override
+        public void onException(File file, Exception e) {
+            logger.error("Could not convert {} to {}", sourceFile, file, e);
+        }
     }
 }

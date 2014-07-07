@@ -22,6 +22,32 @@ public class PseudoConverter extends ConverterAdapter {
         this.operational = operational;
     }
 
+    @Override
+    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
+        return new PseudoConversionJobWithSourceSpecified(source);
+    }
+
+    @Override
+    public boolean isOperational() {
+        return operational;
+    }
+
+    @Override
+    public void shutDown() {
+        super.shutDown();
+        assertTrue(getTempFileFolder().getParentFile().delete());
+    }
+
+    @Override
+    protected void registerShutdownHook() {
+        /* do nothing */
+    }
+
+    @Override
+    protected void deregisterShutdownHook() {
+        /* do nothing */
+    }
+
     private class PseudoConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IInputStreamSource source;
@@ -81,31 +107,5 @@ public class PseudoConverter extends ConverterAdapter {
             }
             return mock(Future.class);
         }
-    }
-
-    @Override
-    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
-        return new PseudoConversionJobWithSourceSpecified(source);
-    }
-
-    @Override
-    public boolean isOperational() {
-        return operational;
-    }
-
-    @Override
-    public void shutDown() {
-        super.shutDown();
-        assertTrue(getTempFileFolder().getParentFile().delete());
-    }
-
-    @Override
-    protected void registerShutdownHook() {
-        /* do nothing */
-    }
-
-    @Override
-    protected void deregisterShutdownHook() {
-        /* do nothing */
     }
 }

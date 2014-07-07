@@ -9,6 +9,19 @@ enum StubbedFutures {
     FAIL,
     BLOCK_AND_FAIL_ON_CANCEL;
 
+    public Future<Boolean> makeFuture() {
+        switch (this) {
+            case SUCCEED:
+                return new SimpleStubbedBooleanFuture(true);
+            case FAIL:
+                return new SimpleStubbedBooleanFuture(false);
+            case BLOCK_AND_FAIL_ON_CANCEL:
+                return new BlockAndFailOnCancelStubbedBooleanFuture();
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
     private static class SimpleStubbedBooleanFuture implements Future<Boolean> {
 
         private final boolean conversionResult;
@@ -86,19 +99,6 @@ enum StubbedFutures {
             } else {
                 throw new TimeoutException();
             }
-        }
-    }
-
-    public Future<Boolean> makeFuture() {
-        switch (this) {
-            case SUCCEED:
-                return new SimpleStubbedBooleanFuture(true);
-            case FAIL:
-                return new SimpleStubbedBooleanFuture(false);
-            case BLOCK_AND_FAIL_ON_CANCEL:
-                return new BlockAndFailOnCancelStubbedBooleanFuture();
-            default:
-                throw new IllegalStateException();
         }
     }
 }

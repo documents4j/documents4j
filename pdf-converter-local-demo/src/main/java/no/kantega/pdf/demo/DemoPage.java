@@ -24,7 +24,7 @@ import java.util.Properties;
 
 public class DemoPage extends WebPage {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(DemoPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoPage.class);
 
     private static final CssResourceReference TWITTER_BOOTSTRAP = new CssResourceReference(DemoPage.class, "bootstrap.min.css");
 
@@ -142,11 +142,16 @@ public class DemoPage extends WebPage {
         return new FileTable(identifier);
     }
 
+    @Override
+    public void renderHead(IHeaderResponse response) {
+        super.renderHead(response);
+        response.render(CssReferenceHeaderItem.forReference(TWITTER_BOOTSTRAP));
+    }
+
     private class FeedbackMessageConductor implements IFileConsumer {
 
-        private FeedbackMessage feedbackMessage;
-
         private final String inputName;
+        private FeedbackMessage feedbackMessage;
 
         private FeedbackMessageConductor(String inputName) {
             this.inputName = inputName;
@@ -177,11 +182,5 @@ public class DemoPage extends WebPage {
         private FeedbackMessage getFeedbackMessage() {
             return feedbackMessage;
         }
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(CssReferenceHeaderItem.forReference(TWITTER_BOOTSTRAP));
     }
 }

@@ -17,23 +17,8 @@ import java.util.Set;
  */
 public class WebConverterApplication extends Application {
 
-    private static class WebConverterConfigurationBinder extends AbstractBinder {
-
-        private final IWebConverterConfiguration webConverterConfiguration;
-
-        private WebConverterConfigurationBinder(IWebConverterConfiguration webConverterConfiguration) {
-            this.webConverterConfiguration = webConverterConfiguration;
-        }
-
-        @Override
-        protected void configure() {
-            bind(webConverterConfiguration).to(IWebConverterConfiguration.class);
-        }
-    }
-
     private final Set<Class<?>> classes;
     private final Set<Object> singletons;
-
     public WebConverterApplication(IWebConverterConfiguration webConverterConfiguration) {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(ConverterResource.class);
@@ -53,5 +38,19 @@ public class WebConverterApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         return singletons;
+    }
+
+    private static class WebConverterConfigurationBinder extends AbstractBinder {
+
+        private final IWebConverterConfiguration webConverterConfiguration;
+
+        private WebConverterConfigurationBinder(IWebConverterConfiguration webConverterConfiguration) {
+            this.webConverterConfiguration = webConverterConfiguration;
+        }
+
+        @Override
+        protected void configure() {
+            bind(webConverterConfiguration).to(IWebConverterConfiguration.class);
+        }
     }
 }

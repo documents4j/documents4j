@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -16,7 +17,7 @@
     </modules>
 
     <properties>
-        <testing.skip.office>false</testing.skip.office>
+        <test.office.skip>true</test.office.skip>
     </properties>
 
     <dependencies>
@@ -30,15 +31,10 @@
 
     <profiles>
         <profile>
-            <id>no-office</id>
+            <id>ms-office</id>
             <properties>
-                <testing.skip.office>true</testing.skip.office>
+                <test.office.skip>false</test.office.skip>
             </properties>
-            <activation>
-                <os>
-                    <family>!Windows</family>
-                </os>
-            </activation>
         </profile>
     </profiles>
 
@@ -49,7 +45,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${version.maven.surefire-plugin}</version>
                 <configuration>
-                    <skipTests>${testing.skip.office}</skipTests>
+                    <skipTests>${test.office.skip}</skipTests>
                 </configuration>
             </plugin>
         </plugins>

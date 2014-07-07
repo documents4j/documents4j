@@ -18,27 +18,9 @@ import static org.junit.Assert.assertFalse;
 class RemoteConverterTestDelegate implements IConverterTestDelegate {
 
     private static final long REMOTE_CONVERTER_TIMEOUT = 2000L;
-
-    private class ConfiguredJerseyTest extends JerseyTest {
-
-        @Override
-        protected Application configure() {
-            enable(TestProperties.LOG_TRAFFIC);
-            enable(TestProperties.DUMP_ENTITY);
-            return new MockWebApplication(operational, REMOTE_CONVERTER_TIMEOUT);
-        }
-
-        @Override
-        public URI getBaseUri() {
-            // This method is overriden in order to change its visibility to public.
-            return super.getBaseUri();
-        }
-    }
-
     private final boolean operational;
     private final ConfiguredJerseyTest jerseyTest;
     private IConverter converter;
-
     public RemoteConverterTestDelegate(boolean operational) throws TestContainerException {
         this.operational = operational;
         this.jerseyTest = new ConfiguredJerseyTest();
@@ -62,5 +44,21 @@ class RemoteConverterTestDelegate implements IConverterTestDelegate {
     @Override
     public IConverter getConverter() {
         return converter;
+    }
+
+    private class ConfiguredJerseyTest extends JerseyTest {
+
+        @Override
+        protected Application configure() {
+            enable(TestProperties.LOG_TRAFFIC);
+            enable(TestProperties.DUMP_ENTITY);
+            return new MockWebApplication(operational, REMOTE_CONVERTER_TIMEOUT);
+        }
+
+        @Override
+        public URI getBaseUri() {
+            // This method is overriden in order to change its visibility to public.
+            return super.getBaseUri();
+        }
     }
 }

@@ -29,37 +29,6 @@ public class FileRow implements Serializable {
         this.properties = properties;
     }
 
-    public File getSource() {
-        return source;
-    }
-
-    public File getTarget() {
-        return target;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public String getDuration() {
-        long milliseconds = Long.valueOf(properties.getProperty(CONVERSION_DURATION_PROPERTY_KEY, "-1"));
-        if (milliseconds < 1000L) {
-            return String.format("%d ms", milliseconds);
-        } else {
-            // Integral division is wanted in order to truncate the resulting value.
-            double seconds = (milliseconds / 100L) / 10d;
-            return String.format("~%.1f s", seconds);
-        }
-    }
-
-    public String getSourceName() {
-        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "input");
-    }
-
-    public String getOutputName() {
-        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "output") + ".pdf";
-    }
-
     public static List<FileRow> findAll() {
 
         File[] folders = DemoApplication.get().getUploadFolder().listFiles();
@@ -104,5 +73,36 @@ public class FileRow implements Serializable {
         } catch (IOException e) {
             return null;
         }
+    }
+
+    public File getSource() {
+        return source;
+    }
+
+    public File getTarget() {
+        return target;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public String getDuration() {
+        long milliseconds = Long.valueOf(properties.getProperty(CONVERSION_DURATION_PROPERTY_KEY, "-1"));
+        if (milliseconds < 1000L) {
+            return String.format("%d ms", milliseconds);
+        } else {
+            // Integral division is wanted in order to truncate the resulting value.
+            double seconds = (milliseconds / 100L) / 10d;
+            return String.format("~%.1f s", seconds);
+        }
+    }
+
+    public String getSourceName() {
+        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "input");
+    }
+
+    public String getOutputName() {
+        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "output") + ".pdf";
     }
 }

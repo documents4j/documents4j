@@ -9,13 +9,6 @@ import static org.mockito.Mockito.mock;
 
 public class DemoPageTest {
 
-    private static class StubbedDemoApplication extends DemoApplication {
-        @Override
-        protected IConverter loadConverter() {
-            return mock(IConverter.class);
-        }
-    }
-
     private WicketTester tester;
 
     @Before
@@ -27,5 +20,12 @@ public class DemoPageTest {
     public void homepageRendersSuccessfully() {
         tester.startPage(DemoPage.class);
         tester.assertRenderedPage(DemoPage.class);
+    }
+
+    private static class StubbedDemoApplication extends DemoApplication {
+        @Override
+        protected IConverter loadConverter() {
+            return mock(IConverter.class);
+        }
     }
 }

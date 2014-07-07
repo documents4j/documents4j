@@ -226,19 +226,18 @@ The following modules are usually of interest to the end user:
 
 Building the project
 --------------------
-This project was set up to allow running as many tests as possible without requiring MS Word. For this purpose, the project
-includes several rich stubs that step in place of the MS Word bridge. When you are building this project on a machine that
-does not run MS Windows or MS Word, you should build the project with the *no-office* profile which skips any tests that
-rely on an actual MS Word instance:
+This project was set up to allow running as many tests as possible without requiring MS Office. For this purpose, the project
+includes several rich stubs that step in place of the MS Office bridges. When you are building this project on a machine that
+with MS Windows and MS Office installed, you should build the project with the *ms-office* profile which triggers tests that
+rely on an actual MS Office instance:
 
 ```
-mvn clean package -Pno-office
+mvn clean package -Pms-office
 ```
 
-If Maven discovers that the build is not run on MS Windows, this profile will be activated by default. When you are testing
-native converters such as the MS Word bridge, do not forget to keep an eye on your task manager. Consider an alternative to
-the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx) for
-debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx).
+When you are testing native converters such as the MS Word bridge, do not forget to keep an eye on your task manager.
+Consider an alternative to the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx)
+for debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx).
 
 Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar
 for the standalone server are only executed when the *extras* profile is active:

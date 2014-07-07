@@ -26,6 +26,10 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
     }
 
+    protected static String quote(String... args) {
+        return String.format("\"%s\"", ARGUMENT_JOINER.join(args));
+    }
+
     protected File getBaseFolder() {
         return baseFolder;
     }
@@ -67,10 +71,6 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             logger.error(message, e);
             throw new ConverterAccessException(message, e);
         }
-    }
-
-    protected static String quote(String... args) {
-        return String.format("\"%s\"", ARGUMENT_JOINER.join(args));
     }
 
     protected void tryDelete(File file) {

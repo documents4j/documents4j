@@ -21,6 +21,28 @@ import static org.junit.Assert.assertTrue;
 public class MockWebApplication extends Application {
 
     private static final int LOWEST_PRIORITY = 0;
+    private final Set<Class<?>> classes;
+    private final Set<Object> singletons;
+    public MockWebApplication(boolean operational, long timeout) {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        classes.add(EncodingFilter.class);
+        classes.add(GZipEncoder.class);
+        classes.add(ClientEncodingAssertingFilter.class);
+        this.classes = Collections.unmodifiableSet(classes);
+        Set<Object> singletons = new HashSet<Object>();
+        singletons.add(new MockWebService(operational, timeout));
+        this.singletons = Collections.unmodifiableSet(singletons);
+    }
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        return classes;
+    }
+
+    @Override
+    public Set<Object> getSingletons() {
+        return singletons;
+    }
 
     @Provider
     @Priority(LOWEST_PRIORITY)
@@ -46,29 +68,5 @@ public class MockWebApplication extends Application {
                 assertEquals(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, responseContext.getHeaderString(HttpHeaders.CONTENT_ENCODING));
             }
         }
-    }
-
-    private final Set<Class<?>> classes;
-    private final Set<Object> singletons;
-
-    public MockWebApplication(boolean operational, long timeout) {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(EncodingFilter.class);
-        classes.add(GZipEncoder.class);
-        classes.add(ClientEncodingAssertingFilter.class);
-        this.classes = Collections.unmodifiableSet(classes);
-        Set<Object> singletons = new HashSet<Object>();
-        singletons.add(new MockWebService(operational, timeout));
-        this.singletons = Collections.unmodifiableSet(singletons);
-    }
-
-    @Override
-    public Set<Class<?>> getClasses() {
-        return classes;
-    }
-
-    @Override
-    public Set<Object> getSingletons() {
-        return singletons;
     }
 }

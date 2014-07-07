@@ -76,6 +76,6 @@ class CommandDescription {
     public static final String DESCRIPTION_BASE_URI = "The base URI of the conversion server. (e.g. http://localhost:8080)";
 
     private CommandDescription() {
-        throw new AssertionError();
+        throw new UnsupportedOperationException();
     }
 }

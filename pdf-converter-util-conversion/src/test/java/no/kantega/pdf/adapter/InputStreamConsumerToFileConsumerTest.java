@@ -16,14 +16,6 @@ import static org.mockito.Mockito.*;
 
 public class InputStreamConsumerToFileConsumerTest extends AbstractAdapterTest {
 
-    private static class CloseInputStreamAnswer implements Answer<Void> {
-        @Override
-        public Void answer(InvocationOnMock invocation) throws Throwable {
-            ((InputStream) invocation.getArguments()[0]).close();
-            return null;
-        }
-    }
-
     @Test
     public void testDelegationCompleteValid() throws Exception {
         IInputStreamConsumer inputStreamConsumer = mock(IInputStreamConsumer.class);
@@ -86,5 +78,13 @@ public class InputStreamConsumerToFileConsumerTest extends AbstractAdapterTest {
         verifyNoMoreInteractions(inputStreamConsumer);
 
         assertFalse(source.exists());
+    }
+
+    private static class CloseInputStreamAnswer implements Answer<Void> {
+        @Override
+        public Void answer(InvocationOnMock invocation) throws Throwable {
+            ((InputStream) invocation.getArguments()[0]).close();
+            return null;
+        }
     }
 }

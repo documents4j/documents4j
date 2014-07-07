@@ -15,6 +15,15 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class LogLevelValueConverterTest {
 
+    private final String name;
+    private final Level level;
+    private ValueConverter<Level> valueConverter;
+
+    public LogLevelValueConverterTest(String name, Level level) {
+        this.name = name;
+        this.level = level;
+    }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -27,16 +36,6 @@ public class LogLevelValueConverterTest {
                 {"all", Level.ALL},
         });
     }
-
-    private final String name;
-    private final Level level;
-
-    public LogLevelValueConverterTest(String name, Level level) {
-        this.name = name;
-        this.level = level;
-    }
-
-    private ValueConverter<Level> valueConverter;
 
     @Before
     public void setUp() throws Exception {

@@ -20,6 +20,12 @@ public class ConversionManagerTest {
 
     private File folder;
 
+    private static MockExternalConverter extractConverter(ConversionManager conversionManager) throws Exception {
+        Field field = ConversionManager.class.getDeclaredField("externalConverter");
+        field.setAccessible(true);
+        return (MockExternalConverter) field.get(conversionManager);
+    }
+
     @Before
     public void setUp() throws Exception {
         folder = Files.createTempDir();
@@ -57,12 +63,6 @@ public class ConversionManagerTest {
     @Test(expected = LinkageError.class)
     public void testEmptyConversionManager() throws Exception {
         makeConversionManager(true);
-    }
-
-    private static MockExternalConverter extractConverter(ConversionManager conversionManager) throws Exception {
-        Field field = ConversionManager.class.getDeclaredField("externalConverter");
-        field.setAccessible(true);
-        return (MockExternalConverter) field.get(conversionManager);
     }
 
     private ConversionManager makeConversionManager(boolean empty) {

@@ -13,6 +13,46 @@ import java.util.concurrent.Future;
 
 public abstract class MockConversionManager implements IConversionManager {
 
+    private final File baseFolder;
+
+    protected MockConversionManager(File baseFolder) {
+        this.baseFolder = baseFolder;
+    }
+
+    public static IConversionManager make(File baseFolder, boolean operational) {
+        if (operational) {
+            return new OperationalMockConversionManager(baseFolder);
+        } else {
+            return new InoperationalMockConversionManager(baseFolder);
+        }
+    }
+
+    protected File getBaseFolder() {
+        return baseFolder;
+    }
+
+    @Override
+    public Future<Boolean> startConversion(File source, File target) {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(source);
+            MockConversionManagerCallback callback = new MockConversionManagerCallback(target);
+            resolve(inputStream).applyTo(callback);
+            return callback.getResultAsFuture();
+        } catch (IOException e) {
+            return MockProcessResult.indicating(new FileSystemInteractionException(
+                    String.format("Could not read input file %s", source), e));
+        } finally {
+            try {
+                Closeables.close(inputStream, false);
+            } catch (IOException e) {
+                throw new AssertionError(String.format("Could not close input stream for %s", source));
+            }
+        }
+    }
+
+    protected abstract MockConversion.RichMessage resolve(InputStream inputStream);
+
     private static class OperationalMockConversionManager extends MockConversionManager {
 
         private volatile boolean shutDown;
@@ -74,44 +114,4 @@ public abstract class MockConversionManager implements IConversionManager {
                     .toString();
         }
     }
-
-    public static IConversionManager make(File baseFolder, boolean operational) {
-        if (operational) {
-            return new OperationalMockConversionManager(baseFolder);
-        } else {
-            return new InoperationalMockConversionManager(baseFolder);
-        }
-    }
-
-    private final File baseFolder;
-
-    protected MockConversionManager(File baseFolder) {
-        this.baseFolder = baseFolder;
-    }
-
-    protected File getBaseFolder() {
-        return baseFolder;
-    }
-
-    @Override
-    public Future<Boolean> startConversion(File source, File target) {
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(source);
-            MockConversionManagerCallback callback = new MockConversionManagerCallback(target);
-            resolve(inputStream).applyTo(callback);
-            return callback.getResultAsFuture();
-        } catch (IOException e) {
-            return MockProcessResult.indicating(new FileSystemInteractionException(
-                    String.format("Could not read input file %s", source), e));
-        } finally {
-            try {
-                Closeables.close(inputStream, false);
-            } catch (IOException e) {
-                throw new AssertionError(String.format("Could not close input stream for %s", source));
-            }
-        }
-    }
-
-    protected abstract MockConversion.RichMessage resolve(InputStream inputStream);
 }

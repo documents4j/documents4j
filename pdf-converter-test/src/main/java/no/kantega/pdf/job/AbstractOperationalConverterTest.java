@@ -19,14 +19,6 @@ import static org.mockito.Mockito.*;
 
 public abstract class AbstractOperationalConverterTest extends AbstractConverterTest {
 
-    private static class CloseStreamAnswer implements Answer<Void> {
-        @Override
-        public Void answer(InvocationOnMock invocation) throws Throwable {
-            ((InputStream) invocation.getArguments()[0]).close();
-            return null;
-        }
-    }
-
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileToFileExecute() throws Exception {
         File docx = validFile(true), pdf = makeTarget(true);
@@ -212,6 +204,14 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
             assertFalse(docx.exists());
             assertFalse(pdf.exists());
             throw (Exception) e.getCause();
+        }
+    }
+
+    private static class CloseStreamAnswer implements Answer<Void> {
+        @Override
+        public Void answer(InvocationOnMock invocation) throws Throwable {
+            ((InputStream) invocation.getArguments()[0]).close();
+            return null;
         }
     }
 }

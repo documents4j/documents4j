@@ -83,17 +83,6 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         assertTrue(docx.delete());
     }
 
-    private class Conversion implements Runnable {
-        @Override
-        public void run() {
-            try {
-                testConversionValid(validDocx(true), makeTarget(true));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS * 2L)
     public void testConversionConcurrently() throws Exception {
         // This test makes sure that conversions can be executed concurrently.
@@ -168,6 +157,17 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
                     getExternalConverter().startConversion(validDocx(true), pdf).future().get().exitValue());
         } finally {
             fileOutputStream.close();
+        }
+    }
+
+    private class Conversion implements Runnable {
+        @Override
+        public void run() {
+            try {
+                testConversionValid(validDocx(true), makeTarget(true));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

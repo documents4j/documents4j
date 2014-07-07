@@ -28,30 +28,10 @@ public enum MockConversion {
 
     // Two one byte delimiters plus two byte status code.
     private static final char DELIMITER = '@';
+    private final int messageCode;
 
-    public class RichMessage {
-
-        private final String message;
-
-        private RichMessage(String message) {
-            this.message = message;
-        }
-
-        public MockConversion getMockConversion() {
-            return MockConversion.this;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void applyTo(IStrategyCallback callback) {
-            MockConversion.this.handle(message, callback);
-        }
-
-        public RichMessage overrideWith(MockConversion mockConversion) {
-            return mockConversion.new RichMessage(message);
-        }
+    private MockConversion(int messageCode) {
+        this.messageCode = messageCode;
     }
 
     public static RichMessage from(InputStream inputStream) {
@@ -74,12 +54,6 @@ public enum MockConversion {
             }
         }
         throw new AssertionError(String.format("%s does not define a value with id %d", MockConversion.class.getSimpleName(), messageCode));
-    }
-
-    private final int messageCode;
-
-    private MockConversion(int messageCode) {
-        this.messageCode = messageCode;
     }
 
     private int getMessageCode() {
@@ -149,5 +123,30 @@ public enum MockConversion {
 
     public String asReply(String message) {
         return String.format("Handled: %s (code: %d)", message, messageCode);
+    }
+
+    public class RichMessage {
+
+        private final String message;
+
+        private RichMessage(String message) {
+            this.message = message;
+        }
+
+        public MockConversion getMockConversion() {
+            return MockConversion.this;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void applyTo(IStrategyCallback callback) {
+            MockConversion.this.handle(message, callback);
+        }
+
+        public RichMessage overrideWith(MockConversion mockConversion) {
+            return mockConversion.new RichMessage(message);
+        }
     }
 }

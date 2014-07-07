@@ -10,11 +10,6 @@ import java.io.File;
 
 public class LinkColumn extends AbstractColumn<FileRow, Void> {
 
-    public enum FileInput {
-        SOURCE,
-        TARGET
-    }
-
     private final FileInput fileInput;
 
     LinkColumn(IModel<String> displayModel, FileInput fileInput) {
@@ -25,6 +20,11 @@ public class LinkColumn extends AbstractColumn<FileRow, Void> {
     @Override
     public void populateItem(Item<ICellPopulator<FileRow>> cellItem, String componentId, IModel<FileRow> rowModel) {
         cellItem.add(new LinkPanel(componentId, new AlternateFileModel(rowModel), new AlternateFileNameModel(rowModel)));
+    }
+
+    public enum FileInput {
+        SOURCE,
+        TARGET
     }
 
     private class AlternateFileNameModel extends AbstractReadOnlyModel<String> {

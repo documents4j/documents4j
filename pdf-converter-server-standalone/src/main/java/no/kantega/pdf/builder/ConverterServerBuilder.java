@@ -22,6 +22,17 @@ import static no.kantega.pdf.builder.AbstractConverterBuilder.assertNumericArgum
  */
 public class ConverterServerBuilder {
 
+    private URI baseUri;
+    private File baseFolder = null;
+    private int corePoolSize = LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE;
+    private int maximumPoolSize = LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE;
+    private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
+    private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
+    private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
+    private ConverterServerBuilder() {
+        /* empty */
+    }
+
     /**
      * Creates a new builder instance.
      *
@@ -49,18 +60,6 @@ public class ConverterServerBuilder {
      */
     public static HttpServer make(String baseUri) {
         return builder().baseUri(baseUri).build();
-    }
-
-    private URI baseUri;
-    private File baseFolder = null;
-    private int corePoolSize = LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE;
-    private int maximumPoolSize = LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE;
-    private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
-    private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
-    private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
-
-    private ConverterServerBuilder() {
-        /* empty */
     }
 
     /**
@@ -169,7 +168,7 @@ public class ConverterServerBuilder {
      * Gets the currently specified base URI.
      *
      * @return The current base URI of this conversion server or {@code null}
-     *         if no such URI was specified.
+     * if no such URI was specified.
      */
     public URI getBaseUri() {
         return baseUri;

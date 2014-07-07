@@ -18,6 +18,10 @@ public class DemoApplication extends WebApplication {
 
     private AtomicInteger nameSequence;
 
+    public static DemoApplication get() {
+        return (DemoApplication) WebApplication.get();
+    }
+
     @Override
     public Class<? extends WebPage> getHomePage() {
         return DemoPage.class;
@@ -42,10 +46,6 @@ public class DemoApplication extends WebApplication {
                 .baseFolder(baseFolder)
                 .processTimeout(2L, TimeUnit.MINUTES)
                 .build();
-    }
-
-    public static DemoApplication get() {
-        return (DemoApplication) WebApplication.get();
     }
 
     public IConverter getConverter() {

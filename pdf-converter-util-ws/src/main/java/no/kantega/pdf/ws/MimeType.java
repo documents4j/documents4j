@@ -26,6 +26,6 @@ public final class MimeType {
     public static final String APPLICATION_PDF = "application/pdf";
 
     private MimeType() {
-        throw new AssertionError();
+        throw new UnsupportedOperationException();
     }
 }

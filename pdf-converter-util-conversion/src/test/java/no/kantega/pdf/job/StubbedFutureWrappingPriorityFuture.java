@@ -5,18 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 class StubbedFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFuture<Void, IConversionContext> {
 
-    private class StubbedConversionContext implements IConversionContext {
-
-        @Override
-        public Future<Boolean> asFuture() {
-            asFuture.incrementAndGet();
-            return future;
-        }
-    }
-
     private final Future<Boolean> future;
     private final IConversionContext conversionContext;
-
     private final AtomicInteger fetchSource = new AtomicInteger(0),
             onSourceConsumed = new AtomicInteger(0),
             startConversion = new AtomicInteger(0),
@@ -92,5 +82,14 @@ class StubbedFutureWrappingPriorityFuture extends AbstractFutureWrappingPriority
 
     int countCountDownLatch() {
         return (int) getPendingCondition().getCount();
+    }
+
+    private class StubbedConversionContext implements IConversionContext {
+
+        @Override
+        public Future<Boolean> asFuture() {
+            asFuture.incrementAndGet();
+            return future;
+        }
     }
 }

@@ -23,6 +23,13 @@ public abstract class AbstractEncodingJerseyTest extends JerseyTest {
 
     private static final int HIGHEST_PRIORITY = Integer.MAX_VALUE;
 
+    @Override
+    @SuppressWarnings("unchecked")
+    protected void configureClient(ClientConfig clientConfig) {
+        clientConfig.register(new EncodingFeature(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, GZipEncoder.class));
+        clientConfig.register(ServerEncodingAssertionFilter.class);
+    }
+
     @Provider
     @Priority(HIGHEST_PRIORITY)
     public static class ServerEncodingAssertionFilter implements ClientRequestFilter, ClientResponseFilter {
@@ -45,12 +52,5 @@ public abstract class AbstractEncodingJerseyTest extends JerseyTest {
                 assertEquals(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, responseContext.getHeaderString(HttpHeaders.CONTENT_ENCODING));
             }
         }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected void configureClient(ClientConfig clientConfig) {
-        clientConfig.register(new EncodingFeature(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, GZipEncoder.class));
-        clientConfig.register(ServerEncodingAssertionFilter.class);
     }
 }

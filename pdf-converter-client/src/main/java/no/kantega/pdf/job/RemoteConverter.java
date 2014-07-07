@@ -39,10 +39,128 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
+    private final Client client;
+    private final URI baseUri;
+    private final ExecutorService executorService;
+
+    protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
+                              int corePoolSize, int maximumPoolSize, long keepAliveTime) {
+        super(baseFolder);
+        this.client = makeClient(requestTimeout, maximumPoolSize);
+        this.baseUri = baseUri;
+        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
+    }
+
+    /**
+     * Creates a new builder instance.
+     *
+     * @return A new builder instance.
+     */
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    /**
+     * Creates a new {@link RemoteConverter} with default configuration.
+     *
+     * @param baseUri The base URI of the remote conversion server.
+     * @return A {@link RemoteConverter} with default configuration.
+     */
+    public static IConverter make(URI baseUri) {
+        return builder().baseUri(baseUri).build();
+    }
+
+    /**
+     * Creates a new {@link RemoteConverter} with default configuration.
+     *
+     * @param baseUri The base URI of the remote conversion server.
+     * @return A {@link RemoteConverter} with default configuration.
+     */
+    public static IConverter make(String baseUri) {
+        return builder().baseUri(baseUri).build();
+    }
+
+    private static Client makeClient(long requestTimeout, int maxConnections) {
+        ClientConfig clientConfig = new ClientConfig();
+        int castRequestTimeout = Ints.checkedCast(requestTimeout);
+        clientConfig.register(makeGZipFeature());
+        clientConfig.property(ClientProperties.ASYNC_THREADPOOL_SIZE, maxConnections);
+        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
+        clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
+        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
+        clientConfig.connectorProvider(new ApacheConnectorProvider());
+        return ClientBuilder.newClient(clientConfig);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Feature makeGZipFeature() {
+        return new EncodingFeature(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, GZipEncoder.class);
+    }
+
+    private static HttpClientConnectionManager makeConnectionManager(int maxConnections) {
+        // Jersey requires an instance of the ClientConnectionManager interface which is deprecated in the latest
+        // version of the Apache HttpComponents. In a future version, this implementation should be updated to
+        // the PoolingHttpClientConnectionManager and the HttpClientConnectionManager.
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnections);
+        return connectionManager;
+    }
+
+    private WebTarget makeTarget() {
+        return client.target(baseUri).path(ConverterNetworkProtocol.RESOURCE_PATH);
+    }
+
+    @Override
+    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
+        return new RemoteConversionWithJobSourceSpecified(source);
+    }
+
+    @Override
+    public boolean isOperational() {
+        try {
+            return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
+        } catch (Exception e) {
+            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
+            return false;
+        }
+    }
+
+    private ConverterServerInformation fetchConverterServerInformation() {
+        return logConverterServerInformation(makeTarget()
+                .request(MediaType.APPLICATION_XML_TYPE)
+                .get(ConverterServerInformation.class));
+    }
+
+    private ConverterServerInformation logConverterServerInformation(ConverterServerInformation converterServerInformation) {
+        LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
+        LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
+        LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
+        if (converterServerInformation.getProtocolVersion() != ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION) {
+            LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
+                    converterServerInformation.getProtocolVersion(), ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION);
+        }
+        return converterServerInformation;
+    }
+
+    @Override
+    public void shutDown() {
+        try {
+            try {
+                client.close();
+            } finally {
+                executorService.shutdown();
+            }
+        } finally {
+            super.shutDown();
+        }
+        LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", baseUri);
+    }
 
     /**
      * A builder for constructing a {@link RemoteConverter}.
-     * <p/>
+     * <p>&nbsp;</p>
      * <i>Note</i>: This builder is not thread safe.
      */
     public static final class Builder extends AbstractConverterBuilder<Builder> {
@@ -123,79 +241,6 @@ public class RemoteConverter extends ConverterAdapter {
         }
     }
 
-    /**
-     * Creates a new builder instance.
-     *
-     * @return A new builder instance.
-     */
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    /**
-     * Creates a new {@link RemoteConverter} with default configuration.
-     *
-     * @param baseUri The base URI of the remote conversion server.
-     * @return A {@link RemoteConverter} with default configuration.
-     */
-    public static IConverter make(URI baseUri) {
-        return builder().baseUri(baseUri).build();
-    }
-
-    /**
-     * Creates a new {@link RemoteConverter} with default configuration.
-     *
-     * @param baseUri The base URI of the remote conversion server.
-     * @return A {@link RemoteConverter} with default configuration.
-     */
-    public static IConverter make(String baseUri) {
-        return builder().baseUri(baseUri).build();
-    }
-
-    private final Client client;
-    private final URI baseUri;
-    private final ExecutorService executorService;
-
-    protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
-                              int corePoolSize, int maximumPoolSize, long keepAliveTime) {
-        super(baseFolder);
-        this.client = makeClient(requestTimeout, maximumPoolSize);
-        this.baseUri = baseUri;
-        this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
-        LOGGER.info("Remote To-PDF converter has started successfully (URI: {})", baseUri);
-    }
-
-    private static Client makeClient(long requestTimeout, int maxConnections) {
-        ClientConfig clientConfig = new ClientConfig();
-        int castRequestTimeout = Ints.checkedCast(requestTimeout);
-        clientConfig.register(makeGZipFeature());
-        clientConfig.property(ClientProperties.ASYNC_THREADPOOL_SIZE, maxConnections);
-        clientConfig.property(ClientProperties.CONNECT_TIMEOUT, castRequestTimeout);
-        clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
-        clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
-        clientConfig.connectorProvider(new ApacheConnectorProvider());
-        return ClientBuilder.newClient(clientConfig);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Feature makeGZipFeature() {
-        return new EncodingFeature(ConverterNetworkProtocol.COMPRESSION_TYPE_GZIP, GZipEncoder.class);
-    }
-
-    private WebTarget makeTarget() {
-        return client.target(baseUri).path(ConverterNetworkProtocol.RESOURCE_PATH);
-    }
-
-    private static HttpClientConnectionManager makeConnectionManager(int maxConnections) {
-        // Jersey requires an instance of the ClientConnectionManager interface which is deprecated in the latest
-        // version of the Apache HttpComponents. In a future version, this implementation should be updated to
-        // the PoolingHttpClientConnectionManager and the HttpClientConnectionManager.
-        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
-        connectionManager.setMaxTotal(maxConnections);
-        connectionManager.setDefaultMaxPerRoute(maxConnections);
-        return connectionManager;
-    }
-
     private class RemoteConversionWithJobSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
 
         private final IInputStreamSource source;
@@ -247,51 +292,5 @@ public class RemoteConverter extends ConverterAdapter {
         public IConversionJob prioritizeWith(int priority) {
             return new RemoteConversionJob(source, callback, priority);
         }
-    }
-
-    @Override
-    public IConversionJobWithSourceSpecified convert(IInputStreamSource source) {
-        return new RemoteConversionWithJobSourceSpecified(source);
-    }
-
-    @Override
-    public boolean isOperational() {
-        try {
-            return !executorService.isShutdown() && fetchConverterServerInformation().isOperational();
-        } catch (Exception e) {
-            LOGGER.warn("Could not connect to conversion server @ {}", baseUri, e);
-            return false;
-        }
-    }
-
-    private ConverterServerInformation fetchConverterServerInformation() {
-        return logConverterServerInformation(makeTarget()
-                .request(MediaType.APPLICATION_XML_TYPE)
-                .get(ConverterServerInformation.class));
-    }
-
-    private ConverterServerInformation logConverterServerInformation(ConverterServerInformation converterServerInformation) {
-        LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
-        LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
-        LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());
-        if (converterServerInformation.getProtocolVersion() != ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION) {
-            LOGGER.warn("Server protocol version ({}) does not match client protocol version ({})",
-                    converterServerInformation.getProtocolVersion(), ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION);
-        }
-        return converterServerInformation;
-    }
-
-    @Override
-    public void shutDown() {
-        try {
-            try {
-                client.close();
-            } finally {
-                executorService.shutdown();
-            }
-        } finally {
-            super.shutDown();
-        }
-        LOGGER.info("Remote To-PDF converter has shut down successfully (URI: {})", baseUri);
     }
 }

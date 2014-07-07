@@ -11,6 +11,10 @@ public final class PortAssert {
 
     private static final int VALID_PORT_MINIMUM = 1024, VALID_PORT_MAXIMUM = 65535;
 
+    private PortAssert() {
+        throw new AssertionError();
+    }
+
     public static void assertPortFree(int port) {
         assertTrue(String.format("Port %d is not available", port), isAvailable(port));
     }
@@ -36,9 +40,5 @@ public final class PortAssert {
         int port = server.getLocalPort();
         server.close();
         return port;
-    }
-
-    private PortAssert() {
-        throw new AssertionError();
     }
 }

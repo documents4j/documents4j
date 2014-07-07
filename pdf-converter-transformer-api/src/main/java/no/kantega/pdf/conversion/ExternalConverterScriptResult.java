@@ -13,6 +13,12 @@ public enum ExternalConverterScriptResult {
     ILLEGAL_CALL(-5, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("A converter script seems to be erroneous"))),
     CONVERTER_INACCESSIBLE(-6, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("The converter seems to be shut down"))),
     UNKNOWN(null, Reaction.with(false));
+    private final Integer exitValue;
+    private final Reaction reaction;
+    private ExternalConverterScriptResult(Integer exitValue, Reaction reaction) {
+        this.exitValue = exitValue;
+        this.reaction = reaction;
+    }
 
     public static ExternalConverterScriptResult from(int exitValue) {
         for (ExternalConverterScriptResult shellResult : ExternalConverterScriptResult.values()) {
@@ -21,14 +27,6 @@ public enum ExternalConverterScriptResult {
             }
         }
         return UNKNOWN;
-    }
-
-    private final Integer exitValue;
-    private final Reaction reaction;
-
-    private ExternalConverterScriptResult(Integer exitValue, Reaction reaction) {
-        this.exitValue = exitValue;
-        this.reaction = reaction;
     }
 
     public boolean resolve() {

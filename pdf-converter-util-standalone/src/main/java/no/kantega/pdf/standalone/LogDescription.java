@@ -8,6 +8,6 @@ public class LogDescription {
     public static final String MAXIMUM_LOG_FILE_SIZE = "10MB";
 
     private LogDescription() {
-        throw new AssertionError();
+        throw new UnsupportedOperationException();
     }
 }

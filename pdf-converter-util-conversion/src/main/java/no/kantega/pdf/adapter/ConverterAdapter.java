@@ -36,6 +36,23 @@ public abstract class ConverterAdapter implements IConverter {
         registerShutdownHook();
     }
 
+    protected static ExecutorService makeExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime) {
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
+                keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
+    }
+
+    private static File makeTemporaryFolder(File baseFolder) {
+        File tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
+        checkState(tempFileFolder.mkdir(), String.format("Cannot create folder: %s", tempFileFolder));
+        return tempFileFolder;
+    }
+
+    private static void deleteOrLog(File file) {
+        if (!file.delete()) {
+            LOGGER.warn("Could not delete temporary folder: {}", file);
+        }
+    }
+
     @Override
     public IConversionJobWithSourceSpecified convert(File source) {
         return convert(new FileSourceFromFile(source));
@@ -61,17 +78,6 @@ public abstract class ConverterAdapter implements IConverter {
         return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
     }
 
-    private class ConverterShutdownHook extends Thread {
-        public ConverterShutdownHook() {
-            super(String.format("Shutdown hook: %s", ConverterAdapter.this.getClass().getName()));
-        }
-
-        @Override
-        public void run() {
-            shutDown();
-        }
-    }
-
     protected File makeTemporaryFile() {
         return makeTemporaryFile(NO_EXTENSION);
     }
@@ -83,17 +89,6 @@ public abstract class ConverterAdapter implements IConverter {
     protected File makeTemporaryFile(String suffix) {
         return new File(tempFileFolder, String.format("%s%d%s",
                 TEMP_FILE_PREFIX, uniqueNameMaker.getAndIncrement(), suffix));
-    }
-
-    protected static ExecutorService makeExecutorService(int corePoolSize, int maximumPoolSize, long keepAliveTime) {
-        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize,
-                keepAliveTime, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>());
-    }
-
-    private static File makeTemporaryFolder(File baseFolder) {
-        File tempFileFolder = new File(baseFolder, UUID.randomUUID().toString());
-        checkState(tempFileFolder.mkdir(), String.format("Cannot create folder: %s", tempFileFolder));
-        return tempFileFolder;
     }
 
     @Override
@@ -118,9 +113,14 @@ public abstract class ConverterAdapter implements IConverter {
         }
     }
 
-    private static void deleteOrLog(File file) {
-        if (!file.delete()) {
-            LOGGER.warn("Could not delete temporary folder: {}", file);
+    private class ConverterShutdownHook extends Thread {
+        public ConverterShutdownHook() {
+            super(String.format("Shutdown hook: %s", ConverterAdapter.this.getClass().getName()));
+        }
+
+        @Override
+        public void run() {
+            shutDown();
         }
     }
 }

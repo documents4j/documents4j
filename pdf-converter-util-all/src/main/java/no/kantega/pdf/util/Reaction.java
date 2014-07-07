@@ -8,6 +8,25 @@ import no.kantega.pdf.throwables.FileSystemInteractionException;
 
 public abstract class Reaction {
 
+    Reaction() {
+        /* empty, but suppress visibility outside of package */
+    }
+
+    public static Reaction with(boolean value) {
+        return new BooleanReaction(value);
+    }
+
+    public static Reaction with(IExceptionBuilder builder) {
+        return new ExceptionalReaction(builder);
+    }
+
+    public abstract boolean apply();
+
+    public static interface IExceptionBuilder {
+
+        RuntimeException make();
+    }
+
     private static class BooleanReaction extends Reaction {
 
         private final boolean value;
@@ -28,11 +47,6 @@ public abstract class Reaction {
                     .toString();
         }
 
-    }
-
-    public static interface IExceptionBuilder {
-
-        RuntimeException make();
     }
 
     private static class ExceptionalReaction extends Reaction {
@@ -139,18 +153,4 @@ public abstract class Reaction {
                     .toString();
         }
     }
-
-    public static Reaction with(boolean value) {
-        return new BooleanReaction(value);
-    }
-
-    public static Reaction with(IExceptionBuilder builder) {
-        return new ExceptionalReaction(builder);
-    }
-
-    Reaction() {
-        /* empty, but suppress visibility outside of package */
-    }
-
-    public abstract boolean apply();
 }

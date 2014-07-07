@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+<module name="Checker">
+    <!--<module name="JavadocPackage"/>-->
+    <module name="NewlineAtEndOfFile"/>
+    <module name="FileTabCharacter"/>
+
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="minimum" value="0"/>
+        <property name="maximum" value="0"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <module name="TreeWalker">
+
+        <!-- Checkstyle has a bug that disallows @return in annotation methods, enable only on demand -->
+        <!--<module name="JavadocMethod"/>-->
+        <!--<module name="JavadocType"/>-->
+        <!--<module name="JavadocVariable"/>-->
+        <!--<module name="JavadocStyle"/>-->
+
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+
+        <module name="IllegalImport"/>
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround">
+            <!-- The RCURLY token has strange semantics where annotation arrays should have a spacing while normal
+                 arrays should not have such a spacing - therefore, we rather exclude it from automatic checks -->
+            <property name="tokens"
+                      value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,TYPE_EXTENSION_AND"/>
+        </module>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+
+        <module name="ModifierOrder"/>
+
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+
+        <module name="EmptyStatement"/>
+        <module name="EqualsHashCode"/>
+        <module name="IllegalInstantiation"/>
+        <module name="MissingSwitchDefault"/>
+        <module name="RedundantThrows"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+
+        <module name="HideUtilityClassConstructor"/>
+        <module name="InterfaceIsType"/>
+
+        <module name="ArrayTypeStyle"/>
+        <module name="TodoComment"/>
+        <module name="UpperEll"/>
+    </module>
+</module>

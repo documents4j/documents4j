@@ -6,6 +6,42 @@ import java.util.concurrent.*;
 
 abstract class MockProcessResult implements Future<Boolean> {
 
+    public static Future<Boolean> indicating(boolean value) {
+        return new BooleanResult(value);
+    }
+
+    public static Future<Boolean> forCancellation() {
+        return new CancelledResult();
+    }
+
+    public static Future<Boolean> indicating(Exception e) {
+        return new ExceptionalResult(e);
+    }
+
+    public static Future<Boolean> forTimeout() {
+        return new BlockingResult();
+    }
+
+    @Override
+    public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        return get();
+    }
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return false;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return false;
+    }
+
+    @Override
+    public boolean isDone() {
+        return true;
+    }
+
     private static class BooleanResult extends MockProcessResult {
 
         private final boolean value;
@@ -108,41 +144,5 @@ abstract class MockProcessResult implements Future<Boolean> {
         public String toString() {
             return Objects.toStringHelper(BlockingResult.class).add("destructionMark", destructionMark).toString();
         }
-    }
-
-    public static Future<Boolean> indicating(boolean value) {
-        return new BooleanResult(value);
-    }
-
-    public static Future<Boolean> forCancellation() {
-        return new CancelledResult();
-    }
-
-    public static Future<Boolean> indicating(Exception e) {
-        return new ExceptionalResult(e);
-    }
-
-    public static Future<Boolean> forTimeout() {
-        return new BlockingResult();
-    }
-
-    @Override
-    public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return get();
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return false;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return false;
-    }
-
-    @Override
-    public boolean isDone() {
-        return true;
     }
 }

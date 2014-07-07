@@ -14,21 +14,30 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
      * The default core pool size of a converter's worker pool.
      */
     public static final int DEFAULT_CORE_POOL_SIZE = 15;
-
+    protected int corePoolSize = DEFAULT_CORE_POOL_SIZE;
     /**
      * The default maximum pool size of a converter's worker pool.
      */
     public static final int DEFAULT_MAXIMUM_POOL_SIZE = 30;
-
+    protected int maximumPoolSize = DEFAULT_MAXIMUM_POOL_SIZE;
     /**
      * The default keep alive time of a converter's worker pool.
      */
     public static final long DEFAULT_KEEP_ALIVE_TIME = TimeUnit.MINUTES.toMillis(10L);
-
-    protected File baseFolder;
-    protected int corePoolSize = DEFAULT_CORE_POOL_SIZE;
-    protected int maximumPoolSize = DEFAULT_MAXIMUM_POOL_SIZE;
     protected long keepAliveTime = DEFAULT_KEEP_ALIVE_TIME;
+    protected File baseFolder;
+
+    protected static void assertNumericArgument(long number, boolean zeroAllowed) {
+        assertNumericArgument(number, zeroAllowed, Long.MAX_VALUE);
+    }
+
+    protected static void assertNumericArgument(long number, boolean zeroAllowed, long maximum) {
+        checkArgument(((zeroAllowed && number == 0L) || number > 0L) && number < maximum);
+    }
+
+    private static void assertSmallerEquals(int first, int second) {
+        checkArgument(first <= second);
+    }
 
     /**
      * Sets a folder for the constructed converter to save files in.
@@ -48,7 +57,7 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
      * number of conversions that are concurrently undertaken by the resulting converter. When a
      * converter is requested to concurrently execute more conversions than {@code maximumPoolSize},
      * it will queue excess conversions until capacities are available again.
-     * <p/>
+     * <p>&nbsp;</p>
      * If this number is set too low, the concurrent performance of the resulting converter will be weak
      * compared to a higher number. If this number is set too high, the converter might <i>overheat</i>
      * when accessing the underlying external resource (such as for example an external process or a
@@ -76,18 +85,6 @@ public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilde
 
     protected File normalizedBaseFolder() {
         return baseFolder == null ? Files.createTempDir() : this.baseFolder;
-    }
-
-    protected static void assertNumericArgument(long number, boolean zeroAllowed) {
-        assertNumericArgument(number, zeroAllowed, Long.MAX_VALUE);
-    }
-
-    protected static void assertNumericArgument(long number, boolean zeroAllowed, long maximum) {
-        checkArgument(((zeroAllowed && number == 0L) || number > 0L) && number < maximum);
-    }
-
-    private static void assertSmallerEquals(int first, int second) {
-        checkArgument(first <= second);
     }
 
     /**

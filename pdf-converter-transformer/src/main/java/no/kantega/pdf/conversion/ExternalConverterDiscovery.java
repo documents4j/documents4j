@@ -19,7 +19,9 @@ enum ExternalConverterDiscovery {
     }
 
     private static IExternalConverter make(Class<? extends IExternalConverter> externalConverterClass,
-                                           File baseFolder, long processTimeout, TimeUnit timeUnit) {
+                                           File baseFolder,
+                                           long processTimeout,
+                                           TimeUnit timeUnit) {
         try {
             return externalConverterClass
                     .getConstructor(File.class, long.class, TimeUnit.class)
@@ -31,7 +33,9 @@ enum ExternalConverterDiscovery {
     }
 
     private static Set<IExternalConverter> makeAll(Set<Class<? extends IExternalConverter>> externalConverterClasses,
-                                                   File baseFolder, long processTimeout, TimeUnit timeUnit) {
+                                                   File baseFolder,
+                                                   long processTimeout,
+                                                   TimeUnit timeUnit) {
         Set<IExternalConverter> externalConverters = new HashSet<IExternalConverter>();
         for (Class<? extends IExternalConverter> externalConverterClass : externalConverterClasses) {
             externalConverters.add(make(externalConverterClass, baseFolder, processTimeout, timeUnit));
@@ -39,8 +43,7 @@ enum ExternalConverterDiscovery {
         return externalConverters;
     }
 
-    private static Set<Class<? extends IExternalConverter>> discover(
-            Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
+    private static Set<Class<? extends IExternalConverter>> discover(Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
         Set<Class<? extends IExternalConverter>> discovered = new HashSet<Class<? extends IExternalConverter>>();
         Map<String, ExternalConverterDiscovery> autoDetectNameMap = makeAutoDetectNameMap();
         for (Map.Entry<Class<? extends IExternalConverter>, Boolean> registration : externalConverterRegistration.entrySet()) {

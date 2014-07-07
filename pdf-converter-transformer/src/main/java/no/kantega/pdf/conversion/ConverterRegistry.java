@@ -1,5 +1,6 @@
 package no.kantega.pdf.conversion;
 
+import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.throwables.ConverterException;
 
 import java.util.HashMap;
@@ -57,7 +58,7 @@ class ConverterRegistry {
     public IExternalConverter lookup(String sourceFormat, String targetFormat) {
         IExternalConverter externalConverter = converterMapping.get(new ConversionPath(sourceFormat, targetFormat));
         if (externalConverter == null) {
-            throw new ConverterException("No converter for conversion of " + sourceFormat + " to " + targetFormat + " available");
+            throw new ConversionInputException("No converter for conversion of " + sourceFormat + " to " + targetFormat + " available");
         }
         return externalConverter;
     }

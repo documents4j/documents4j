@@ -1,9 +1,13 @@
 package no.kantega.pdf.demo;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.FeedbackMessage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.AbstractReadOnlyModel;
+
+import java.io.Serializable;
 
 public class ColoredFeedbackPanel extends FeedbackPanel {
 
@@ -40,5 +44,13 @@ public class ColoredFeedbackPanel extends FeedbackPanel {
         } else {
             return "alert alert-success";
         }
+    }
+
+    @Override
+    protected Component newMessageDisplayComponent(String id, FeedbackMessage message) {
+        Serializable serializable = message.getMessage();
+        Label label = new Label(id, (serializable == null) ? "" : serializable.toString() + "<br/>");
+        label.setEscapeModelStrings(false);
+        return label;
     }
 }

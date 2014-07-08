@@ -4,6 +4,7 @@ import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.io.File;
 import java.util.Arrays;
@@ -39,24 +40,24 @@ public final class MicrosoftWordAssert {
         assertTrue(wordAssertScript.exists());
         return new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordAssertScript.getAbsolutePath())))
-                .redirectErrorAsInfo(LOGGER)
-                .redirectOutputAsInfo(LOGGER)
+                .redirectOutput(Slf4jStream.of(LOGGER).asInfo())
+                .redirectError(Slf4jStream.of(LOGGER).asInfo())
                 .timeout(1L, TimeUnit.MINUTES)
                 .exitValueAny()
                 .execute()
-                .exitValue();
+                .getExitValue();
     }
 
     public void killWord() throws Exception {
         assertTrue(wordShutdownScript.exists());
         new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))
-                .redirectErrorAsInfo(LOGGER)
-                .redirectOutputAsInfo(LOGGER)
+                .redirectOutput(Slf4jStream.of(LOGGER).asInfo())
+                .redirectError(Slf4jStream.of(LOGGER).asInfo())
                 .timeout(1L, TimeUnit.MINUTES)
                 .exitValueAny()
                 .execute()
-                .exitValue();
+                .getExitValue();
     }
 
     public void shutDown() {

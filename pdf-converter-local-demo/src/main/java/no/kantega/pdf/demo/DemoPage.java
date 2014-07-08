@@ -4,15 +4,22 @@ import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.api.IFileConsumer;
 import no.kantega.pdf.throwables.ConverterException;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.head.CssReferenceHeaderItem;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.util.ListModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.CssResourceReference;
 import org.slf4j.Logger;
@@ -21,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Properties;
+import java.util.*;
 
 public class DemoPage extends WebPage {
 
@@ -30,6 +37,7 @@ public class DemoPage extends WebPage {
     private static final CssResourceReference TWITTER_BOOTSTRAP = new CssResourceReference(DemoPage.class, "bootstrap.min.css");
 
     private final FileUploadField fileUploadField;
+    private final DropDownChoice<DocumentType> sourceFormat, targetFormat;
 
     public DemoPage(final PageParameters parameters) {
         super(parameters);
@@ -38,10 +46,39 @@ public class DemoPage extends WebPage {
         add(makeLocalWarning("localhost"));
 
         fileUploadField = makeUploadField("upload");
+        final Map<DocumentType, Set<DocumentType>> conversions = DemoApplication.get().getConverter().getSupportedConversions();
+        List<DocumentType> documentTypes = new ArrayList<DocumentType>(conversions.keySet());
+        Collections.sort(documentTypes);
+        sourceFormat = makeDropDownChoice("sourceFormat", new ListModel<DocumentType>(documentTypes));
+        targetFormat = makeDropDownChoice("targetFormat", new AbstractReadOnlyModel<List<DocumentType>>() {
+            @Override
+            public List<DocumentType> getObject() {
+                if (sourceFormat.getModelObject() == null) {
+                    return Collections.emptyList();
+                }
+                Set<DocumentType> sourceTypes = conversions.get(sourceFormat.getModelObject());
+                if (sourceTypes == null) {
+                    return Collections.emptyList();
+                }
+                List<DocumentType> documentTypes = new ArrayList<DocumentType>(sourceTypes);
+                Collections.sort(documentTypes);
+                return documentTypes;
+            }
+        });
+        sourceFormat.add(new AjaxFormComponentUpdatingBehavior("onchange") {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                if (target != null) {
+                    target.add(targetFormat);
+                }
+            }
+        });
 
         Form<?> form = makeUploadForm("form");
         form.setMultiPart(true);
         form.add(fileUploadField);
+        form.add(sourceFormat);
+        form.add(targetFormat);
         form.add(makeSubmitButton("submit"));
         add(form);
 
@@ -65,8 +102,20 @@ public class DemoPage extends WebPage {
 
                 FileUpload fileUpload = fileUploadField.getFileUpload();
 
+                boolean abort = false;
                 if (fileUpload == null) {
+                    abort = true;
                     warn("You did not choose a file!");
+                }
+                if (sourceFormat.getModelObject() == null) {
+                    abort = true;
+                    warn("You did not choose a source format!");
+                }
+                if (targetFormat.getModelObject() == null) {
+                    abort = true;
+                    warn("You did not choose a target format!");
+                }
+                if (abort) {
                     return;
                 }
 
@@ -85,14 +134,16 @@ public class DemoPage extends WebPage {
 
                     Properties properties = new Properties();
                     properties.setProperty(FileRow.INPUT_NAME_PROPERTY_KEY, fileUpload.getClientFileName());
+                    properties.setProperty(FileRow.SOURCE_FORMAT, sourceFormat.getModelObject().toString());
+                    properties.setProperty(FileRow.TARGET_FORMAT, targetFormat.getModelObject().toString());
 
                     FeedbackMessageConductor conductor = new FeedbackMessageConductor(fileUpload.getClientFileName());
                     long conversionDuration;
                     try {
                         conversionDuration = System.currentTimeMillis();
                         DemoApplication.get().getConverter()
-                                .convert(newFile).as(DocumentType.MS_WORD)
-                                .to(target, conductor).as(DocumentType.PDF)
+                                .convert(newFile).as(sourceFormat.getModelObject())
+                                .to(target, conductor).as(targetFormat.getModelObject())
                                 .execute();
                         conversionDuration = System.currentTimeMillis() - conversionDuration;
                         properties.setProperty(FileRow.CONVERSION_DURATION_PROPERTY_KEY, String.valueOf(conversionDuration));
@@ -136,6 +187,12 @@ public class DemoPage extends WebPage {
 
     private FileUploadField makeUploadField(String identifier) {
         return new FileUploadField(identifier);
+    }
+
+    private DropDownChoice<DocumentType> makeDropDownChoice(String identifier, IModel<List<DocumentType>> types) {
+        DropDownChoice<DocumentType> dropDownChoice = new DropDownChoice<DocumentType>(identifier, new Model<DocumentType>(), types);
+        dropDownChoice.setOutputMarkupId(true);
+        return dropDownChoice;
     }
 
     private Component makeSubmitButton(String identifier) {

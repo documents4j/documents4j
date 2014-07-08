@@ -115,7 +115,7 @@ public enum MockConversion {
     public File asFile(String message, File file) throws IOException {
         InputStream inputStream = toInputStream(message);
         try {
-            ByteStreams.copy(inputStream, Files.newOutputStreamSupplier(file));
+            Files.asByteSink(file).writeFrom(inputStream);
         } finally {
             inputStream.close();
         }

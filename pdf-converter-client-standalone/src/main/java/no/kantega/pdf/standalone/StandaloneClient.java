@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -32,6 +35,19 @@ public class StandaloneClient {
 
     private StandaloneClient() {
         throw new UnsupportedOperationException();
+    }
+
+    private static final Map<DocumentType, String> FILE_NAME_EXTENSIONS;
+
+    static {
+        FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
+        FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
+        FILE_NAME_EXTENSIONS.put(DocumentType.DOCX, "docx");
+        FILE_NAME_EXTENSIONS.put(DocumentType.PDF, "pdf");
+        FILE_NAME_EXTENSIONS.put(DocumentType.PDFA, "pdf");
+        FILE_NAME_EXTENSIONS.put(DocumentType.MHTML, "mhtml");
+        FILE_NAME_EXTENSIONS.put(DocumentType.RTF, "rtf");
+        FILE_NAME_EXTENSIONS.put(DocumentType.XML, "xml");
     }
 
     public static void main(String[] args) {
@@ -45,7 +61,8 @@ public class StandaloneClient {
             try {
                 Logger logger = LoggerFactory.getLogger(StandaloneClient.class);
                 sayHello(converter, logger);
-                System.out.println("Enter '\\q' for exiting this application. Enter '<source> [-> <target>]' for converting a file.");
+                DocumentType[] documentTypes = configureConversion(console, converter.getSupportedConversions());
+                console.printf("Enter '<source> [-> <target>]' for converting a file. Enter '\\q' for exiting this application.%n");
                 String argument;
                 do {
                     console.printf("> ");
@@ -53,6 +70,8 @@ public class StandaloneClient {
                     if (argument != null) {
                         if (argument.equals("\\q")) {
                             break;
+                        } else if (argument.equals("\\f")) {
+                            documentTypes = configureConversion(console, converter.getSupportedConversions());
                         }
                         int targetIndex = argument.indexOf("->");
                         String source = targetIndex == -1 ? argument : argument.substring(0, targetIndex);
@@ -61,27 +80,59 @@ public class StandaloneClient {
                             console.printf("Input file does not exist: %s%n", sourceFile);
                             continue;
                         }
-                        String target = targetIndex == -1 ? source + ".pdf" : argument.substring(targetIndex + 1);
+                        String target = targetIndex == -1 ? source + extensionFor(documentTypes[1]) : argument.substring(targetIndex + 1);
                         File targetFile = normalize(target);
-                        converter.convert(sourceFile).as(DocumentType.MS_WORD)
-                                .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(DocumentType.PDF)
+                        converter.convert(sourceFile).as(documentTypes[0])
+                                .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(documentTypes[1])
                                 .schedule();
                         console.printf("Scheduled conversion: %s -> %s%n", sourceFile, targetFile);
+                        logger.info("Converting {} to {}", sourceFile, targetFile);
                     } else {
-                        logger.error("Could not read from console.");
+                        logger.error("Error when reading from console.");
                     }
                 } while (argument != null);
                 sayGoodbye(converter, logger);
             } finally {
                 converter.shutDown();
             }
-            System.out.println("The connection was successfully closed. Goodbye!");
+            console.printf("The connection was successfully closed. Goodbye!%n");
         } catch (Exception e) {
-            LoggerFactory.getLogger(StandaloneClient.class).error("The PDF-conversion client terminated with an unexpected error", e);
+            LoggerFactory.getLogger(StandaloneClient.class).error("The document conversion client terminated with an unexpected error", e);
             System.err.println(String.format("Error: %s", e.getMessage()));
             System.err.println("Use option -? to display a list of legal commands.");
             System.exit(-1);
         }
+    }
+
+    private static DocumentType[] configureConversion(Console console, Map<DocumentType, Set<DocumentType>> supportedConversions) {
+        console.printf("The connected converter supports the following conversion formats:");
+        Map<Integer, DocumentType[]> conversionsByIndex = new HashMap<Integer, DocumentType[]>();
+        int index = 0;
+        for (Map.Entry<DocumentType, Set<DocumentType>> entry : supportedConversions.entrySet()) {
+            for (DocumentType targetType : entry.getValue()) {
+                conversionsByIndex.put(index, new DocumentType[]{entry.getKey(), targetType});
+                console.printf("  | [%i]: '%s' to '%s'%n", entry.getKey(), targetType);
+            }
+        }
+        do {
+            console.printf("Enter the number of the conversion you want to perform: ");
+            try {
+                int choice = Integer.parseInt(console.readLine());
+                DocumentType[] conversion = conversionsByIndex.get(choice);
+                if (conversion != null) {
+                    console.printf("Converting '%s' to '%s'. You can change this setup by entering '\\f'.%n", conversion[0], conversion[1]);
+                    return conversion;
+                }
+                console.printf("The number you provided is not among the legal choices%n");
+            } catch (RuntimeException e) {
+                console.printf("You did not provide a number%n");
+            }
+        } while (true);
+    }
+
+    private static String extensionFor(DocumentType documentType) {
+        String fileNameExtension = FILE_NAME_EXTENSIONS.get(documentType);
+        return fileNameExtension == null ? "converted" : fileNameExtension;
     }
 
     private static File normalize(String path) {
@@ -113,7 +164,7 @@ public class StandaloneClient {
             System.out.println("The converter was started with unknown arguments: " + e.options());
             optionParser.printHelpOn(System.out);
             System.exit(-1);
-            throw e; // In theory, System.exit does not guarantee a JVM exit.
+            throw e; // System.exit does not guarantee a JVM exit.
         }
 
         if (optionSet.has(helpSpec)) {

@@ -1,21 +1,34 @@
 package no.kantega.pdf.demo;
 
+import no.kantega.pdf.api.DocumentType;
+
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class FileRow implements Serializable {
 
-    public static final String SOURCE_FILE_NAME = "source.word";
-    public static final String TARGET_FILE_NAME = "target.pdf";
+    public static final String SOURCE_FILE_NAME = "source.raw";
+    public static final String TARGET_FILE_NAME = "target.raw";
     public static final String PROPERTIES_FILE_NAME = "conversion.properties";
 
     public static final String INPUT_NAME_PROPERTY_KEY = "name";
+    public static final String SOURCE_FORMAT = "source";
+    public static final String TARGET_FORMAT = "target";
     public static final String CONVERSION_DURATION_PROPERTY_KEY = "length";
 
     public static final String PROPERTY_COMMENT = "Kantega PDF converter demo record";
+    private static final Map<String, String> FILE_EXTENSIONS;
+
+    static {
+        FILE_EXTENSIONS = new HashMap<String, String>();
+        FILE_EXTENSIONS.put(DocumentType.DOC.toString(), "doc");
+        FILE_EXTENSIONS.put(DocumentType.DOCX.toString(), "docx");
+        FILE_EXTENSIONS.put(DocumentType.MHTML.toString(), "mhtml");
+        FILE_EXTENSIONS.put(DocumentType.PDF.toString(), "pdf");
+        FILE_EXTENSIONS.put(DocumentType.PDFA.toString(), "pdfa");
+        FILE_EXTENSIONS.put(DocumentType.RTF.toString(), "rtf");
+        FILE_EXTENSIONS.put(DocumentType.XML.toString(), "xml");
+    }
 
     private final int row;
     private final File source;
@@ -98,11 +111,24 @@ public class FileRow implements Serializable {
         }
     }
 
+    public String getSourceFormat() {
+        return properties.getProperty(SOURCE_FORMAT, "(unknown)");
+    }
+
+    public String getTargetFormat() {
+        return properties.getProperty(TARGET_FORMAT, "(unknown)");
+    }
+
     public String getSourceName() {
         return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "input");
     }
 
     public String getOutputName() {
-        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "output") + ".pdf";
+        return properties.getProperty(INPUT_NAME_PROPERTY_KEY, "output") + "." + findFileExtension();
+    }
+
+    private String findFileExtension() {
+        String extension = FILE_EXTENSIONS.get(getTargetFormat());
+        return extension == null ? "converted" : extension;
     }
 }

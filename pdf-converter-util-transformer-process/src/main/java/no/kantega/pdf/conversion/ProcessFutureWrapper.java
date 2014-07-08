@@ -18,27 +18,27 @@ public class ProcessFutureWrapper implements Future<Boolean> {
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return startedProcess.future().cancel(mayInterruptIfRunning);
+        return startedProcess.getFuture().cancel(mayInterruptIfRunning);
     }
 
     @Override
     public boolean isCancelled() {
-        return startedProcess.future().isCancelled();
+        return startedProcess.getFuture().isCancelled();
     }
 
     @Override
     public boolean isDone() {
-        return startedProcess.future().isDone();
+        return startedProcess.getFuture().isDone();
     }
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        return evaluateExitValue(startedProcess.future().get().exitValue());
+        return evaluateExitValue(startedProcess.getFuture().get().getExitValue());
     }
 
     @Override
     public Boolean get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        return evaluateExitValue(startedProcess.future().get(timeout, unit).exitValue());
+        return evaluateExitValue(startedProcess.getFuture().get(timeout, unit).getExitValue());
     }
 
     private boolean evaluateExitValue(int exitValue) throws ExecutionException {

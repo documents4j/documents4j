@@ -1,6 +1,5 @@
 package no.kantega.pdf.adapter;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import no.kantega.pdf.api.IFileSource;
 import no.kantega.pdf.api.IInputStreamSource;
@@ -24,7 +23,7 @@ public class InputStreamFromFileSourceTest extends AbstractAdapterTest {
 
         IInputStreamSource translator = new InputStreamSourceFromFileSource(fileSource);
         InputStream inputStream = translator.getInputStream();
-        ByteStreams.copy(inputStream, Files.newOutputStreamSupplier(target));
+        Files.asByteSink(target).writeFrom(inputStream);
         translator.onConsumed(inputStream);
 
         assertTrue(target.isFile());

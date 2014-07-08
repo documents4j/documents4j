@@ -1,7 +1,7 @@
 package no.kantega.pdf.adapter;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public abstract class AbstractAdapterTest {
     protected File makeFile(boolean existent) throws Exception {
         File file = new File(temporaryFolder, String.format("file.%d", uniqueNameMaker.getAndIncrement()));
         if (existent) {
-            Files.copy(ByteStreams.newInputStreamSupplier(VALUES), file);
+            ByteSource.wrap(VALUES).copyTo(Files.asByteSink(file));
         }
         assertEquals(existent, file.isFile());
         return file;

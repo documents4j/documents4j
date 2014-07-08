@@ -1,6 +1,5 @@
 package no.kantega.pdf;
 
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
@@ -42,9 +41,7 @@ public enum TestResource {
     public File materializeIn(File folder, String name) {
         File file = new File(folder, name);
         try {
-            ByteStreams.copy(
-                    Resources.newInputStreamSupplier(Resources.getResource(getClass(), path)),
-                    Files.newOutputStreamSupplier(file));
+            Resources.asByteSource(Resources.getResource(getClass(), path)).copyTo(Files.asByteSink(file));
             return file;
         } catch (IOException e) {
             throw new AssertionError("Unexpected IOException occurred: " + e.getMessage());

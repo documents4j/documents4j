@@ -5,6 +5,7 @@ import no.kantega.pdf.throwables.ConverterAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,8 +41,8 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
 
     protected ProcessExecutor makePresetProcessExecutor() {
         return new ProcessExecutor()
-                .redirectOutputAsInfo(logger)
-                .redirectErrorAsInfo(logger)
+                .redirectOutput(Slf4jStream.of(logger).asInfo())
+                .redirectError(Slf4jStream.of(logger).asInfo())
                 .readOutput(true)
                 .directory(getBaseFolder())
                 .timeout(getProcessTimeout(), TimeUnit.MILLISECONDS)
@@ -57,7 +58,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             // procedure, start up processes will never be killed either.
             return makePresetProcessExecutor()
                     .command("cmd", "/C", quote(script.getAbsolutePath()))
-                    .execute().exitValue();
+                    .execute().getExitValue();
         } catch (IOException e) {
             String message = String.format("Unable to run script: %s", script);
             logger.error(message, e);

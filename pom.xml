@@ -81,15 +81,15 @@
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <version.jersey>2.6</version.jersey>
-        <version.guava>14.0.1</version.guava>
-        <version.zt-exec>1.5</version.zt-exec>
-        <version.jopt-simple>4.5</version.jopt-simple>
-        <version.slf4j>1.7.5</version.slf4j>
+        <version.jersey>2.10.1</version.jersey>
+        <version.guava>17.0</version.guava>
+        <version.zt-exec>1.7</version.zt-exec>
+        <version.jopt-simple>4.6</version.jopt-simple>
+        <version.slf4j>1.7.7</version.slf4j>
         <version.logback>1.1.2</version.logback>
         <version.junit>4.11</version.junit>
         <version.mockito>1.9.5</version.mockito>
-        <version.thread-weaver>0.1</version.thread-weaver>
+        <version.thread-weaver>0.2</version.thread-weaver>
         <version.jetty>8.1.13.v20130916</version.jetty>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
         <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>

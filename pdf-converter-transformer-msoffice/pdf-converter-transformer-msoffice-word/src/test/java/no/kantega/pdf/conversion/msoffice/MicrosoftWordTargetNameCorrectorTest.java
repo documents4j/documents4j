@@ -1,7 +1,6 @@
 package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.base.Charsets;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
@@ -39,7 +38,7 @@ public class MicrosoftWordTargetNameCorrectorTest {
 
     private File makeFile(String extension) throws Exception {
         File file = new File(temporaryFolder, String.format("file%d%s", nameGenerator.getAndIncrement(), extension));
-        Files.copy(ByteStreams.newInputStreamSupplier(MESSAGE.getBytes(Charsets.UTF_8)), file);
+        Files.asByteSink(file).write(MESSAGE.getBytes(Charsets.UTF_8));
         return file;
     }
 

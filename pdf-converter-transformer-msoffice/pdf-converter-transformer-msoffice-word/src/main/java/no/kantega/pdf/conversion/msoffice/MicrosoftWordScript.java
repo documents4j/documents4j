@@ -1,7 +1,6 @@
 package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.base.Objects;
-import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
@@ -48,9 +47,7 @@ enum MicrosoftWordScript {
             if (!script.createNewFile()) {
                 throw new IOException(String.format("Could not create file %s", script));
             }
-            ByteStreams.copy(
-                    Resources.newInputStreamSupplier(Resources.getResource(getClass(), path)),
-                    Files.newOutputStreamSupplier(script));
+            Resources.asByteSource(Resources.getResource(getClass(), path)).copyTo(Files.asByteSink(script));
         } catch (IOException e) {
             String message = String.format("Could not copy script resource '%s' to local file system at '%s'", path, folder);
             LOGGER.error(message, e);

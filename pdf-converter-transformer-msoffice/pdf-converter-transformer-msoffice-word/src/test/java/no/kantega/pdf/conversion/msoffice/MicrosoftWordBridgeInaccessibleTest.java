@@ -32,7 +32,7 @@ public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
         assertTrue(otherFolder.delete());
         File target = makeTarget(false);
         assertEquals(getExternalConverter().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
-                        .future().get().exitValue(),
+                        .getFuture().get().getExitValue(),
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
         assertFalse(target.exists());
     }

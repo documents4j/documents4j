@@ -71,7 +71,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         StartedProcess conversion = getExternalConverter().doStartConversion(source, getSourceDocumentType(), target, getTargetDocumentType());
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                conversion.future().get().exitValue());
+                conversion.getFuture().get().getExitValue());
         assertTrue(target.exists());
     }
 
@@ -138,7 +138,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
                 .doStartConversion(corruptSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType());
         assertEquals(
                 ExternalConverterScriptResult.ILLEGAL_INPUT.getExitValue().intValue(),
-                conversion.future().get().exitValue());
+                conversion.getFuture().get().getExitValue());
         assertFalse(target.exists());
     }
 
@@ -149,7 +149,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
                 .doStartConversion(inexistentSourceFile(), getSourceDocumentType(), target, getTargetDocumentType());
         assertEquals(
                 ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitValue().intValue(),
-                conversion.future().get().exitValue());
+                conversion.getFuture().get().getExitValue());
         assertFalse(target.exists());
     }
 
@@ -165,7 +165,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 getExternalConverter().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
-                        .future().get().exitValue());
+                        .getFuture().get().getExitValue());
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
@@ -177,7 +177,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
             assertEquals(
                     ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                     getExternalConverter().doStartConversion(source, getSourceDocumentType(), makeTarget(true), getTargetDocumentType())
-                            .future().get().exitValue());
+                            .getFuture().get().getExitValue());
         } finally {
             fileInputStream.close();
         }
@@ -193,7 +193,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
             assertEquals(
                     ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitValue().intValue(),
                     getExternalConverter().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
-                            .future().get().exitValue());
+                            .getFuture().get().getExitValue());
         } finally {
             fileOutputStream.close();
         }

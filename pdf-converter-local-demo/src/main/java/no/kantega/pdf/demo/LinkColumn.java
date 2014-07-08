@@ -19,7 +19,7 @@ public class LinkColumn extends AbstractColumn<FileRow, Void> {
 
     @Override
     public void populateItem(Item<ICellPopulator<FileRow>> cellItem, String componentId, IModel<FileRow> rowModel) {
-        cellItem.add(new LinkPanel(componentId, new AlternateFileModel(rowModel), new AlternateFileNameModel(rowModel)));
+        cellItem.add(new LinkPanel(componentId, new AlternateFileModel(rowModel), new AlternateFileFormatModel(rowModel), new AlternateFileNameModel(rowModel)));
     }
 
     public enum FileInput {
@@ -38,6 +38,20 @@ public class LinkColumn extends AbstractColumn<FileRow, Void> {
         @Override
         public String getObject() {
             return fileInput == FileInput.SOURCE ? rowModel.getObject().getSourceName() : rowModel.getObject().getOutputName();
+        }
+    }
+
+    private class AlternateFileFormatModel extends AbstractReadOnlyModel<String> {
+
+        private final IModel<FileRow> rowModel;
+
+        private AlternateFileFormatModel(IModel<FileRow> rowModel) {
+            this.rowModel = rowModel;
+        }
+
+        @Override
+        public String getObject() {
+            return fileInput == FileInput.SOURCE ? rowModel.getObject().getSourceFormat() : rowModel.getObject().getTargetFormat();
         }
     }
 

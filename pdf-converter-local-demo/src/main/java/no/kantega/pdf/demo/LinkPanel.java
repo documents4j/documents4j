@@ -9,24 +9,26 @@ import java.io.File;
 
 public class LinkPanel extends Panel {
 
-    LinkPanel(String id, IModel<File> file, IModel<String> name) {
+    LinkPanel(String id, IModel<File> file, IModel<String> type, IModel<String> name) {
         super(id);
-        add(new DownloadLink("file", file, name).setBody(new FileNameAndSizeModel(file, name)));
+        add(new DownloadLink("file", file, name).setBody(new FileNameAndFormatAndSizeModel(file, type, name)));
     }
 
-    private static class FileNameAndSizeModel extends AbstractReadOnlyModel<String> {
+    private static class FileNameAndFormatAndSizeModel extends AbstractReadOnlyModel<String> {
 
         private final IModel<File> fileModel;
+        private final IModel<String> typeModel;
         private final IModel<String> nameModel;
 
-        private FileNameAndSizeModel(IModel<File> fileModel, IModel<String> nameModel) {
+        private FileNameAndFormatAndSizeModel(IModel<File> fileModel, IModel<String> typeModel, IModel<String> nameModel) {
             this.fileModel = fileModel;
+            this.typeModel = typeModel;
             this.nameModel = nameModel;
         }
 
         @Override
         public String getObject() {
-            return String.format("%s (%s)", nameModel.getObject(), prettySize());
+            return String.format("%s (%s, %s)", nameModel.getObject(), typeModel.getObject(), prettySize());
         }
 
         private String prettySize() {

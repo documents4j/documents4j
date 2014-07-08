@@ -1,6 +1,8 @@
 package no.kantega.pdf.api;
 
-public class DocumentType {
+import java.io.Serializable;
+
+public class DocumentType implements Serializable, Comparable<DocumentType> {
 
     public static final DocumentType MS_WORD = new DocumentType(Value.APPLICATION, Value.WORD_ANY);
     public static final DocumentType RTF = new DocumentType(Value.APPLICATION, Value.RTF);
@@ -50,6 +52,11 @@ public class DocumentType {
     @Override
     public int hashCode() {
         return 31 * type.hashCode() + subtype.hashCode();
+    }
+
+    @Override
+    public int compareTo(DocumentType other) {
+        return toString().compareTo(other.toString());
     }
 
     @Override

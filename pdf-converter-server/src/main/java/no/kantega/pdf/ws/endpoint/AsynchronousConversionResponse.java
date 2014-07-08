@@ -25,8 +25,8 @@ public class AsynchronousConversionResponse implements IInputStreamConsumer, Tim
         this.asyncResponse = asyncResponse;
         this.targetType = targetType;
         this.answerLock = new Object();
-        asyncResponse.setTimeoutHandler(this);
         asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
+        asyncResponse.setTimeoutHandler(this);
         LOGGER.info("Registered conversion request for {}", asyncResponse);
     }
 

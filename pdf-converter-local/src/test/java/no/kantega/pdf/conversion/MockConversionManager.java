@@ -61,7 +61,7 @@ public abstract class MockConversionManager implements IConversionManager {
     }
 
     @Override
-    public Map<DocumentType, Set<DocumentType>> supported() {
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
         return Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE));
     }
 

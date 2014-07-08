@@ -30,7 +30,7 @@ public class ConverterResource {
                         webConverterConfiguration.getConverter().isOperational(),
                         webConverterConfiguration.getTimeout(),
                         ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION,
-                        webConverterConfiguration.getConverter().supported()))
+                        webConverterConfiguration.getConverter().getSupportedConversions()))
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

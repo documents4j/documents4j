@@ -3,10 +3,13 @@ package no.kantega.pdf.job;
 import com.google.common.io.Files;
 import no.kantega.pdf.api.IConverter;
 import no.kantega.pdf.conversion.IConversionManager;
+import no.kantega.pdf.conversion.IExternalConverter;
 import no.kantega.pdf.conversion.MockConversionManager;
 import org.junit.Ignore;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -51,11 +54,15 @@ class LocalConverterTestDelegate implements IConverterTestDelegate {
                     LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE,
                     LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME,
                     LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT,
-                    TimeUnit.MILLISECONDS);
+                    TimeUnit.MILLISECONDS,
+                    Collections.<Class<? extends IExternalConverter>, Boolean>emptyMap());
         }
 
         @Override
-        protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
+        protected IConversionManager makeConversionManager(File baseFolder,
+                                                           long processTimeout,
+                                                           TimeUnit unit,
+                                                           Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration) {
             return MockConversionManager.make(baseFolder, operational);
         }
     }

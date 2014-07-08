@@ -35,7 +35,7 @@ public class PseudoConverter extends ConverterAdapter {
     }
 
     @Override
-    public Map<DocumentType, Set<DocumentType>> supported() {
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
         return Collections.singletonMap(legalSourceFormat, Collections.singleton(legalTargetFormat));
     }
 

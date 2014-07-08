@@ -120,8 +120,8 @@ public class RemoteConverter extends ConverterAdapter {
     }
 
     @Override
-    public Map<DocumentType, Set<DocumentType>> supported() {
-        return fetchConverterServerInformation().getSupported();
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
+        return fetchConverterServerInformation().getSupportedConversions();
     }
 
     @Override

@@ -7,10 +7,13 @@ import no.kantega.pdf.api.*;
 import no.kantega.pdf.builder.AbstractConverterBuilder;
 import no.kantega.pdf.conversion.DefaultConversionManager;
 import no.kantega.pdf.conversion.IConversionManager;
+import no.kantega.pdf.conversion.IExternalConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -35,10 +38,14 @@ public class LocalConverter extends ConverterAdapter {
     private final ExecutorService executorService;
 
     protected LocalConverter(File baseFolder,
-                             int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                             long processTimeout, TimeUnit processTimeoutUnit) {
+                             int corePoolSize,
+                             int maximumPoolSize,
+                             long keepAliveTime,
+                             long processTimeout,
+                             TimeUnit processTimeoutUnit,
+                             Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration) {
         super(baseFolder);
-        this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit);
+        this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit, converterConfiguration);
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         LOGGER.info("Local To-PDF converter has started successfully");
     }
@@ -61,13 +68,16 @@ public class LocalConverter extends ConverterAdapter {
         return builder().build();
     }
 
-    protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
-        return new DefaultConversionManager(baseFolder, processTimeout, unit);
+    protected IConversionManager makeConversionManager(File baseFolder,
+                                                       long processTimeout,
+                                                       TimeUnit unit,
+                                                       Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration) {
+        return new DefaultConversionManager(baseFolder, processTimeout, unit, converterConfiguration);
     }
 
     @Override
-    public Map<DocumentType, Set<DocumentType>> supported() {
-        return conversionManager.supported();
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
+        return conversionManager.getSupportedConversions();
     }
 
     @Override
@@ -105,8 +115,10 @@ public class LocalConverter extends ConverterAdapter {
 
         private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
 
+        private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
+
         private Builder() {
-            /* empty */
+            converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();
         }
 
         /**
@@ -124,10 +136,39 @@ public class LocalConverter extends ConverterAdapter {
             return this;
         }
 
+        /**
+         * Enables the given {@link no.kantega.pdf.conversion.IExternalConverter}. Any converter that is shipped with
+         * this library is discovered automatically from the class path and does not need to be enabled explicitly.
+         *
+         * @param externalConverter The converter to be enabled.
+         * @return This builder.
+         */
+        public Builder enable(Class<? extends IExternalConverter> externalConverter) {
+            converterConfiguration.put(externalConverter, Boolean.TRUE);
+            return this;
+        }
+
+        /**
+         * Enables the given {@link no.kantega.pdf.conversion.IExternalConverter}. Any converter that is shipped with
+         * this library is discovered automatically but can be disabled by invoking this method.
+         *
+         * @param externalConverter The converter to be disabled.
+         * @return This builder.
+         */
+        public Builder disable(Class<? extends IExternalConverter> externalConverter) {
+            converterConfiguration.put(externalConverter, Boolean.FALSE);
+            return this;
+        }
+
         @Override
         public IConverter build() {
-            return new LocalConverter(normalizedBaseFolder(), corePoolSize, maximumPoolSize,
-                    keepAliveTime, processTimeout, TimeUnit.MILLISECONDS);
+            return new LocalConverter(normalizedBaseFolder(),
+                    corePoolSize,
+                    maximumPoolSize,
+                    keepAliveTime,
+                    processTimeout,
+                    TimeUnit.MILLISECONDS,
+                    converterConfiguration);
         }
 
         /**
@@ -137,6 +178,16 @@ public class LocalConverter extends ConverterAdapter {
          */
         public long getProcessTimeout() {
             return processTimeout;
+        }
+
+        /**
+         * Returns a map of explicitly enabled or disabled converters where the mapped value represents a boolean
+         * that indicates if a converter was enabled or disabled.
+         *
+         * @return This builder's configuration of external converters.
+         */
+        public Map<Class<? extends IExternalConverter>, Boolean> getConverterConfiguration() {
+            return Collections.unmodifiableMap(converterConfiguration);
         }
     }
 

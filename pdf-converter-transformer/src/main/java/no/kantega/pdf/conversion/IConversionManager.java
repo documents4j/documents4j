@@ -11,7 +11,7 @@ public interface IConversionManager {
 
     Future<Boolean> startConversion(File source, DocumentType inputFormat, File target, DocumentType outputFormat);
 
-    Map<DocumentType, Set<DocumentType>> supported();
+    Map<DocumentType, Set<DocumentType>> getSupportedConversions();
 
     boolean isOperational();
 

@@ -12,7 +12,7 @@ class ConverterRegistry {
 
     private final Set<? extends IExternalConverter> externalConverters;
     private final Map<ConversionPath, IExternalConverter> converterMapping;
-    private final Map<DocumentType, Set<DocumentType>> supported;
+    private final Map<DocumentType, Set<DocumentType>> supportedConversions;
 
     public ConverterRegistry(Set<? extends IExternalConverter> externalConverters) {
         this.externalConverters = externalConverters;
@@ -20,7 +20,7 @@ class ConverterRegistry {
         for (IExternalConverter externalConverter : externalConverters) {
             converterMapping.putAll(resolve(externalConverter));
         }
-        supported = extractSupportedConversions(converterMapping.keySet());
+        supportedConversions = extractSupportedConversions(converterMapping.keySet());
     }
 
     private static Map<DocumentType, Set<DocumentType>> extractSupportedConversions(Set<ConversionPath> conversionPaths) {
@@ -55,8 +55,8 @@ class ConverterRegistry {
         return conversionMapping;
     }
 
-    public Map<DocumentType, Set<DocumentType>> supported() {
-        return Collections.unmodifiableMap(supported);
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
+        return Collections.unmodifiableMap(supportedConversions);
     }
 
     public IExternalConverter lookup(DocumentType sourceFormat, DocumentType targetFormat) {

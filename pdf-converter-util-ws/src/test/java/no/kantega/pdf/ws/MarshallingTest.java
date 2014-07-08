@@ -32,7 +32,7 @@ public class MarshallingTest {
         Set<DocumentType> second = new HashSet<DocumentType>();
         second.add(FIRST_SAMPLE_TYPE);
         supported.put(SECOND_SAMPLE_TYPE, second);
-        converterServerInformation.setSupported(supported);
+        converterServerInformation.setSupportedConversions(supported);
         return converterServerInformation;
     }
 
@@ -43,6 +43,11 @@ public class MarshallingTest {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024);
         jaxbMarshaller.marshal(makeSample(), outputStream);
         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-        assertEquals(makeSample(), jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(outputStream.toByteArray())));
+        ConverterServerInformation unmarshalled = (ConverterServerInformation) jaxbUnmarshaller.unmarshal(new ByteArrayInputStream(outputStream.toByteArray()));
+        ConverterServerInformation original = makeSample();
+        assertEquals(original.isOperational(), unmarshalled.isOperational());
+        assertEquals(original.getProtocolVersion(), unmarshalled.getProtocolVersion());
+        assertEquals(original.getTimeout(), unmarshalled.getTimeout());
+        assertEquals(original.getSupportedConversions(), unmarshalled.getSupportedConversions());
     }
 }

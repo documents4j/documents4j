@@ -3,7 +3,6 @@ package no.kantega.pdf.conversion;
 import no.kantega.pdf.api.DocumentType;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -13,16 +12,14 @@ public class DefaultConversionManager implements IConversionManager {
 
     private final ConverterRegistry converterRegistry;
 
-    public DefaultConversionManager(File baseFolder, long processTimeout, TimeUnit timeUnit) {
-        this(baseFolder, processTimeout, timeUnit, Collections.<Class<? extends IExternalConverter>, Boolean>emptyMap());
-    }
-
     public DefaultConversionManager(File baseFolder,
                                     long processTimeout,
                                     TimeUnit timeUnit,
                                     Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
-        converterRegistry = new ConverterRegistry(ExternalConverterDiscovery
-                .loadConfiguration(externalConverterRegistration, baseFolder, processTimeout, timeUnit));
+        converterRegistry = new ConverterRegistry(ExternalConverterDiscovery.loadConfiguration(baseFolder,
+                processTimeout,
+                timeUnit,
+                externalConverterRegistration));
     }
 
     @Override
@@ -31,8 +28,8 @@ public class DefaultConversionManager implements IConversionManager {
     }
 
     @Override
-    public Map<DocumentType, Set<DocumentType>> supported() {
-        return converterRegistry.supported();
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
+        return converterRegistry.getSupportedConversions();
     }
 
     @Override

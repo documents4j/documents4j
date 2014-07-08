@@ -40,7 +40,7 @@ public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTe
         assertEquals(DEFAULT_TIMEOUT, converterServerInformation.getTimeout());
         assertEquals(CONVERTER_IS_OPERATIONAL, converterServerInformation.isOperational());
         assertEquals(ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION, converterServerInformation.getProtocolVersion());
-        assertEquals(Collections.singletonMap(SOURCE_FORMAT, Collections.singleton(TARGET_FORMAT)), converterServerInformation.getSupported());
+        assertEquals(Collections.singletonMap(SOURCE_FORMAT, Collections.singleton(TARGET_FORMAT)), converterServerInformation.getSupportedConversions());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)

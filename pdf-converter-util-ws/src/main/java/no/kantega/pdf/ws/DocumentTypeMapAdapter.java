@@ -61,20 +61,5 @@ public class DocumentTypeMapAdapter extends XmlAdapter<DocumentTypeMapAdapter.El
         public void setValue(Set<DocumentType> value) {
             this.value = value;
         }
-
-        @Override
-        public boolean equals(Object other) {
-            if (this == other) return true;
-            if (other == null || getClass() != other.getClass()) return false;
-            Element element = (Element) other;
-            return key.equals(element.key) && value.equals(element.value);
-        }
-
-        @Override
-        public int hashCode() {
-            int result = key.hashCode();
-            result = 31 * result + value.hashCode();
-            return result;
-        }
     }
 }

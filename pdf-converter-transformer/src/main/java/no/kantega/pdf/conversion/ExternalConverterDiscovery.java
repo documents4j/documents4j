@@ -27,8 +27,7 @@ enum ExternalConverterDiscovery {
                     .getConstructor(File.class, long.class, TimeUnit.class)
                     .newInstance(baseFolder, processTimeout, timeUnit);
         } catch (Exception e) {
-            throw new LinkageError(String.format("The class path contains an external converter with an " +
-                    "invalid constructor signature: %s", e.getMessage()));
+            throw new IllegalStateException(String.format("%s could not be created by a (File, long, TimeUnit) constructor", externalConverterClass), e);
         }
     }
 
@@ -64,7 +63,7 @@ enum ExternalConverterDiscovery {
 
     private static Set<Class<? extends IExternalConverter>> validate(Set<Class<? extends IExternalConverter>> externalConverterClasses) {
         if (externalConverterClasses.size() == 0) {
-            throw new LinkageError("There were no external converters found on the class path.");
+            throw new IllegalStateException("The application was started without any registered or class-path discovered converters.");
         }
         return externalConverterClasses;
     }
@@ -77,8 +76,10 @@ enum ExternalConverterDiscovery {
         return autoDetectNames;
     }
 
-    public static Set<IExternalConverter> loadConfiguration(Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration,
-                                                            File baseFolder, long processTimeout, TimeUnit timeUnit) {
+    public static Set<IExternalConverter> loadConfiguration(File baseFolder,
+                                                            long processTimeout,
+                                                            TimeUnit timeUnit,
+                                                            Map<Class<? extends IExternalConverter>, Boolean> externalConverterRegistration) {
         return makeAll(validate(discover(externalConverterRegistration)), baseFolder, processTimeout, timeUnit);
     }
 

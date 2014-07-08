@@ -19,7 +19,7 @@ public class ConverterServerInformation {
     private boolean operational;
     private long timeout;
     private int protocolVersion;
-    private Map<DocumentType, Set<DocumentType>> supported;
+    private Map<DocumentType, Set<DocumentType>> supportedConversions;
 
     public ConverterServerInformation() {
         /* JAX-RS requires default constructor */
@@ -28,11 +28,11 @@ public class ConverterServerInformation {
     public ConverterServerInformation(boolean operational,
                                       long timeout,
                                       int protocolVersion,
-                                      Map<DocumentType, Set<DocumentType>> supported) {
+                                      Map<DocumentType, Set<DocumentType>> supportedConversions) {
         this.operational = operational;
         this.timeout = timeout;
         this.protocolVersion = protocolVersion;
-        this.supported = supported;
+        this.supportedConversions = supportedConversions;
     }
 
     @XmlElement(required = true, nillable = false)
@@ -64,29 +64,11 @@ public class ConverterServerInformation {
 
     @XmlJavaTypeAdapter(DocumentTypeMapAdapter.class)
     @XmlElement(required = true, nillable = false)
-    public Map<DocumentType, Set<DocumentType>> getSupported() {
-        return supported;
+    public Map<DocumentType, Set<DocumentType>> getSupportedConversions() {
+        return supportedConversions;
     }
 
-    public void setSupported(Map<DocumentType, Set<DocumentType>> supported) {
-        this.supported = supported;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (other == null || getClass() != other.getClass()) return false;
-        ConverterServerInformation that = (ConverterServerInformation) other;
-        return operational == that.operational && protocolVersion == that.protocolVersion
-                && timeout == that.timeout && supported.equals(that.supported);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (operational ? 1 : 0);
-        result = 31 * result + (int) (timeout ^ (timeout >>> 32));
-        result = 31 * result + protocolVersion;
-        result = 31 * result + supported.hashCode();
-        return result;
+    public void setSupportedConversions(Map<DocumentType, Set<DocumentType>> supportedConversions) {
+        this.supportedConversions = supportedConversions;
     }
 }

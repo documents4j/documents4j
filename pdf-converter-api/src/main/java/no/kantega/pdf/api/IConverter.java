@@ -78,7 +78,7 @@ public interface IConverter {
      * @return A map of all possible conversions with the key describing the input types and the set
      * describing the formats that this input type can be converted into.
      */
-    Map<DocumentType, Set<DocumentType>> supported();
+    Map<DocumentType, Set<DocumentType>> getSupportedConversions();
 
     /**
      * Checks if this converter is currently operational.

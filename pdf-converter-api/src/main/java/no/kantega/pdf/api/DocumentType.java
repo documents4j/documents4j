@@ -6,9 +6,10 @@ public class DocumentType {
     public static final DocumentType RTF = new DocumentType(Value.APPLICATION, Value.RTF);
     public static final DocumentType DOCX = new DocumentType(Value.APPLICATION, Value.DOCX);
     public static final DocumentType DOC = new DocumentType(Value.APPLICATION, Value.DOC);
-    public static final DocumentType HTML = new DocumentType(Value.TEXT, Value.HTML);
     public static final DocumentType XML = new DocumentType(Value.APPLICATION, Value.XML);
+    public static final DocumentType MHTML = new DocumentType(Value.APPLICATION, Value.MHTML);
     public static final DocumentType PDF = new DocumentType(Value.APPLICATION, Value.PDF);
+    public static final DocumentType PDFA = new DocumentType(Value.APPLICATION, Value.PDFA);
     private final String type;
     private final String subtype;
 
@@ -65,9 +66,10 @@ public class DocumentType {
         public static final String DOCX = "vnd.openxmlformats-officedocument.wordprocessingml.document";
         public static final String WORD_ANY = "vnd.no.kantega.pdf.any-msword";
         public static final String PDF = "pdf";
+        public static final String PDFA = "vnd.no.kantega.pdf.pdf-a";
         public static final String RTF = "rtf";
-        public static final String HTML = "html";
         public static final String XML = "xml";
+        public static final String MHTML = "x-mimearchive";
 
         private Value() {
             throw new UnsupportedOperationException();

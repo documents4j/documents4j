@@ -23,12 +23,16 @@ import static no.kantega.pdf.api.DocumentType.Value.*;
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + WORD_ANY,
                 APPLICATION + "/" + RTF,
-                TEXT + "/" + RTF},
+                TEXT + "/" + RTF,
+                APPLICATION + "/" + XML,
+                APPLICATION + "/" + MHTML},
         to = {APPLICATION + "/" + PDF,
                 APPLICATION + "/" + DOC,
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + RTF,
-                TEXT + "/" + RTF})
+                TEXT + "/" + RTF,
+                APPLICATION + "/" + XML,
+                APPLICATION + "/" + MHTML})
 public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);

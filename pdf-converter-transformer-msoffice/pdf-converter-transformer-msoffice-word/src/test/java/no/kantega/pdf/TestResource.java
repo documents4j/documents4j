@@ -11,7 +11,19 @@ public enum TestResource {
 
     DOCX_VALID("/valid.docx"),
     DOCX_CORRUPT("/corrupt.docx"),
-    DOCX_INEXISTENT("/inexistent.docx");
+    DOCX_INEXISTENT("/inexistent.docx"),
+
+    RTF_VALID("/valid.rtf"),
+    RTF_CORRUPT("/corrupt.rtf"),
+    RTF_INEXISTENT("/inexistent.rtf"),
+
+    XML_VALID("/valid.xml"),
+    XML_CORRUPT("/corrupt.xml"),
+    XML_INEXISTENT("/inexistent.xml"),
+
+    MHTML_VALID("/valid.mhtml"),
+    MHTML_CORRUPT("/corrupt.mhtml"),
+    MHTML_INEXISTENT("/inexistent.mhtml");
 
     private final String path;
 

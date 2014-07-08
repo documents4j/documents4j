@@ -11,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractWordAssertingTest {
 
-    public static final long DEFAULT_CONVERSION_TIMEOUT = 20000L;
+    public static final long DEFAULT_CONVERSION_TIMEOUT = 50000L;
 
     private static File WORD_ASSERT_FOLDER;
     private static MicrosoftWordAssert WORD_ASSERT;

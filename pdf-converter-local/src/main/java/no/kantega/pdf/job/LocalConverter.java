@@ -112,10 +112,8 @@ public class LocalConverter extends ConverterAdapter {
          * The default time out for external processes.
          */
         public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
-
-        private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
-
         private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
+        private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
 
         private Builder() {
             converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();

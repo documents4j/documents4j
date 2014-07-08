@@ -1,6 +1,7 @@
 package no.kantega.pdf;
 
 import com.google.common.io.Files;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -22,9 +23,13 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
 
     private static File EXTERNAL_CONVERTER_DIRECTORY;
     private static MicrosoftWordBridge EXTERNAL_CONVERTER;
+    private final DocumentTypeProvider documentTypeProvider;
     private AtomicInteger nameGenerator;
     private File files;
     private Set<File> fileCopies;
+    protected AbstractWordBasedTest(DocumentTypeProvider documentTypeProvider) {
+        this.documentTypeProvider = documentTypeProvider;
+    }
 
     @BeforeClass
     public static void setUpConverter() throws Exception {
@@ -66,15 +71,23 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
     }
 
     public File validSourceFile(boolean delete) throws IOException {
-        return makeCopy(TestResource.DOCX_VALID, delete);
+        return makeCopy(documentTypeProvider.getValid(), delete);
     }
 
     public File corruptSourceFile(boolean delete) throws IOException {
-        return makeCopy(TestResource.DOCX_CORRUPT, delete);
+        return makeCopy(documentTypeProvider.getCorrupt(), delete);
     }
 
     public File inexistentSourceFile() throws IOException {
-        return TestResource.DOCX_INEXISTENT.absoluteTo(files);
+        return documentTypeProvider.getInexistent().absoluteTo(files);
+    }
+
+    public DocumentType getSourceDocumentType() {
+        return documentTypeProvider.getSourceDocumentType();
+    }
+
+    public DocumentType getTargetDocumentType() {
+        return documentTypeProvider.getTargetDocumentType();
     }
 
     public File getFileFolder() {
@@ -100,7 +113,7 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
     }
 
     public File makeTarget(boolean delete) {
-        return makeTarget(String.format("target.%d.pdf", nameGenerator.getAndIncrement()), delete);
+        return makeTarget(String.format("target.%d.%s", nameGenerator.getAndIncrement(), documentTypeProvider.getTargetFileNameSuffix()), delete);
     }
 
     public File makeTarget(String name, boolean delete) {
@@ -110,5 +123,50 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
             fileCopies.add(target);
         }
         return target;
+    }
+
+    public static class DocumentTypeProvider {
+
+        private final TestResource valid, corrupt, inexistent;
+        private final DocumentType sourceDocumentType, targetDocumentType;
+        private final String targetFileNameSuffix;
+
+        public DocumentTypeProvider(TestResource valid,
+                                    TestResource corrupt,
+                                    TestResource inexistent,
+                                    DocumentType sourceDocumentType,
+                                    DocumentType targetDocumentType,
+                                    String targetFileNameSuffix) {
+            this.valid = valid;
+            this.corrupt = corrupt;
+            this.inexistent = inexistent;
+            this.sourceDocumentType = sourceDocumentType;
+            this.targetDocumentType = targetDocumentType;
+            this.targetFileNameSuffix = targetFileNameSuffix;
+        }
+
+        public TestResource getValid() {
+            return valid;
+        }
+
+        public TestResource getCorrupt() {
+            return corrupt;
+        }
+
+        public TestResource getInexistent() {
+            return inexistent;
+        }
+
+        public DocumentType getSourceDocumentType() {
+            return sourceDocumentType;
+        }
+
+        public DocumentType getTargetDocumentType() {
+            return targetDocumentType;
+        }
+
+        public String getTargetFileNameSuffix() {
+            return targetFileNameSuffix;
+        }
     }
 }

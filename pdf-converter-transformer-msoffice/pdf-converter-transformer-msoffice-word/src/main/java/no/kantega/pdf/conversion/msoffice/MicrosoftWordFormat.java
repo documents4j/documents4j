@@ -5,10 +5,11 @@ import no.kantega.pdf.api.DocumentType;
 public enum MicrosoftWordFormat {
 
     PDF("17", "pdf", DocumentType.PDF),
+    PDFA("999", "pdf", DocumentType.PDFA),
     RTF("6", "rtf", DocumentType.RTF),
     DOCX("16", "docx", DocumentType.DOCX),
     DOC("0", "doc", DocumentType.DOC),
-    HTML("8", "html", DocumentType.HTML),
+    MHTML("8", "mht", DocumentType.MHTML),
     XML("11", "xml", DocumentType.XML);
 
     private final String value;

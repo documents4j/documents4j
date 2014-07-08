@@ -2,6 +2,7 @@ package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.AbstractWordBasedTest;
+import no.kantega.pdf.TestResource;
 import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.junit.Test;
@@ -13,6 +14,15 @@ import static org.junit.Assert.*;
 
 public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
 
+    public MicrosoftWordBridgeInaccessibleTest() {
+        super(new DocumentTypeProvider(TestResource.DOCX_VALID,
+                TestResource.DOCX_CORRUPT,
+                TestResource.DOCX_INEXISTENT,
+                DocumentType.DOCX,
+                DocumentType.PDF,
+                "pdf"));
+    }
+
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testInaccessible() throws Exception {
         getWordAssert().assertWordRunning();
@@ -20,9 +30,10 @@ public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
         File otherFolder = Files.createTempDir();
         new MicrosoftWordBridge(otherFolder, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS).shutDown();
         assertTrue(otherFolder.delete());
-        File pdf = makeTarget(false);
-        assertEquals(getExternalConverter().doStartConversion(validSourceFile(true), DocumentType.MS_WORD, pdf, DocumentType.PDF).future().get().exitValue(),
+        File target = makeTarget(false);
+        assertEquals(getExternalConverter().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
+                        .future().get().exitValue(),
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
-        assertFalse(pdf.exists());
+        assertFalse(target.exists());
     }
 }

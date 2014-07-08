@@ -99,7 +99,6 @@
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
         <version.maven.release-plugin>2.4.1</version.maven.release-plugin>
         <version.maven.cobertura>2.6</version.maven.cobertura>
-        <version.maven.coveralls>2.2.0</version.maven.coveralls>
         <version.maven.checkstyle>2.12.1</version.maven.checkstyle>
         <version.maven.resources>2.6</version.maven.resources>
         <version.maven.compiler>3.1</version.maven.compiler>
@@ -269,13 +268,6 @@
                     </formats>
                     <check/>
                 </configuration>
-            </plugin>
-
-            <!-- Generate coveralls reports from Travis -->
-            <plugin>
-                <groupId>org.eluder.coveralls</groupId>
-                <artifactId>coveralls-maven-plugin</artifactId>
-                <version>${version.maven.coveralls}</version>
             </plugin>
         </plugins>
 

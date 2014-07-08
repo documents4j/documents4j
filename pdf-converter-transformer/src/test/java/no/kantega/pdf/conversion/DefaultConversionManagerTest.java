@@ -19,6 +19,9 @@ public class DefaultConversionManagerTest {
 
     private static final long TIMEOUT = 1000L;
 
+    private static final DocumentType SOURCE_FORMAT = new DocumentType(MockExternalConverter.SOURCE_FORMAT);
+    private static final DocumentType TARGET_FORMAT = new DocumentType(MockExternalConverter.TARGET_FORMAT);
+
     private File folder;
 
     private static MockExternalConverter extractConverter(DefaultConversionManager conversionManager) throws Exception {
@@ -58,13 +61,13 @@ public class DefaultConversionManagerTest {
 
         File source = mock(File.class), target = mock(File.class);
         conversionManager.startConversion(source,
-                new DocumentType(MockExternalConverter.SOURCE_FORMAT),
+                SOURCE_FORMAT,
                 target,
-                new DocumentType(MockExternalConverter.TARGET_FORMAT));
+                TARGET_FORMAT);
         conversionManager.shutDown();
 
         MockExternalConverter bridge = extractConverter(conversionManager);
-        verify(bridge.getDelegate()).startConversion(source, target);
+        verify(bridge.getDelegate()).startConversion(source, SOURCE_FORMAT, target, TARGET_FORMAT);
         verify(bridge.getDelegate()).shutDown();
         verifyNoMoreInteractions(bridge.getDelegate());
     }

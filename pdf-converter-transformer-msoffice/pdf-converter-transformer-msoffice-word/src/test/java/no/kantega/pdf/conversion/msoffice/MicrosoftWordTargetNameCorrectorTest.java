@@ -19,6 +19,8 @@ import static org.mockito.Mockito.when;
 
 public class MicrosoftWordTargetNameCorrectorTest {
 
+    private static final String FOO = "foo";
+
     private static final String MESSAGE = "This is a test message";
 
     private File temporaryFolder;
@@ -46,8 +48,8 @@ public class MicrosoftWordTargetNameCorrectorTest {
         Process process = mock(Process.class);
         when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
-        File target = makeFile(".pdf");
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(target);
+        File target = makeFile("." + FOO);
+        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(target, FOO);
         nameCorrector.afterStop(process);
 
         assertTrue(target.isFile());
@@ -59,11 +61,11 @@ public class MicrosoftWordTargetNameCorrectorTest {
         Process process = mock(Process.class);
         when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
-        File target = makeFile(".pdf");
+        File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
         assertFalse(virtual.exists());
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual);
+        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
         assertFalse(target.exists());
@@ -76,11 +78,11 @@ public class MicrosoftWordTargetNameCorrectorTest {
         Process process = mock(Process.class);
         when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue());
 
-        File target = makeFile(".pdf");
+        File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
         assertFalse(virtual.exists());
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual);
+        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
         assertFalse(virtual.exists());
@@ -93,14 +95,14 @@ public class MicrosoftWordTargetNameCorrectorTest {
         Process process = mock(Process.class);
         when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
-        File target = makeFile(".pdf");
+        File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
         assertTrue(virtual.createNewFile());
         assertTrue(virtual.exists());
         FileOutputStream fileOutputStream = new FileOutputStream(virtual);
         fileOutputStream.getChannel().lock();
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual);
+        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
         try {
             nameCorrector.afterStop(process);
         } catch (FileSystemInteractionException e) {

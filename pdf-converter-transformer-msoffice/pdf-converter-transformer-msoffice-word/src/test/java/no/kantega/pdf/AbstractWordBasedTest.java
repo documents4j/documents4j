@@ -65,15 +65,15 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
         assertTrue(files.delete());
     }
 
-    public File validDocx(boolean delete) throws IOException {
+    public File validSourceFile(boolean delete) throws IOException {
         return makeCopy(TestResource.DOCX_VALID, delete);
     }
 
-    public File corruptDocx(boolean delete) throws IOException {
+    public File corruptSourceFile(boolean delete) throws IOException {
         return makeCopy(TestResource.DOCX_CORRUPT, delete);
     }
 
-    public File inexistentDocx() throws IOException {
+    public File inexistentSourceFile() throws IOException {
         return TestResource.DOCX_INEXISTENT.absoluteTo(files);
     }
 
@@ -89,7 +89,7 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
          * this will cause the conversion to fail. In practice, users should never use the converter on files
          * that are concurrently used by other applications or are currently converted by this application. Instead,
          * they should create a defensive copy before the conversion. In order to keep the tests stable, all tests
-         * will however use a defensive copy.
+         * will use such a defensive copy.
          */
         File copy = testResource.materializeIn(files, String.format("%s.%d", testResource.getName(), nameGenerator.getAndIncrement()));
         assertTrue(copy.isFile());

@@ -1,6 +1,5 @@
-package no.kantega.pdf.conversion.msoffice;
+package no.kantega.pdf.conversion;
 
-import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import no.kantega.pdf.throwables.ConverterException;
 import org.zeroturnaround.exec.StartedProcess;
 
@@ -9,7 +8,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-class ProcessFutureWrapper implements Future<Boolean> {
+public class ProcessFutureWrapper implements Future<Boolean> {
 
     private final StartedProcess startedProcess;
 

@@ -2,6 +2,7 @@ package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.AbstractWordBasedTest;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class MicrosoftWordBridgeInaccessibleTest extends AbstractWordBasedTest {
         new MicrosoftWordBridge(otherFolder, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS).shutDown();
         assertTrue(otherFolder.delete());
         File pdf = makeTarget(false);
-        assertEquals(getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue(),
+        assertEquals(getExternalConverter().doStartConversion(validSourceFile(true), DocumentType.MS_WORD, pdf, DocumentType.PDF).future().get().exitValue(),
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
         assertFalse(pdf.exists());
     }

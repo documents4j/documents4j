@@ -4,22 +4,36 @@ import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.throwables.ConversionInputException;
 import no.kantega.pdf.throwables.ConverterException;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 
 class ConverterRegistry {
 
+    private final Set<? extends IExternalConverter> externalConverters;
     private final Map<ConversionPath, IExternalConverter> converterMapping;
+    private final Map<DocumentType, Set<DocumentType>> supported;
 
     public ConverterRegistry(Set<? extends IExternalConverter> externalConverters) {
+        this.externalConverters = externalConverters;
         converterMapping = new HashMap<ConversionPath, IExternalConverter>();
         for (IExternalConverter externalConverter : externalConverters) {
             converterMapping.putAll(resolve(externalConverter));
         }
+        supported = extractSupportedConversions(converterMapping.keySet());
+    }
+
+    private static Map<DocumentType, Set<DocumentType>> extractSupportedConversions(Set<ConversionPath> conversionPaths) {
+        Map<DocumentType, Set<DocumentType>> supported = new HashMap<DocumentType, Set<DocumentType>>();
+        for (ConversionPath conversionPath : conversionPaths) {
+            Set<DocumentType> targetFormat = supported.get(conversionPath.getSourceFormat());
+            if (targetFormat == null) {
+                targetFormat = new HashSet<DocumentType>();
+                supported.put(conversionPath.getSourceFormat(), targetFormat);
+            }
+            targetFormat.add(conversionPath.getTargetFormat());
+        }
+        return supported;
     }
 
     private static Map<ConversionPath, IExternalConverter> resolve(IExternalConverter externalConverter) {
@@ -41,6 +55,10 @@ class ConverterRegistry {
         return conversionMapping;
     }
 
+    public Map<DocumentType, Set<DocumentType>> supported() {
+        return Collections.unmodifiableMap(supported);
+    }
+
     public IExternalConverter lookup(DocumentType sourceFormat, DocumentType targetFormat) {
         IExternalConverter externalConverter = converterMapping.get(new ConversionPath(sourceFormat, targetFormat));
         if (externalConverter == null) {
@@ -50,7 +68,7 @@ class ConverterRegistry {
     }
 
     public boolean isOperational() {
-        for (IExternalConverter externalConverter : new HashSet<IExternalConverter>(converterMapping.values())) {
+        for (IExternalConverter externalConverter : externalConverters) {
             if (!externalConverter.isOperational()) {
                 return false;
             }
@@ -60,7 +78,7 @@ class ConverterRegistry {
 
     public void shutDown() {
         Set<RuntimeException> runtimeExceptions = new HashSet<RuntimeException>();
-        for (IExternalConverter externalConverter : new HashSet<IExternalConverter>(converterMapping.values())) {
+        for (IExternalConverter externalConverter : externalConverters) {
             try {
                 externalConverter.shutDown();
             } catch (RuntimeException e) {

@@ -1,8 +1,10 @@
 package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.conversion.AbstractExternalConverter;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
+import no.kantega.pdf.conversion.ProcessFutureWrapper;
 import no.kantega.pdf.conversion.ViableConversion;
 import no.kantega.pdf.throwables.ConverterAccessException;
 import org.slf4j.Logger;
@@ -17,8 +19,16 @@ import java.util.concurrent.TimeUnit;
 import static no.kantega.pdf.api.DocumentType.Value.*;
 
 @ViableConversion(
-        from = {APPLICATION + "/" + DOC, APPLICATION + "/" + DOCX, APPLICATION + "/" + WORD_ANY},
-        to = APPLICATION + "/" + PDF)
+        from = {APPLICATION + "/" + DOC,
+                APPLICATION + "/" + DOCX,
+                APPLICATION + "/" + WORD_ANY,
+                APPLICATION + "/" + RTF,
+                TEXT + "/" + RTF},
+        to = {APPLICATION + "/" + PDF,
+                APPLICATION + "/" + DOC,
+                APPLICATION + "/" + DOCX,
+                APPLICATION + "/" + RTF,
+                TEXT + "/" + RTF})
 public class MicrosoftWordBridge extends AbstractExternalConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
@@ -74,23 +84,27 @@ public class MicrosoftWordBridge extends AbstractExternalConverter {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, File target) {
-        return new ProcessFutureWrapper(doStartConversion(source, target));
+    public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
+        return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
     }
 
-    public StartedProcess doStartConversion(File source, File target) {
-        LOGGER.info("Requested conversion from {} to {}", source, target);
+    public StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
+        LOGGER.info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
         try {
+            MicrosoftWordFormat microsoftWordFormat = MicrosoftWordFormat.of(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
             return makePresetProcessExecutor()
                     .command("cmd", "/C",
-                            quote(conversionScript.getAbsolutePath(), source.getAbsolutePath(), target.getAbsolutePath()))
+                            quote(conversionScript.getAbsolutePath(),
+                                    source.getAbsolutePath(),
+                                    target.getAbsolutePath(),
+                                    microsoftWordFormat.getValue()))
                     .destroyOnExit()
-                    .addListener(new MicrosoftWordTargetNameCorrector(target))
+                    .addListener(new MicrosoftWordTargetNameCorrector(target, microsoftWordFormat.getFileExtension()))
                     .start();
         } catch (IOException e) {
-            String message = String.format("Could not start shell script ('%s') for conversion of '%s' to '%s' ",
-                    conversionScript, source, target);
+            String message = String.format("Could not start shell script ('%s') for conversion of '%s' (%s) to '%s' (%s)",
+                    conversionScript, source, sourceType, target, targetType);
             LOGGER.error(message, e);
             throw new ConverterAccessException(message, e);
         }

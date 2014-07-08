@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
@@ -61,6 +63,11 @@ public class LocalConverter extends ConverterAdapter {
 
     protected IConversionManager makeConversionManager(File baseFolder, long processTimeout, TimeUnit unit) {
         return new DefaultConversionManager(baseFolder, processTimeout, unit);
+    }
+
+    @Override
+    public Map<DocumentType, Set<DocumentType>> supported() {
+        return conversionManager.supported();
     }
 
     @Override

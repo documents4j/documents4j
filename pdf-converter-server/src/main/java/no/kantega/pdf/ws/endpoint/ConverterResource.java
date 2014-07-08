@@ -29,7 +29,8 @@ public class ConverterResource {
                 .entity(new ConverterServerInformation(
                         webConverterConfiguration.getConverter().isOperational(),
                         webConverterConfiguration.getTimeout(),
-                        ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION))
+                        ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION,
+                        webConverterConfiguration.getConverter().supported()))
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

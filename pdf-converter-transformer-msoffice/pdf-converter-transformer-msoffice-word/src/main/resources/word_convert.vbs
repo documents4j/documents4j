@@ -1,21 +1,13 @@
-' See http://msdn2.microsoft.com/en-us/library/bb238158.aspx
-Const wdFormatPDF = 17  ' PDF format.
-Const wdFormatXPS = 18  ' XPS format.
+
 
 Const WdDoNotSaveChanges = 0
 
 Dim arguments
 Set arguments = WScript.Arguments
 
-' Make sure that there are two arguments given.
-Function CheckUserArguments()
-  If arguments.Unnamed.Count <> 2 Then
-    WScript.Quit -5
-  End If
-End Function
-
 ' Transforms a MS Word file into PDF.
-Function DocToPdf( docInputFile, pdfOutputFile )
+' See http://msdn.microsoft.com/en-us/library/bb238158%28v=office.12%29.aspx
+Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
   Dim fileSystemObject
   Dim wordApplication
@@ -33,14 +25,14 @@ Function DocToPdf( docInputFile, pdfOutputFile )
 
   ' Find the Word file on the file system.
   Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
-  docInputFile = fileSystemObject.GetAbsolutePathName(docInputFile)
+  inputFile = fileSystemObject.GetAbsolutePathName(inputFile)
 
   ' Convert the Word file only if it exists.
-  If (fileSystemObject.FileExists(docInputFile)) Then
+  If (fileSystemObject.FileExists(inputFile)) Then
 
     ' Open the MS Word document.
     On Error Resume Next
-    Set wordDocument = wordDocuments.Open(docInputFile, false, true, false)
+    Set wordDocument = wordDocuments.Open(inputFile, false, true, false)
     If Err <> 0 then
         WScript.Quit -2
     End If
@@ -48,7 +40,7 @@ Function DocToPdf( docInputFile, pdfOutputFile )
 
     ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
     On Error Resume Next
-    wordDocument.SaveAs pdfOutputFile, wdFormatPDF
+    wordDocument.SaveAs outputFile, CInt(formatEnumeration)
     ' Close the MS Word document.
     wordDocument.Close WdDoNotSaveChanges
     If Err <> 0 then
@@ -69,5 +61,4 @@ Function DocToPdf( docInputFile, pdfOutputFile )
 End Function
 
 ' Execute script
-Call CheckUserArguments()
-Call DocToPdf( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1) )
+Call ConvertFile( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1), arguments.Unnamed.Item(2) )

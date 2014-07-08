@@ -2,6 +2,8 @@ package no.kantega.pdf.api;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A converter that allows the conversion of MS Word files to PDF. A converter might have an active life cycle such
@@ -69,6 +71,14 @@ public interface IConverter {
      * @return The current conversion specification.
      */
     IConversionJobWithSourceUnspecified convert(IFileSource source);
+
+    /**
+     * Returns a mapping of all conversions that are supported by the backing conversion engine.
+     *
+     * @return A map of all possible conversions with the key describing the input types and the set
+     * describing the formats that this input type can be converted into.
+     */
+    Map<DocumentType, Set<DocumentType>> supported();
 
     /**
      * Checks if this converter is currently operational.

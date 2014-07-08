@@ -13,12 +13,12 @@ class MicrosoftWordTargetNameCorrector extends ProcessListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
 
-    private static final String PDF_FILE_EXTENSION = "pdf";
-
     private final File target;
+    private final String fileExtension;
 
-    public MicrosoftWordTargetNameCorrector(File target) {
+    public MicrosoftWordTargetNameCorrector(File target, String fileExtension) {
         this.target = target;
+        this.fileExtension = fileExtension;
     }
 
     @Override
@@ -35,7 +35,7 @@ class MicrosoftWordTargetNameCorrector extends ProcessListener {
     }
 
     private File makeRenamedTarget() {
-        return new File(target.getAbsolutePath().concat(target.getName().endsWith(".") ? "" : ".").concat(PDF_FILE_EXTENSION));
+        return new File(target.getAbsolutePath().concat(target.getName().endsWith(".") ? "" : ".").concat(fileExtension));
     }
 
     private void tryCleanTarget(File renamedTarget) {

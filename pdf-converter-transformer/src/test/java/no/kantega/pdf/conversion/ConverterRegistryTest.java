@@ -50,7 +50,7 @@ public class ConverterRegistryTest {
     private static class ViableAnnotationMock implements IExternalConverter {
 
         @Override
-        public Future<Boolean> startConversion(File source, File target) {
+        public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
             throw new AssertionError();
         }
 
@@ -69,7 +69,7 @@ public class ConverterRegistryTest {
     private static class ViableAnnotationsMock implements IExternalConverter {
 
         @Override
-        public Future<Boolean> startConversion(File source, File target) {
+        public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
             throw new AssertionError();
         }
 

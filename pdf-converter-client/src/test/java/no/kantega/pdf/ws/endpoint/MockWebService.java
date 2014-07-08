@@ -12,6 +12,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 
 import static org.junit.Assert.assertNotEquals;
 
@@ -36,7 +37,8 @@ public class MockWebService {
                 .entity(new ConverterServerInformation(
                         operational,
                         timeout,
-                        ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION))
+                        ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION,
+                        Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE))))
                 .type(MediaType.APPLICATION_XML_TYPE)
                 .build();
     }

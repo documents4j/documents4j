@@ -1,6 +1,7 @@
 package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.AbstractWordBasedTest;
+import no.kantega.pdf.api.DocumentType;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +41,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     private void testConversionValid(File docx, File pdf) throws Exception {
         assertTrue(docx.exists());
         assertFalse(pdf.exists());
-        StartedProcess conversion = getExternalConverter().doStartConversion(docx, pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(docx, DocumentType.MS_WORD, pdf, DocumentType.PDF);
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -51,36 +52,42 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     public void testConversionValid() throws Exception {
         // Check if the script can be run several times.
         for (int i = 0; i < CONVERSION_INVOCATIONS; i++) {
-            testConversionValid(validDocx(true), makeTarget(true));
+            testConversionValid(validSourceFile(true), makeTarget(true));
         }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidTargetOtherFileExtension() throws Exception {
-        testConversionValid(validDocx(true), makeTarget("target.file", true));
+        testConversionValid(validSourceFile(true), makeTarget("target.file", true));
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidTargetNoFileExtension() throws Exception {
-        testConversionValid(validDocx(true), makeTarget("target", true));
+        testConversionValid(validSourceFile(true), makeTarget("target", true));
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidSourceNoFileExtension() throws Exception {
         File docx = new File(getFileFolder(), "source");
         assertFalse(docx.exists());
-        assertTrue(validDocx(false).renameTo(docx));
-        testConversionValid(docx, makeTarget(true));
-        assertTrue(docx.delete());
+        assertTrue(validSourceFile(false).renameTo(docx));
+        try {
+            testConversionValid(docx, makeTarget(true));
+        } finally {
+            assertTrue(docx.delete());
+        }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidSourceOtherFileExtension() throws Exception {
         File docx = new File(getFileFolder(), "source.file");
         assertFalse(docx.exists());
-        assertTrue(validDocx(false).renameTo(docx));
-        testConversionValid(docx, makeTarget(true));
-        assertTrue(docx.delete());
+        assertTrue(validSourceFile(false).renameTo(docx));
+        try {
+            testConversionValid(docx, makeTarget(true));
+        } finally {
+            assertTrue(docx.delete());
+        }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS * 2L)
@@ -100,7 +107,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionCorrupt() throws Exception {
         File pdf = makeTarget(false);
-        StartedProcess conversion = getExternalConverter().doStartConversion(corruptDocx(true), pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(corruptSourceFile(true), DocumentType.MS_WORD, pdf, DocumentType.PDF);
         assertEquals(
                 ExternalConverterScriptResult.ILLEGAL_INPUT.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -110,7 +117,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionInexistent() throws Exception {
         File pdf = makeTarget(false);
-        StartedProcess conversion = getExternalConverter().doStartConversion(inexistentDocx(), pdf);
+        StartedProcess conversion = getExternalConverter().doStartConversion(inexistentSourceFile(), DocumentType.MS_WORD, pdf, DocumentType.PDF);
         assertEquals(
                 ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitValue().intValue(),
                 conversion.future().get().exitValue());
@@ -128,18 +135,18 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         fileOutputStream.close();
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue());
+                getExternalConverter().doStartConversion(validSourceFile(true), DocumentType.MS_WORD, pdf, DocumentType.PDF).future().get().exitValue());
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionSourceLocked() throws Exception {
-        File docx = validDocx(true);
+        File docx = validSourceFile(true);
         FileInputStream fileInputStream = new FileInputStream(docx);
         fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);
         try {
             assertEquals(
                     ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                    getExternalConverter().doStartConversion(docx, makeTarget(true)).future().get().exitValue());
+                    getExternalConverter().doStartConversion(docx, DocumentType.MS_WORD, makeTarget(true), DocumentType.PDF).future().get().exitValue());
         } finally {
             fileInputStream.close();
         }
@@ -154,7 +161,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         try {
             assertEquals(
                     ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitValue().intValue(),
-                    getExternalConverter().doStartConversion(validDocx(true), pdf).future().get().exitValue());
+                    getExternalConverter().doStartConversion(validSourceFile(true), DocumentType.MS_WORD, pdf, DocumentType.PDF).future().get().exitValue());
         } finally {
             fileOutputStream.close();
         }
@@ -164,7 +171,7 @@ public class MicrosoftWordBridgeConversionTest extends AbstractWordBasedTest {
         @Override
         public void run() {
             try {
-                testConversionValid(validDocx(true), makeTarget(true));
+                testConversionValid(validSourceFile(true), makeTarget(true));
             } catch (Exception e) {
                 e.printStackTrace();
             }

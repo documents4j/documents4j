@@ -1,6 +1,7 @@
 package no.kantega.pdf.conversion;
 
 import com.google.common.base.Objects;
+import no.kantega.pdf.api.DocumentType;
 
 import java.io.File;
 import java.util.concurrent.Future;
@@ -30,8 +31,8 @@ public class MockExternalConverter implements IExternalConverter {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, File target) {
-        return delegate.startConversion(source, target);
+    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
+        return delegate.startConversion(source, sourceFormat, target, targetFormat);
     }
 
     public IExternalConverter getDelegate() {

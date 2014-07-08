@@ -12,6 +12,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -39,6 +40,7 @@ public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTe
         assertEquals(DEFAULT_TIMEOUT, converterServerInformation.getTimeout());
         assertEquals(CONVERTER_IS_OPERATIONAL, converterServerInformation.isOperational());
         assertEquals(ConverterNetworkProtocol.CURRENT_PROTOCOL_VERSION, converterServerInformation.getProtocolVersion());
+        assertEquals(Collections.singletonMap(SOURCE_FORMAT, Collections.singleton(TARGET_FORMAT)), converterServerInformation.getSupported());
     }
 
     @Test(timeout = DEFAULT_TIMEOUT)

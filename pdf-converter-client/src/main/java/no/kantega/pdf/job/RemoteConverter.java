@@ -26,6 +26,8 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
 import java.net.URI;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RunnableFuture;
@@ -115,6 +117,11 @@ public class RemoteConverter extends ConverterAdapter {
     @Override
     public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
         return new RemoteConversionJobWithSourceUnspecified(source);
+    }
+
+    @Override
+    public Map<DocumentType, Set<DocumentType>> supported() {
+        return fetchConverterServerInformation().getSupported();
     }
 
     @Override

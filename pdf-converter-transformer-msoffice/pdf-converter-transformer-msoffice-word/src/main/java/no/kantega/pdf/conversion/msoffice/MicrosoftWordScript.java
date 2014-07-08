@@ -14,7 +14,7 @@ import java.util.Random;
 
 enum MicrosoftWordScript {
 
-    WORD_PDF_CONVERSION_SCRIPT("/doc2pdf.vbs"),
+    WORD_PDF_CONVERSION_SCRIPT("/word_convert.vbs"),
     WORD_STARTUP_SCRIPT("/word_start.vbs"),
     WORD_SHUTDOWN_SCRIPT("/word_shutdown.vbs"),
     WORD_ASSERT_SCRIPT("/word_assert.vbs");

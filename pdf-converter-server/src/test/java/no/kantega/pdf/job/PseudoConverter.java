@@ -8,6 +8,9 @@ import no.kantega.pdf.api.*;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertTrue;
@@ -29,6 +32,11 @@ public class PseudoConverter extends ConverterAdapter {
     @Override
     public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
         return new PseudoConversionJobWithSourceUnspecified(source);
+    }
+
+    @Override
+    public Map<DocumentType, Set<DocumentType>> supported() {
+        return Collections.singletonMap(legalSourceFormat, Collections.singleton(legalTargetFormat));
     }
 
     @Override

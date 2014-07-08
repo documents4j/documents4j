@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 public abstract class MockConversionManager implements IConversionManager {
@@ -55,6 +58,11 @@ public abstract class MockConversionManager implements IConversionManager {
                 throw new AssertionError(String.format("Could not close input stream for %s", source));
             }
         }
+    }
+
+    @Override
+    public Map<DocumentType, Set<DocumentType>> supported() {
+        return Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE));
     }
 
     protected abstract MockConversion.RichMessage resolve(InputStream inputStream);

@@ -98,6 +98,10 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
         return documentTypeProvider.getTargetDocumentType();
     }
 
+    public boolean supportsLockedConversion() {
+        return documentTypeProvider.supportsLockedConversion();
+    }
+
     public File getFileFolder() {
         return files;
     }

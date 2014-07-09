@@ -23,7 +23,6 @@ public class FileRow implements Serializable {
         FILE_EXTENSIONS = new HashMap<String, String>();
         FILE_EXTENSIONS.put(DocumentType.DOC.toString(), "doc");
         FILE_EXTENSIONS.put(DocumentType.DOCX.toString(), "docx");
-        FILE_EXTENSIONS.put(DocumentType.ODT.toString(), "odt");
         FILE_EXTENSIONS.put(DocumentType.XLS.toString(), "xls");
         FILE_EXTENSIONS.put(DocumentType.XLSX.toString(), "xlsx");
         FILE_EXTENSIONS.put(DocumentType.ODS.toString(), "ods");

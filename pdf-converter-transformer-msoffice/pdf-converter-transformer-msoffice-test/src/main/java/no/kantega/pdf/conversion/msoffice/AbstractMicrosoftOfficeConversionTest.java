@@ -23,8 +23,8 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMicrosoftOfficeConversionTest.class);
 
-    private static final int CONVERSION_THREADS = 3;
-    private static final int CONVERSION_INVOCATIONS = 4;
+    protected static final int CONVERSION_THREADS = 3;
+    protected static final int CONVERSION_INVOCATIONS = 4;
 
     protected AbstractMicrosoftOfficeConversionTest(DocumentTypeProvider documentTypeProvider) {
         super(documentTypeProvider);
@@ -149,6 +149,9 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionSourceLocked() throws Exception {
+        if (!supportsLockedConversion()) {
+            return;
+        }
         File source = validSourceFile(true);
         FileInputStream fileInputStream = new FileInputStream(source);
         fileInputStream.getChannel().lock(0L, Long.MAX_VALUE, true);

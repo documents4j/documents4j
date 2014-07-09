@@ -7,19 +7,26 @@ public class DocumentTypeProvider {
     private final Document valid, corrupt, inexistent;
     private final DocumentType sourceDocumentType, targetDocumentType;
     private final String targetFileNameSuffix;
+    private final boolean supportsLockedConversion;
 
     public DocumentTypeProvider(Document valid,
                                 Document corrupt,
                                 Document inexistent,
                                 DocumentType sourceDocumentType,
                                 DocumentType targetDocumentType,
-                                String targetFileNameSuffix) {
+                                String targetFileNameSuffix,
+                                boolean supportsLockedConversion) {
         this.valid = valid;
         this.corrupt = corrupt;
         this.inexistent = inexistent;
         this.sourceDocumentType = sourceDocumentType;
         this.targetDocumentType = targetDocumentType;
         this.targetFileNameSuffix = targetFileNameSuffix;
+        this.supportsLockedConversion = supportsLockedConversion;
+    }
+
+    public boolean supportsLockedConversion() {
+        return supportsLockedConversion;
     }
 
     public Document getValid() {

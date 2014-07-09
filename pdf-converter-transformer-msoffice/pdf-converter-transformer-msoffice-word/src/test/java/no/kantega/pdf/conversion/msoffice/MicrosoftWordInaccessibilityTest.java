@@ -18,6 +18,7 @@ public class MicrosoftWordInaccessibilityTest extends AbstractMicrosoftOfficeIna
                 MicrosoftWordDocument.DOCX_INEXISTENT,
                 DocumentType.DOCX,
                 DocumentType.PDF,
-                "pdf"));
+                "pdf",
+                true));
     }
 }

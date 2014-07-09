@@ -20,13 +20,16 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMicrosoftOfficeBridge.class);
 
     private final File conversionScript;
+    private final boolean renameTargetOnWrongFileExtensionForPdf;
 
     protected AbstractMicrosoftOfficeBridge(File baseFolder,
                                             long processTimeout,
                                             TimeUnit processTimeoutUnit,
-                                            MicrosoftOfficeScript conversionScript) {
+                                            MicrosoftOfficeScript conversionScript,
+                                            boolean renameTargetOnWrongFileExtensionForPdf) {
         super(baseFolder, processTimeout, processTimeoutUnit);
         this.conversionScript = conversionScript.materializeIn(baseFolder);
+        this.renameTargetOnWrongFileExtensionForPdf = renameTargetOnWrongFileExtensionForPdf;
     }
 
     protected void tryStart(MicrosoftOfficeScript startupScript) {
@@ -71,7 +74,9 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                                     target.getAbsolutePath(),
                                     microsoftOfficeFormat.getValue()))
                     .destroyOnExit()
-                    .addListener(new MicrosoftOfficeTargetNameCorrector(target, microsoftOfficeFormat.getFileExtension()))
+                    .addListener(new MicrosoftOfficeTargetNameCorrector(target,
+                            microsoftOfficeFormat.getFileExtension(),
+                            renameTargetOnWrongFileExtensionForPdf))
                     .start();
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' (%s) to '%s' (%s)",

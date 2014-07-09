@@ -15,15 +15,17 @@ class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
 
     private final File target;
     private final String fileExtension;
+    private final boolean renameOnWrongExtensionForPdf;
 
-    public MicrosoftOfficeTargetNameCorrector(File target, String fileExtension) {
+    public MicrosoftOfficeTargetNameCorrector(File target, String fileExtension, boolean renameOnWrongExtensionForPdf) {
         this.target = target;
         this.fileExtension = fileExtension;
+        this.renameOnWrongExtensionForPdf = renameOnWrongExtensionForPdf;
     }
 
     @Override
     public void afterStop(Process process) {
-        if (conversionSuccessful(process) && targetHasNoFileExtension()) {
+        if (conversionSuccessful(process) && (targetHasNoFileExtension() || (renameOnWrongExtensionForPdf && targetHasWrongFileExtensionForPdf()))) {
             File renamedTarget = makeRenamedTarget();
             LOGGER.trace("Rename file {} to {}", renamedTarget, target);
             tryCleanTarget(renamedTarget);
@@ -50,7 +52,11 @@ class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
     }
 
     private boolean targetHasNoFileExtension() {
-        return Files.getFileExtension(target.getName()).length() == 0;
+        return !fileExtension.equals("txt") && Files.getFileExtension(target.getName()).length() == 0;
+    }
+
+    private boolean targetHasWrongFileExtensionForPdf() {
+        return fileExtension.equals("pdf") && !Files.getFileExtension(target.getName()).equals(fileExtension);
     }
 
     private boolean conversionSuccessful(Process process) {

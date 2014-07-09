@@ -19,6 +19,7 @@ import static no.kantega.pdf.api.DocumentType.Value.*;
                 APPLICATION + "/" + XML,
                 APPLICATION + "/" + MHTML},
         to = {APPLICATION + "/" + PDF,
+                APPLICATION + "/" + PDFA,
                 APPLICATION + "/" + DOC,
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + RTF,
@@ -32,7 +33,7 @@ public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {
     private static final Object WORD_LOCK = new Object();
 
     public MicrosoftWordBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftWordScript.CONVERSION);
+        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftWordScript.CONVERSION, false);
         startUp();
     }
 

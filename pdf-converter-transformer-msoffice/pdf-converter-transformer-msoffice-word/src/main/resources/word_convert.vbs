@@ -12,7 +12,6 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   Dim fileSystemObject
   Dim wordApplication
   Dim wordDocument
-  Dim wordDocuments
 
   ' Get the running instance of MS Word. If Word is not running, exit the conversion.
   On Error Resume Next
@@ -20,7 +19,6 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   If Err <> 0 Then
     WScript.Quit -6
   End If
-  Set wordDocuments = wordApplication.Documents
   On Error GoTo 0
 
   ' Find the source file on the file system.
@@ -32,7 +30,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Attempt to open the source document.
     On Error Resume Next
-    Set wordDocument = wordDocuments.Open(inputFile, false, true, false)
+    Set wordDocument = wordApplication.Documents.Open(inputFile, False, True)
     If Err <> 0 Then
         WScript.Quit -2
     End If

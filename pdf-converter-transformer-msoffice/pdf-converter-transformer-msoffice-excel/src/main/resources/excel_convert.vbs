@@ -45,7 +45,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     End If
 
     ' Close the source document.
-    excelDocument.Close
+    excelDocument.Close False
     If Err <> 0 Then
         WScript.Quit -3
     End If

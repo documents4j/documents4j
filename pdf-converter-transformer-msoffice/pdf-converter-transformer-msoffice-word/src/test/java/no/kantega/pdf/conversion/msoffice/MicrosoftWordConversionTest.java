@@ -16,19 +16,16 @@ public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversi
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.PDF, "pdf"},
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.PDFA, "pdf"},
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.XML, "xml"},
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.RTF, "rtf"},
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.MHTML, "mht"},
-                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.ODT, "odt"},
-                {RTF_VALID, RTF_CORRUPT, RTF_INEXISTENT, DocumentType.RTF, DocumentType.PDF, "pdf"},
-                {XML_VALID, XML_CORRUPT, XML_INEXISTENT, DocumentType.XML, DocumentType.PDF, "pdf"},
-                {ODT_VALID, ODT_CORRUPT, ODT_INEXISTENT, DocumentType.ODT, DocumentType.PDF, "pdf"},
-                {ODT_VALID, ODT_CORRUPT, ODT_INEXISTENT, DocumentType.ODT, DocumentType.DOCX, "docx"},
-                {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf"},
-                {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.DOCX, "docx"},
-                {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf"}
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.PDF, "pdf", true},
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.PDFA, "pdf", true},
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.XML, "xml", true},
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.RTF, "rtf", true},
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.MHTML, "mhtml", true},
+                {RTF_VALID, RTF_CORRUPT, RTF_INEXISTENT, DocumentType.RTF, DocumentType.PDF, "pdf", true},
+                {XML_VALID, XML_CORRUPT, XML_INEXISTENT, DocumentType.XML, DocumentType.PDF, "pdf", true},
+                {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf", false},
+                {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.DOCX, "docx", false},
+                {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf", true}
         });
     }
 
@@ -42,7 +39,8 @@ public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversi
                                        Document inexistent,
                                        DocumentType sourceDocumentType,
                                        DocumentType targetDocumentType,
-                                       String targetFileNameSuffix) {
-        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix));
+                                       String targetFileNameSuffix,
+                                       boolean supportsLockedConversion) {
+        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
     }
 }

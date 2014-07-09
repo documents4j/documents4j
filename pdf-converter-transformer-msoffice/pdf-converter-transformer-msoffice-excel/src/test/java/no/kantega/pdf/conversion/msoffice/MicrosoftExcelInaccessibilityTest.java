@@ -16,6 +16,7 @@ public class MicrosoftExcelInaccessibilityTest extends AbstractMicrosoftOfficeIn
                 MicrosoftExcelDocument.XLSX_INEXISTENT,
                 DocumentType.XLSX,
                 DocumentType.PDF,
-                "pdf"));
+                "pdf",
+                true));
     }
 }

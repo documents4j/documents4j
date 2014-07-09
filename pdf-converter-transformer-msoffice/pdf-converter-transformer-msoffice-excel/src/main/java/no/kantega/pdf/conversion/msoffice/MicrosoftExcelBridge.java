@@ -14,11 +14,11 @@ import static no.kantega.pdf.api.DocumentType.Value.*;
         from = {APPLICATION + "/" + XLS,
                 APPLICATION + "/" + XLSX,
                 APPLICATION + "/" + EXCEL_ANY,
-                TEXT + "/" + CSV,
-                APPLICATION + "/" + XML},
+                APPLICATION + "/" + ODS},
         to = {APPLICATION + "/" + PDF,
                 APPLICATION + "/" + XLS,
                 APPLICATION + "/" + XLSX,
+                APPLICATION + "/" + ODS,
                 TEXT + "/" + CSV,
                 TEXT + "/" + PLAIN,
                 APPLICATION + "/" + XML})
@@ -29,7 +29,7 @@ public class MicrosoftExcelBridge extends AbstractMicrosoftOfficeBridge {
     private static final Object WORD_LOCK = new Object();
 
     public MicrosoftExcelBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftExcelScript.CONVERSION);
+        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftExcelScript.CONVERSION, true);
         startUp();
     }
 

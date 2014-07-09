@@ -2,6 +2,8 @@ package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.api.DocumentType;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -16,19 +18,13 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-//                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.PDF, "pdf"},
-//                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.XML, "xml"},
-                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.CSV, "csv"},
-//                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.MHTML, "mht"},
-//                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.ODS, "ods"},
-//                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.TEXT, "txt"},
-//                {CSV_VALID, CSV_CORRUPT, CSV_INEXISTENT, DocumentType.CSV, DocumentType.PDF, "pdf"},
-//                {XML_VALID, XML_CORRUPT, XML_INEXISTENT, DocumentType.XML, DocumentType.PDF, "pdf"},
-//                {ODS_VALID, ODS_CORRUPT, ODS_INEXISTENT, DocumentType.ODT, DocumentType.PDF, "pdf"},
-//                {ODS_VALID, ODS_CORRUPT, ODS_INEXISTENT, DocumentType.ODT, DocumentType.DOCX, "docx"},
-//                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf"},
-//                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.DOC, DocumentType.DOCX, "docx"},
-//                {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf"}
+                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.PDF, "pdf", true},
+                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.XML, "xml", true},
+                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.CSV, "csv", true},
+                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.ODS, "ods", true},
+                {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.TEXT, "txt", true},
+                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf", false},
+                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.XLS, DocumentType.XLSX, "xlsx", false}
         });
     }
 
@@ -42,7 +38,15 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
                                         Document inexistent,
                                         DocumentType sourceDocumentType,
                                         DocumentType targetDocumentType,
-                                        String targetFileNameSuffix) {
-        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix));
+                                        String targetFileNameSuffix,
+                                        boolean supportsLockedConversion) {
+        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
+    }
+
+    @Override
+    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS * 2L)
+    @Ignore("MS Excel is not equally robust as MS Word and fails under high stress")
+    public void testConversionConcurrently() throws Exception {
+        super.testConversionConcurrently();
     }
 }

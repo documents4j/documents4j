@@ -8,7 +8,6 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType RTF = new DocumentType(Value.APPLICATION, Value.RTF);
     public static final DocumentType DOCX = new DocumentType(Value.APPLICATION, Value.DOCX);
     public static final DocumentType DOC = new DocumentType(Value.APPLICATION, Value.DOC);
-    public static final DocumentType ODT = new DocumentType(Value.APPLICATION, Value.ODT);
     public static final DocumentType MS_EXCEL = new DocumentType(Value.APPLICATION, Value.EXCEL_ANY);
     public static final DocumentType XLSX = new DocumentType(Value.APPLICATION, Value.XLSX);
     public static final DocumentType XLS = new DocumentType(Value.APPLICATION, Value.XLS);
@@ -81,12 +80,10 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
         public static final String DOCX = "vnd.openxmlformats-officedocument.wordprocessingml.document";
         public static final String WORD_ANY = "vnd.no.kantega.pdf.any-msword";
 
-        public static final String ODT = "vnd.oasis.opendocument.text";
-        public static final String ODS = "vnd.oasis.opendocument.spreadsheet";
-
         public static final String XLS = "vnd.ms-excel";
         public static final String XLSX = "vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         public static final String EXCEL_ANY = "vnd.no.kantega.pdf.any-msexcel";
+        public static final String ODS = "vnd.oasis.opendocument.spreadsheet";
 
         public static final String PDF = "pdf";
         public static final String PDFA = "vnd.no.kantega.pdf.pdf-a";

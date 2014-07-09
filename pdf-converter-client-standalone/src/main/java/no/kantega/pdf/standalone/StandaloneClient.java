@@ -43,7 +43,6 @@ public class StandaloneClient {
         FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
         FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
         FILE_NAME_EXTENSIONS.put(DocumentType.DOCX, "docx");
-        FILE_NAME_EXTENSIONS.put(DocumentType.ODT, "odt");
         FILE_NAME_EXTENSIONS.put(DocumentType.XLS, "xls");
         FILE_NAME_EXTENSIONS.put(DocumentType.XLSX, "xlsx");
         FILE_NAME_EXTENSIONS.put(DocumentType.ODS, "ods");

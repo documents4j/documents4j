@@ -2,6 +2,9 @@ package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.api.DocumentType;
 
+/**
+ * A format <a href="http://msdn.microsoft.com/en-us/library/bb238158%28v=office.12%29.aspx">enumeration for MS Office</a>.
+ */
 public enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
 
     PDF("17", "pdf", DocumentType.PDF),
@@ -9,7 +12,7 @@ public enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
     DOCX("16", "docx", DocumentType.DOCX),
     DOC("0", "doc", DocumentType.DOC),
     RTF("6", "rtf", DocumentType.RTF),
-    MHTML("8", "mht", DocumentType.MHTML),
+    MHTML("9", "mht", DocumentType.MHTML),
     XML("11", "xml", DocumentType.XML);
 
     private final String value;

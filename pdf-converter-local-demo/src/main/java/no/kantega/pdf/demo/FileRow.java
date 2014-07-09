@@ -23,11 +23,17 @@ public class FileRow implements Serializable {
         FILE_EXTENSIONS = new HashMap<String, String>();
         FILE_EXTENSIONS.put(DocumentType.DOC.toString(), "doc");
         FILE_EXTENSIONS.put(DocumentType.DOCX.toString(), "docx");
-        FILE_EXTENSIONS.put(DocumentType.MHTML.toString(), "mhtml");
+        FILE_EXTENSIONS.put(DocumentType.ODT.toString(), "odt");
+        FILE_EXTENSIONS.put(DocumentType.XLS.toString(), "xls");
+        FILE_EXTENSIONS.put(DocumentType.XLSX.toString(), "xlsx");
+        FILE_EXTENSIONS.put(DocumentType.ODS.toString(), "ods");
         FILE_EXTENSIONS.put(DocumentType.PDF.toString(), "pdf");
-        FILE_EXTENSIONS.put(DocumentType.PDFA.toString(), "pdfa");
+        FILE_EXTENSIONS.put(DocumentType.PDFA.toString(), "pdf");
+        FILE_EXTENSIONS.put(DocumentType.MHTML.toString(), "mhtml");
         FILE_EXTENSIONS.put(DocumentType.RTF.toString(), "rtf");
         FILE_EXTENSIONS.put(DocumentType.XML.toString(), "xml");
+        FILE_EXTENSIONS.put(DocumentType.TEXT.toString(), "txt");
+        FILE_EXTENSIONS.put(DocumentType.CSV.toString(), "csv");
     }
 
     private final int row;

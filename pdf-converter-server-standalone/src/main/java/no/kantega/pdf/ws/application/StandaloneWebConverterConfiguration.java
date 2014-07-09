@@ -1,6 +1,7 @@
 package no.kantega.pdf.ws.application;
 
 import no.kantega.pdf.api.IConverter;
+import no.kantega.pdf.conversion.IExternalConverter;
 import no.kantega.pdf.job.LocalConverter;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.ext.Provider;
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Provider
@@ -23,17 +25,21 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
     private final long processTimeout;
     private final long requestTimeout;
 
+    private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
+
     private volatile IConverter converter;
 
     public StandaloneWebConverterConfiguration(File baseFolder,
                                                int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                                               long processTimeout, long requestTimeout) {
+                                               long processTimeout, long requestTimeout,
+                                               Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration) {
         this.baseFolder = baseFolder;
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
         this.keepAliveTime = keepAliveTime;
         this.processTimeout = processTimeout;
         this.requestTimeout = requestTimeout;
+        this.converterConfiguration = converterConfiguration;
     }
 
     @Override
@@ -49,11 +55,12 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
     @Override
     public void onStartup(Container container) {
         LOGGER.info("Standalone conversion server is starting: starting up local converter");
-        this.converter = LocalConverter.builder()
+        LocalConverter.Builder builder = LocalConverter.builder()
                 .baseFolder(baseFolder)
                 .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
-                .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
-                .build();
+                .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS);
+        // TODO: Configure enabled and disabled converters.
+        this.converter = builder.build();
         LOGGER.info("Standalone conversion server is starting: local converter is started");
     }
 

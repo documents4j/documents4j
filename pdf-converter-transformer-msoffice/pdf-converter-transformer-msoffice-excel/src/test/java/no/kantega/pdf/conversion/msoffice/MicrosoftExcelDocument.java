@@ -1,4 +1,4 @@
-package no.kantega.pdf;
+package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -6,15 +6,23 @@ import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
 
-public enum TestResource {
+public enum MicrosoftExcelDocument implements Document {
 
-    DOCX_VALID("/valid.docx"),
-    DOCX_CORRUPT("/corrupt.docx"),
-    DOCX_INEXISTENT("/inexistent.docx"),
+    XLS_VALID("/valid.xls"),
+    XLS_CORRUPT("/corrupt.xls"),
+    XLS_INEXISTENT("/inexistent.xls"),
 
-    RTF_VALID("/valid.rtf"),
-    RTF_CORRUPT("/corrupt.rtf"),
-    RTF_INEXISTENT("/inexistent.rtf"),
+    XLSX_VALID("/valid.xlsx"),
+    XLSX_CORRUPT("/corrupt.xlsx"),
+    XLSX_INEXISTENT("/inexistent.xlsx"),
+
+    ODS_VALID("/valid.ods"),
+    ODS_CORRUPT("/corrupt.ods"),
+    ODS_INEXISTENT("/inexistent.ods"),
+
+    CSV_VALID("/valid.rtf"),
+    CSV_CORRUPT("/corrupt.rtf"),
+    CSV_INEXISTENT("/inexistent.rtf"),
 
     XML_VALID("/valid.xml"),
     XML_CORRUPT("/corrupt.xml"),
@@ -26,18 +34,21 @@ public enum TestResource {
 
     private final String path;
 
-    private TestResource(String path) {
+    private MicrosoftExcelDocument(String path) {
         this.path = path;
     }
 
+    @Override
     public String getName() {
         return path.substring(1);
     }
 
+    @Override
     public File materializeIn(File folder) {
         return materializeIn(folder, path);
     }
 
+    @Override
     public File materializeIn(File folder, String name) {
         File file = new File(folder, name);
         try {
@@ -48,6 +59,7 @@ public enum TestResource {
         }
     }
 
+    @Override
     public File absoluteTo(File folder) {
         return new File(folder, path);
     }

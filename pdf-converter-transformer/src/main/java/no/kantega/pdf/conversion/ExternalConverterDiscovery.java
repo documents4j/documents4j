@@ -11,7 +11,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 enum ExternalConverterDiscovery {
 
-    MICROSOFT_WORD("no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge");
+    MICROSOFT_WORD("no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge"),
+    MICROSOFT_EXCEL("no.kantega.pdf.conversion.msoffice.MicrosoftExcelBridge");
+
     private final String className;
 
     private ExternalConverterDiscovery(String className) {

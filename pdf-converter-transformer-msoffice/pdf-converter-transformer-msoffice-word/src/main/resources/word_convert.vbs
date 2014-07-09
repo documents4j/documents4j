@@ -1,3 +1,4 @@
+' See http://msdn.microsoft.com/en-us/library/bb243311%28v=office.12%29.aspx
 Const WdDoNotSaveChanges = 0
 Const WdExportFormatPDF = 17
 Const MagicFormatPDFA = 999
@@ -5,7 +6,7 @@ Const MagicFormatPDFA = 999
 Dim arguments
 Set arguments = WScript.Arguments
 
-' Transforms a file using word into the given format.
+' Transforms a file using MS Word into the given format.
 Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
   Dim fileSystemObject
@@ -22,14 +23,14 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   Set wordDocuments = wordApplication.Documents
   On Error GoTo 0
 
-  ' Find the Word file on the file system.
+  ' Find the source file on the file system.
   Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
   inputFile = fileSystemObject.GetAbsolutePathName(inputFile)
 
-  ' Convert the Word file only if it exists.
+  ' Convert the source file only if it exists.
   If fileSystemObject.FileExists(inputFile) Then
 
-    ' Open the MS Word document.
+    ' Attempt to open the source document.
     On Error Resume Next
     Set wordDocument = wordDocuments.Open(inputFile, false, true, false)
     If Err <> 0 Then
@@ -39,7 +40,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
     On Error Resume Next
-    If  formatEnumeration = MagicFormatPDFA Then
+    If formatEnumeration = MagicFormatPDFA Then
       wordDocument.ExportAsFixedFormat outputFile, _
                                        WdExportFormatPDF, _
                                        False, _
@@ -49,7 +50,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
       wordDocument.SaveAs outputFile, formatEnumeration
     End If
 
-    ' Close the MS Word document.
+    ' Close the source document.
     wordDocument.Close WdDoNotSaveChanges
     If Err <> 0 Then
         WScript.Quit -3
@@ -68,5 +69,5 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
 End Function
 
-' Execute script
+' Execute the script.
 Call ConvertFile( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1), CInt(arguments.Unnamed.Item(2)) )

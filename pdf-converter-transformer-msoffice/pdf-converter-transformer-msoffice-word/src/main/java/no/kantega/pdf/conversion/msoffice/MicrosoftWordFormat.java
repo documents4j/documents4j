@@ -2,13 +2,13 @@ package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.api.DocumentType;
 
-public enum MicrosoftWordFormat {
+public enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
 
     PDF("17", "pdf", DocumentType.PDF),
     PDFA("999", "pdf", DocumentType.PDFA),
-    RTF("6", "rtf", DocumentType.RTF),
     DOCX("16", "docx", DocumentType.DOCX),
     DOC("0", "doc", DocumentType.DOC),
+    RTF("6", "rtf", DocumentType.RTF),
     MHTML("8", "mht", DocumentType.MHTML),
     XML("11", "xml", DocumentType.XML);
 
@@ -22,7 +22,7 @@ public enum MicrosoftWordFormat {
         this.documentType = documentType;
     }
 
-    public static MicrosoftWordFormat of(DocumentType documentType) {
+    public static MicrosoftOfficeFormat of(DocumentType documentType) {
         for (MicrosoftWordFormat enumeration : MicrosoftWordFormat.values()) {
             if (enumeration.documentType.equals(documentType)) {
                 return enumeration;
@@ -31,10 +31,12 @@ public enum MicrosoftWordFormat {
         throw new IllegalArgumentException("Unknown document type: " + documentType);
     }
 
+    @Override
     public String getValue() {
         return value;
     }
 
+    @Override
     public String getFileExtension() {
         return fileExtension;
     }

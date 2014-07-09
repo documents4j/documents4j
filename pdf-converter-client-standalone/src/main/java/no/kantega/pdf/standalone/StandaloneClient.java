@@ -43,11 +43,17 @@ public class StandaloneClient {
         FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
         FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
         FILE_NAME_EXTENSIONS.put(DocumentType.DOCX, "docx");
+        FILE_NAME_EXTENSIONS.put(DocumentType.ODT, "odt");
+        FILE_NAME_EXTENSIONS.put(DocumentType.XLS, "xls");
+        FILE_NAME_EXTENSIONS.put(DocumentType.XLSX, "xlsx");
+        FILE_NAME_EXTENSIONS.put(DocumentType.ODS, "ods");
         FILE_NAME_EXTENSIONS.put(DocumentType.PDF, "pdf");
         FILE_NAME_EXTENSIONS.put(DocumentType.PDFA, "pdf");
         FILE_NAME_EXTENSIONS.put(DocumentType.MHTML, "mhtml");
         FILE_NAME_EXTENSIONS.put(DocumentType.RTF, "rtf");
         FILE_NAME_EXTENSIONS.put(DocumentType.XML, "xml");
+        FILE_NAME_EXTENSIONS.put(DocumentType.TEXT, "txt");
+        FILE_NAME_EXTENSIONS.put(DocumentType.CSV, "csv");
     }
 
     public static void main(String[] args) {

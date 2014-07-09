@@ -1,12 +1,10 @@
-package no.kantega.pdf;
+package no.kantega.pdf.conversion.msoffice;
 
 import com.google.common.io.Files;
 import no.kantega.pdf.api.DocumentType;
-import no.kantega.pdf.conversion.msoffice.MicrosoftWordBridge;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,27 +14,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
+public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAssertingTest {
 
     private static File EXTERNAL_CONVERTER_DIRECTORY;
-    private static MicrosoftWordBridge EXTERNAL_CONVERTER;
-    private final DocumentTypeProvider documentTypeProvider;
-    private AtomicInteger nameGenerator;
-    private File files;
-    private Set<File> fileCopies;
-    protected AbstractWordBasedTest(DocumentTypeProvider documentTypeProvider) {
-        this.documentTypeProvider = documentTypeProvider;
-    }
+    private static AbstractMicrosoftOfficeBridge EXTERNAL_CONVERTER;
 
-    @BeforeClass
-    public static void setUpConverter() throws Exception {
+    // Must be called from a @BeforeClass method in the inheriting class.
+    protected static void setUp(Class<? extends AbstractMicrosoftOfficeBridge> bridge,
+                             MicrosoftOfficeScript assertionScript,
+                             MicrosoftOfficeScript shutdownScript) throws Exception {
+        AbstractMicrosoftOfficeAssertingTest.setUp(assertionScript, shutdownScript);
         EXTERNAL_CONVERTER_DIRECTORY = Files.createTempDir();
-        EXTERNAL_CONVERTER = new MicrosoftWordBridge(EXTERNAL_CONVERTER_DIRECTORY,
-                DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
-        getWordAssert().assertWordRunning();
+        EXTERNAL_CONVERTER = bridge.getDeclaredConstructor(File.class, long.class, TimeUnit.class)
+                .newInstance(EXTERNAL_CONVERTER_DIRECTORY, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
+        getAssertionEngine().assertRunning();
         assertTrue(EXTERNAL_CONVERTER.isOperational());
     }
 
@@ -45,14 +38,29 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
         try {
             EXTERNAL_CONVERTER.shutDown();
             assertFalse(EXTERNAL_CONVERTER.isOperational());
-            getWordAssert().assertWordNotRunning();
+            getAssertionEngine().assertNotRunning();
         } finally {
-            assertTrue(EXTERNAL_CONVERTER_DIRECTORY.delete());
+            try {
+                assertTrue(EXTERNAL_CONVERTER_DIRECTORY.delete());
+            } finally {
+                EXTERNAL_CONVERTER_DIRECTORY = null;
+                EXTERNAL_CONVERTER = null;
+            }
         }
     }
 
-    public static MicrosoftWordBridge getExternalConverter() {
+    protected static AbstractMicrosoftOfficeBridge getOfficeBridge() {
         return EXTERNAL_CONVERTER;
+    }
+
+    private final DocumentTypeProvider documentTypeProvider;
+    private AtomicInteger nameGenerator;
+    private File files;
+    private Set<File> fileCopies;
+
+    protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
+        this.documentTypeProvider = documentTypeProvider;
+        assertNotNull(getClass() + "was not set up properly", EXTERNAL_CONVERTER);
     }
 
     @Before
@@ -94,7 +102,7 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
         return files;
     }
 
-    private File makeCopy(TestResource testResource, boolean delete) throws IOException {
+    private File makeCopy(Document document, boolean delete) throws IOException {
         /*
          * When MS Word is asked to convert a file that is already opened by another program or by itself,
          * it will queue the conversion process until the file is released by the other process. This will cause
@@ -104,7 +112,7 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
          * they should create a defensive copy before the conversion. In order to keep the tests stable, all tests
          * will use such a defensive copy.
          */
-        File copy = testResource.materializeIn(files, String.format("%s.%d", testResource.getName(), nameGenerator.getAndIncrement()));
+        File copy = document.materializeIn(files, String.format("%s.%d", document.getName(), nameGenerator.getAndIncrement()));
         assertTrue(copy.isFile());
         if (delete) {
             fileCopies.add(copy);
@@ -123,50 +131,5 @@ public abstract class AbstractWordBasedTest extends AbstractWordAssertingTest {
             fileCopies.add(target);
         }
         return target;
-    }
-
-    public static class DocumentTypeProvider {
-
-        private final TestResource valid, corrupt, inexistent;
-        private final DocumentType sourceDocumentType, targetDocumentType;
-        private final String targetFileNameSuffix;
-
-        public DocumentTypeProvider(TestResource valid,
-                                    TestResource corrupt,
-                                    TestResource inexistent,
-                                    DocumentType sourceDocumentType,
-                                    DocumentType targetDocumentType,
-                                    String targetFileNameSuffix) {
-            this.valid = valid;
-            this.corrupt = corrupt;
-            this.inexistent = inexistent;
-            this.sourceDocumentType = sourceDocumentType;
-            this.targetDocumentType = targetDocumentType;
-            this.targetFileNameSuffix = targetFileNameSuffix;
-        }
-
-        public TestResource getValid() {
-            return valid;
-        }
-
-        public TestResource getCorrupt() {
-            return corrupt;
-        }
-
-        public TestResource getInexistent() {
-            return inexistent;
-        }
-
-        public DocumentType getSourceDocumentType() {
-            return sourceDocumentType;
-        }
-
-        public DocumentType getTargetDocumentType() {
-            return targetDocumentType;
-        }
-
-        public String getTargetFileNameSuffix() {
-            return targetFileNameSuffix;
-        }
     }
 }

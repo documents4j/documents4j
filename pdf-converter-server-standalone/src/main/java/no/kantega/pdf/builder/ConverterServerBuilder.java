@@ -1,5 +1,6 @@
 package no.kantega.pdf.builder;
 
+import no.kantega.pdf.conversion.IExternalConverter;
 import no.kantega.pdf.job.LocalConverter;
 import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 import no.kantega.pdf.ws.application.StandaloneWebConverterConfiguration;
@@ -10,6 +11,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.File;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,9 +32,10 @@ public class ConverterServerBuilder {
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
+    private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
 
     private ConverterServerBuilder() {
-        /* empty */
+        converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();
     }
 
     /**
@@ -162,7 +166,8 @@ public class ConverterServerBuilder {
     private StandaloneWebConverterConfiguration makeConfiguration() {
         return new StandaloneWebConverterConfiguration(baseFolder,
                 corePoolSize, maximumPoolSize, keepAliveTime,
-                processTimeout, requestTimeout);
+                processTimeout, requestTimeout,
+                converterConfiguration);
     }
 
     /**

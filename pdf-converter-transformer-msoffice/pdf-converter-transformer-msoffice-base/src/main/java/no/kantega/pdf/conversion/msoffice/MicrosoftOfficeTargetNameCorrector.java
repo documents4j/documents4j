@@ -9,14 +9,14 @@ import org.zeroturnaround.exec.listener.ProcessListener;
 
 import java.io.File;
 
-class MicrosoftWordTargetNameCorrector extends ProcessListener {
+class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftOfficeTargetNameCorrector.class);
 
     private final File target;
     private final String fileExtension;
 
-    public MicrosoftWordTargetNameCorrector(File target, String fileExtension) {
+    public MicrosoftOfficeTargetNameCorrector(File target, String fileExtension) {
         this.target = target;
         this.fileExtension = fileExtension;
     }

@@ -5,18 +5,16 @@ import com.google.common.io.Files;
 import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import no.kantega.pdf.throwables.FileSystemInteractionException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-public class MicrosoftWordTargetNameCorrectorTest {
+public class MicrosoftOfficeTargetNameCorrectorTest {
 
     private static final String FOO = "foo";
 
@@ -33,7 +31,7 @@ public class MicrosoftWordTargetNameCorrectorTest {
 
     @After
     public void tearDown() throws Exception {
-        assertTrue(temporaryFolder.delete());
+        Assert.assertTrue(temporaryFolder.delete());
     }
 
     private File makeFile(String extension) throws Exception {
@@ -44,71 +42,71 @@ public class MicrosoftWordTargetNameCorrectorTest {
 
     @Test
     public void testRenamingProcessSuccessfulFileWithFileNameExtension() throws Exception {
-        Process process = mock(Process.class);
-        when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
+        Process process = Mockito.mock(Process.class);
+        Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
         File target = makeFile("." + FOO);
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(target, FOO);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(target, FOO);
         nameCorrector.afterStop(process);
 
-        assertTrue(target.isFile());
-        assertTrue(target.delete());
+        Assert.assertTrue(target.isFile());
+        Assert.assertTrue(target.delete());
     }
 
     @Test
     public void testRenamingProcessSuccessfulFileWithoutFileNameExtension() throws Exception {
-        Process process = mock(Process.class);
-        when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
+        Process process = Mockito.mock(Process.class);
+        Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
         File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
-        assertFalse(virtual.exists());
+        Assert.assertFalse(virtual.exists());
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
-        assertFalse(target.exists());
-        assertTrue(virtual.isFile());
-        assertTrue(virtual.delete());
+        Assert.assertFalse(target.exists());
+        Assert.assertTrue(virtual.isFile());
+        Assert.assertTrue(virtual.delete());
     }
 
     @Test
     public void testRenamingProcessInvalidFileWithoutFileNameExtension() throws Exception {
-        Process process = mock(Process.class);
-        when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue());
+        Process process = Mockito.mock(Process.class);
+        Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue());
 
         File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
-        assertFalse(virtual.exists());
+        Assert.assertFalse(virtual.exists());
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
-        assertFalse(virtual.exists());
-        assertTrue(target.isFile());
-        assertTrue(target.delete());
+        Assert.assertFalse(virtual.exists());
+        Assert.assertTrue(target.isFile());
+        Assert.assertTrue(target.delete());
     }
 
     @Test(expected = FileSystemInteractionException.class)
     public void testRenamingProcessSuccessfulFileWithoutFileNameExtensionBlocked() throws Exception {
-        Process process = mock(Process.class);
-        when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
+        Process process = Mockito.mock(Process.class);
+        Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
         File target = makeFile("." + FOO);
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
-        assertTrue(virtual.createNewFile());
-        assertTrue(virtual.exists());
+        Assert.assertTrue(virtual.createNewFile());
+        Assert.assertTrue(virtual.exists());
         FileOutputStream fileOutputStream = new FileOutputStream(virtual);
         fileOutputStream.getChannel().lock();
 
-        MicrosoftWordTargetNameCorrector nameCorrector = new MicrosoftWordTargetNameCorrector(virtual, FOO);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         try {
             nameCorrector.afterStop(process);
         } catch (FileSystemInteractionException e) {
-            assertFalse(target.exists());
+            Assert.assertFalse(target.exists());
             fileOutputStream.close();
-            assertEquals(virtual.length(), 0L);
-            assertTrue(virtual.delete());
+            Assert.assertEquals(virtual.length(), 0L);
+            Assert.assertTrue(virtual.delete());
             throw e;
         }
     }

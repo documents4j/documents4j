@@ -14,6 +14,9 @@
 
     <modules>
         <module>pdf-converter-transformer-msoffice-word</module>
+        <module>pdf-converter-transformer-msoffice-excel</module>
+        <module>pdf-converter-transformer-msoffice-base</module>
+        <module>pdf-converter-transformer-msoffice-test</module>
     </modules>
 
     <properties>

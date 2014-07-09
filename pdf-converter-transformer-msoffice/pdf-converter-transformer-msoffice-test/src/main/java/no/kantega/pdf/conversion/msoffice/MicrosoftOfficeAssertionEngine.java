@@ -13,30 +13,32 @@ import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public final class MicrosoftWordAssert {
+public class MicrosoftOfficeAssertionEngine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordAssert.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftOfficeAssertionEngine.class);
 
     private final File wordAssertScript, wordShutdownScript;
 
-    public MicrosoftWordAssert(File temporaryFolder) {
-        wordAssertScript = MicrosoftWordScript.WORD_ASSERT_SCRIPT.materializeIn(temporaryFolder);
-        wordShutdownScript = MicrosoftWordScript.WORD_SHUTDOWN_SCRIPT.materializeIn(temporaryFolder);
+    public MicrosoftOfficeAssertionEngine(File temporaryFolder,
+                                          MicrosoftOfficeScript assertionScript,
+                                          MicrosoftOfficeScript shutdownScript) {
+        wordAssertScript = assertionScript.materializeIn(temporaryFolder);
+        wordShutdownScript = shutdownScript.materializeIn(temporaryFolder);
     }
 
-    public void assertWordRunning() throws Exception {
-        assertEquals("Unexpected state: MS Word is not running",
+    public void assertRunning() throws Exception {
+        assertEquals("Unexpected state: MS Office component is not running",
                 ExternalConverterScriptResult.CONVERTER_INTERACTION_SUCCESSFUL.getExitValue().intValue(),
-                runWordCheckScript());
+                runAssertionCheckScript());
     }
 
-    public void assertWordNotRunning() throws Exception {
-        assertEquals("Unexpected state: MS Word is running",
+    public void assertNotRunning() throws Exception {
+        assertEquals("Unexpected state: MS Office component is running",
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue(),
-                runWordCheckScript());
+                runAssertionCheckScript());
     }
 
-    private int runWordCheckScript() throws Exception {
+    private int runAssertionCheckScript() throws Exception {
         assertTrue(wordAssertScript.exists());
         return new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordAssertScript.getAbsolutePath())))
@@ -48,7 +50,7 @@ public final class MicrosoftWordAssert {
                 .getExitValue();
     }
 
-    public void killWord() throws Exception {
+    public void kill() throws Exception {
         assertTrue(wordShutdownScript.exists());
         new ProcessExecutor()
                 .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))

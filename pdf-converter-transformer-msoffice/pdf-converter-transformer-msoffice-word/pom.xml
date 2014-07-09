@@ -12,6 +12,13 @@
     <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
 
     <dependencies>
+        <!-- Local dependencies -->
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-transformer-msoffice-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- External dependencies -->
         <dependency>
             <groupId>org.zeroturnaround</groupId>
@@ -24,6 +31,13 @@
         </dependency>
 
         <!-- Testing dependencies -->
+        <dependency>
+            <groupId>no.kantega</groupId>
+            <artifactId>pdf-converter-transformer-msoffice-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

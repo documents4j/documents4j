@@ -11,12 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
-enum MicrosoftWordScript {
+enum MicrosoftWordScript implements MicrosoftOfficeScript {
 
-    WORD_PDF_CONVERSION_SCRIPT("/word_convert.vbs"),
-    WORD_STARTUP_SCRIPT("/word_start.vbs"),
-    WORD_SHUTDOWN_SCRIPT("/word_shutdown.vbs"),
-    WORD_ASSERT_SCRIPT("/word_assert.vbs");
+    CONVERSION("/word_convert.vbs"),
+    STARTUP("/word_start.vbs"),
+    SHUTDOWN("/word_shutdown.vbs"),
+    ASSERTION("/word_assert.vbs");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
     private static final Random RANDOM = new Random();
@@ -41,6 +41,7 @@ enum MicrosoftWordScript {
         }
     }
 
+    @Override
     public File materializeIn(File folder) {
         File script = new File(folder, getRandomizedName());
         try {

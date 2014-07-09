@@ -41,10 +41,16 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Make the MS Office available on the classpath -->
+        <!-- Make MS Office converters available on the classpath -->
         <dependency>
             <groupId>no.kantega</groupId>
             <artifactId>pdf-converter-transformer-msoffice-word</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>pdf-converter-transformer-msoffice-excel</artifactId>
             <version>${project.version}</version>
         </dependency>
 

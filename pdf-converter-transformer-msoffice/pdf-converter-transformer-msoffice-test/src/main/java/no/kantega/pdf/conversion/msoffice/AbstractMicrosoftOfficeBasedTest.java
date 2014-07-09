@@ -18,39 +18,39 @@ import static org.junit.Assert.*;
 
 public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAssertingTest {
 
-    private static File EXTERNAL_CONVERTER_DIRECTORY;
-    private static AbstractMicrosoftOfficeBridge EXTERNAL_CONVERTER;
+    private static File externalConverterDirectory;
+    private static AbstractMicrosoftOfficeBridge externalConverter;
 
     // Must be called from a @BeforeClass method in the inheriting class.
     protected static void setUp(Class<? extends AbstractMicrosoftOfficeBridge> bridge,
                              MicrosoftOfficeScript assertionScript,
                              MicrosoftOfficeScript shutdownScript) throws Exception {
         AbstractMicrosoftOfficeAssertingTest.setUp(assertionScript, shutdownScript);
-        EXTERNAL_CONVERTER_DIRECTORY = Files.createTempDir();
-        EXTERNAL_CONVERTER = bridge.getDeclaredConstructor(File.class, long.class, TimeUnit.class)
-                .newInstance(EXTERNAL_CONVERTER_DIRECTORY, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
+        externalConverterDirectory = Files.createTempDir();
+        externalConverter = bridge.getDeclaredConstructor(File.class, long.class, TimeUnit.class)
+                .newInstance(externalConverterDirectory, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
         getAssertionEngine().assertRunning();
-        assertTrue(EXTERNAL_CONVERTER.isOperational());
+        assertTrue(externalConverter.isOperational());
     }
 
     @AfterClass
     public static void tearDownConverter() throws Exception {
         try {
-            EXTERNAL_CONVERTER.shutDown();
-            assertFalse(EXTERNAL_CONVERTER.isOperational());
+            externalConverter.shutDown();
+            assertFalse(externalConverter.isOperational());
             getAssertionEngine().assertNotRunning();
         } finally {
             try {
-                assertTrue(EXTERNAL_CONVERTER_DIRECTORY.delete());
+                assertTrue(externalConverterDirectory.delete());
             } finally {
-                EXTERNAL_CONVERTER_DIRECTORY = null;
-                EXTERNAL_CONVERTER = null;
+                externalConverterDirectory = null;
+                externalConverter = null;
             }
         }
     }
 
     protected static AbstractMicrosoftOfficeBridge getOfficeBridge() {
-        return EXTERNAL_CONVERTER;
+        return externalConverter;
     }
 
     private final DocumentTypeProvider documentTypeProvider;
@@ -60,7 +60,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
 
     protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
         this.documentTypeProvider = documentTypeProvider;
-        assertNotNull(getClass() + "was not set up properly", EXTERNAL_CONVERTER);
+        assertNotNull(getClass() + "was not set up properly", externalConverter);
     }
 
     @Before

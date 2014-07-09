@@ -9,7 +9,6 @@ If Err <> 0 Then
 End If
 
 ' Try to shut down MS Excel.
-excelApplication.Workbooks.Close False
 excelApplication.Quit
 
 ' If this was impossible, exit with an error.

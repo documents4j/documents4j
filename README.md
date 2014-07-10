@@ -13,7 +13,7 @@ The API
 -------
 documents4j uses a fluent API for performing a document conversion. As mentioned, the API does not expose any details of the backing converter implementation. Instead, a converter is represented by an instance of `IConverter`. Using this converter, an example conversion of a MS Word file into a PDF is executed as follows:
 
-```
+```java
 File wordFile = new File( ... ), target = new File( ... );
 IConverter converter = ... ;
 Future<Boolean> conversion = converter
@@ -38,7 +38,7 @@ Local converter
 ---------------
 The `LocalConverter` implementation of `IConverter` performs conversions by converting files within the same (non-virtual) machine. A `LocalConverter` is created by using a simple builder:
 
-```
+```java
 IConverter converter = LocalConverter.builder()
                            .baseFolder(new File("C:\Users\documents4j\temp"));
                            .workerPool(20, 25, 2, TimeUnit.SECONDS)
@@ -75,7 +75,7 @@ Remote converter
 ----------------
 A `RemoteConverter` is created fairly similar to a `LocalConverter` by using another builder:
 
-```
+```java
 IConverter converter = RemoteConverter.builder()
                            .baseFolder(new File("C:\Users\documents4j\temp"));
                            .workerPool(20, 25, 2, TimeUnit.SECONDS)
@@ -89,7 +89,7 @@ Similary to the `LocalConverter`, the `RemoteConverter` requires a folder for wr
 #### Conversion server ####
 documents4j offers a standalone conversion server which implements the required REST API by using a `LocalConverter` under the covers. This conversion server is contained in the *com.documents4j/documents4j-server-standalone* module. The Maven build creates a shaded artifact for this module which contains all dependencies. This way, the conversion server can be started from the command line, simply by:
 
-```
+```bash
 java -jar documents4j-server-standalone-shaded.jar http://localhost:9998
 ```
 
@@ -98,7 +98,7 @@ The above command starts the conversion server to listen for a HTTP connection o
 #### Conversion client ####
 Similarly to the conversion server, documents4j ships with a small console client which is mainly intended for debugging purposes. Using the client it is possible to connect to a conversion server in order to validate that a connection is possible and not prevented by for example active fire walls. The client is contained in the *com.documents4j/documents4j-client-standalone* module. You can connect to a server by:
 
-```
+```bash
 java -jar documents4j-client-standalone-shaded.jar http://localhost:9998
 ```
 
@@ -148,7 +148,7 @@ Building the project
 --------------------
 This project is set up to allow running as many tests as possible without requiring MS Office or even MS Windows installed. For this purpose, the project includes several rich stubs that step in place of the MS Office bridges. When you are building this project on a machine with MS Windows and MS Office installed, you should build the project with the `ms-office` profile which triggers tests that rely on an actual MS Office instance. You can then build the project using Maven:
 
-```
+```bash
 mvn clean package -Pms-office
 ```
 

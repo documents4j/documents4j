@@ -2,29 +2,32 @@
 <html xmlns:wicket="http://wicket.apache.org">
 <head>
     <meta charset="utf-8"/>
-    <title>PDF converter demo</title>
+    <title>documents4j - demo</title>
 </head>
 <body style="padding: 10px 20px;">
 
-<h1>MS Word to PDF converter demo</h1>
+<h1>A demo of documents4j</h1>
 
 <p>
-    Please upload MS Word files in order to convert them to PDF. Please be aware: This is just a simple demo and
-    files get converted synchronously during your request. If the size of your document is large, this might
-    take a while. In real applications, you would probably implement an asynchronous routine on your web
-    interface. The converter implementation already supports this!
+    Please upload a file which is then processed by documents4j into the chosen output format. In order to select a
+    suitable converter backend, also provide the format of the input file. Be however aware: This is a simple demo
+    which is not suited for processing large files or a big amount of files. All files are converted synchronously
+    during your requests. If the size of your document is large, this might take a while. In real-world applications,
+    you would want to implement asynchronous processing which is detached from a HTTP request cycle. The converter
+    implementation already supports this, this demo application does however not make use of this capability.
 </p>
 
 <p class="alert alert-warn" wicket:id="localhost">
     <b>Important!</b><br/>
-    It seems as if this browser is running on the same machine as the converter backend. If you are opening an instance
-    of MS Word (for example by opening MS Word files from this page), this might result in unexpected behavior of this
-    application. Be further aware that killing the JVM that is running this application might not kill the MS Word
-    processes that were opened by this application: MS Windows requires GUI processes such as MS Word to always be
-    started as a child process of a MS Windows specific <em>master GUI process</em>. Therefore, MS Word processes are
-    never child processes of the JVM and will therefore survive a killing of the JVM process. This converter software
-    provides a shut down hook for this purpose, but shut down hooks are not triggered when a process is simply
-    killed instead of shut down regularly.
+    It seems as if this browser is running on the same machine as the converter backend. If you are opening, closing
+    or using an instance of a conversion software such as MS Office components, you might experience unexpected
+    behavior. Remember that opening files from this web page might trigger the use of an application. Be further
+    aware that killing the JVM that is running this application might not kill conversion process that were triggered
+    by this application. This is in particularly true for MS Windows processes such as MS Office components. MS Windows
+    requires GUI processes such as MS Office components to always be run as a child process of a MS Windows specific
+    <em>GUI process</em>. Therefore, MS Office component processes are never child processes of the JVM process and
+    will therefore survive a killing of the corresponding JVM process. documents4j provides a shut down hook for this
+    purpose, but shut down hooks are not triggered when a process is simply killed instead of shut down regularly.
 </p>
 
 <div wicket:id="feedback" class="alert alert-error"></div>
@@ -47,7 +50,7 @@
             </div>
         </div>
         <div class="control-group">
-            <label for="targetFormat" class="control-label">Source file type</label>
+            <label for="targetFormat" class="control-label">Target file type</label>
 
             <div class="controls">
                 <select wicket:id="targetFormat" id="targetFormat"></select>

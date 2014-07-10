@@ -65,7 +65,7 @@ public class StandaloneClient {
             IConverter converter = asConverter(args);
             try {
                 Logger logger = LoggerFactory.getLogger(StandaloneClient.class);
-                sayHello(converter, logger);
+                sayHello(converter, logger, console);
                 DocumentType[] documentTypes = configureConversion(console, converter.getSupportedConversions());
                 console.printf("Enter '<source> [-> <target>]' for converting a file. Enter '\\q' for exiting this application.%n");
                 String argument;
@@ -312,7 +312,8 @@ public class StandaloneClient {
                 .forHelp();
     }
 
-    private static void sayHello(IConverter converter, Logger logger) {
+    private static void sayHello(IConverter converter, Logger logger, Console console) {
+        console.printf("Welcome to the documents4j client!%n");
         boolean operational = converter.isOperational();
         if (operational) {
             logger.info("Converter {} is operational", converter);

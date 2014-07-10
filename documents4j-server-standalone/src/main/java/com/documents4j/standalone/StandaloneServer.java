@@ -344,6 +344,7 @@ public class StandaloneServer {
     }
 
     private static void sayHello(ConverterServerBuilder builder, Logger logger) {
+        System.out.println("Welcome to the documents4j server!");
         String serverStartupMessage = String.format("%tc: Started server on '%s'", System.currentTimeMillis(), builder.getBaseUri());
         logger.info(serverStartupMessage);
         logServerInfo(builder, logger);

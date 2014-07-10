@@ -35,8 +35,8 @@ public class FileSourceFromInputStreamSourceTest extends AbstractAdapterTest {
 
         assertTrue(target.exists());
         assertEquals(source.length(), target.length());
-        assertFalse("File wrapper should not have closed stream", source.delete());
 
+        verify(inputStream, never()).close();
         inputStream.close(); // Release stream manually.
         assertTrue(source.delete());
 

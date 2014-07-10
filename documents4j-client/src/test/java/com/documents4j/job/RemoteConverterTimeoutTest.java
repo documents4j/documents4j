@@ -13,7 +13,7 @@ public class RemoteConverterTimeoutTest {
     private static final String BASE_URI = "http://localhost:0";
 
     private static final long TIMEOUT = 100L;
-    private static final long TIMEOUT_OVERHEAD = 2000L;
+    private static final long TIMEOUT_OVERHEAD = 5000L;
 
     private IConverter converter;
 

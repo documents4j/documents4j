@@ -128,20 +128,21 @@ All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can the
 
 Efficiency considerations
 -------------------------
+
+#### Input and target desription ####
 The API intents to hide the implementation details of a specific `IConverter` implementation from the end user. However, a `RemoteConverter` needs to send data as a stream which requires reading it to memory first. (As of today, documents4j does not make use of Java NIO.) This is why a `RemoteConverter` will always perform better when handed instances of `InputStream` and `OutputStream` as source and target compared to files. The `LocalConverter` on the other hand, communicates with a backing conversion software such as MS Word by using the file system. Therefore, instances of `File` as source and target input will perform better when using a `LocalConverter`.
 
 In the end, a user should however always try to hand the available data to the `IConverter` implementation. The implementation will then figure out by itself what data it requires and convert the data to the desired format. In doing so, the converter will also clean up after itself (e.g. closing streams, deleting temporary files). There is no performance advantage when input formats are converted manually.
 
-Running MS Office as a Windows service
+#### Configuring an executing JVM ####
+MS Office components are (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of a significant amount of memory to the JVM should be considered as a cause. 
+
+Running documents4j application as Windows service
 --------------------------------------
-Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service context. When run as a service, MS Office is always started with MS Window's local service account which does not configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there are two possible approaches of which the first approach is more recommended:
+documents4j might misfunction when run as a Windows service together with MS Office conversion. Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service context. When run as a service, MS Office is always started with MS Window's local service account which does not configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there are two possible approaches of which the first approach is more recommended:
+
 1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*. On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*. [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).
 2. You can manipulate MS Window's registry such that MS Office applications are run with another account than the local service account. [This approach is documented on MSDN](http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy). Note that this breaks MS Window's sandbox model and imposes additional security threats to the machine that runs MS Office.
-
-Configuring the JVM of a `LocalConverter` or a conversion server
-----------------------------------------------------------------
-MS Word is (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run
-short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of a significant amount of memory to the JVM should be considered as a cause. 
 
 Building the project
 --------------------

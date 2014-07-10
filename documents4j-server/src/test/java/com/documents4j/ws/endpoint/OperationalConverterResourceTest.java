@@ -25,8 +25,8 @@ public class OperationalConverterResourceTest extends AbstractEncodingJerseyTest
 
     private static final String MESSAGE = "Hello converter!";
     private static final boolean CONVERTER_IS_OPERATIONAL = true;
-    private static final long DEFAULT_TIMEOUT = 2000L;
-    private static final long ADDITIONAL_TIMEOUT = 1000L;
+    private static final long DEFAULT_TIMEOUT = 3000L;
+    private static final long ADDITIONAL_TIMEOUT = 5000L;
 
     @Override
     protected Application configure() {

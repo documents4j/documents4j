@@ -46,7 +46,7 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
         Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
         File target = makeFile("." + FOO);
-        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(target, FOO, false);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(target, FOO);
         nameCorrector.afterStop(process);
 
         Assert.assertTrue(target.isFile());
@@ -62,7 +62,7 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
         Assert.assertFalse(virtual.exists());
 
-        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO, false);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
         Assert.assertFalse(target.exists());
@@ -79,7 +79,7 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
         File virtual = new File(temporaryFolder, Files.getNameWithoutExtension(target.getName()));
         Assert.assertFalse(virtual.exists());
 
-        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO, false);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         nameCorrector.afterStop(process);
 
         Assert.assertFalse(virtual.exists());
@@ -99,7 +99,7 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
         FileOutputStream fileOutputStream = new FileOutputStream(virtual);
         fileOutputStream.getChannel().lock();
 
-        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO, false);
+        MicrosoftOfficeTargetNameCorrector nameCorrector = new MicrosoftOfficeTargetNameCorrector(virtual, FOO);
         try {
             nameCorrector.afterStop(process);
         } catch (FileSystemInteractionException e) {

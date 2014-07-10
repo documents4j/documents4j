@@ -2,8 +2,6 @@ package no.kantega.pdf.conversion.msoffice;
 
 import no.kantega.pdf.api.DocumentType;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -41,12 +39,5 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
                                         String targetFileNameSuffix,
                                         boolean supportsLockedConversion) {
         super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
-    }
-
-    @Override
-    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS * 2L)
-    @Ignore("MS Excel is not equally robust as MS Word and fails under high stress")
-    public void testConversionConcurrently() throws Exception {
-        super.testConversionConcurrently();
     }
 }

@@ -33,7 +33,7 @@ public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {
     private static final Object WORD_LOCK = new Object();
 
     public MicrosoftWordBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftWordScript.CONVERSION, false);
+        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftWordScript.CONVERSION);
         startUp();
     }
 
@@ -50,6 +50,11 @@ public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {
             tryStop(MicrosoftWordScript.SHUTDOWN);
             LOGGER.info("From-Microsoft-Word-Converter was shut down successfully");
         }
+    }
+
+    @Override
+    protected MicrosoftOfficeTargetNameCorrector targetNameCorrector(File target, String fileExtension) {
+        return new MicrosoftWordTargetNameCorrector(target, fileExtension);
     }
 
     @Override

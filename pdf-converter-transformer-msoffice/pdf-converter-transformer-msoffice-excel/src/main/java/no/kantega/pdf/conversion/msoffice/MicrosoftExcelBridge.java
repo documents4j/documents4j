@@ -69,4 +69,9 @@ public class MicrosoftExcelBridge extends AbstractMicrosoftOfficeBridge {
     protected MicrosoftOfficeScript getAssertionScript() {
         return MicrosoftExcelScript.ASSERTION;
     }
+
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
 }

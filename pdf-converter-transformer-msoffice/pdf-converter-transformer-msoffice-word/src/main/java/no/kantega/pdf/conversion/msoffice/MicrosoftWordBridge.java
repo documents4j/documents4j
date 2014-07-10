@@ -66,4 +66,9 @@ public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {
     protected MicrosoftOfficeScript getAssertionScript() {
         return MicrosoftWordScript.ASSERTION;
     }
+
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
 }

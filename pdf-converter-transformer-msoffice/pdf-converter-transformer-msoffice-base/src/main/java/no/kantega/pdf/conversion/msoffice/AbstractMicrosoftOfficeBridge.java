@@ -7,7 +7,6 @@ import no.kantega.pdf.conversion.ExternalConverterScriptResult;
 import no.kantega.pdf.conversion.ProcessFutureWrapper;
 import no.kantega.pdf.throwables.ConverterAccessException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
@@ -16,8 +15,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConverter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMicrosoftOfficeBridge.class);
 
     private final File conversionScript;
 
@@ -60,7 +57,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
     }
 
     protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
-        LOGGER.info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
+        getLogger().info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
@@ -76,7 +73,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' (%s) to '%s' (%s)",
                     conversionScript, source, sourceType, target, targetType);
-            LOGGER.error(message, e);
+            getLogger().error(message, e);
             throw new ConverterAccessException(message, e);
         }
     }
@@ -86,6 +83,8 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
     protected abstract MicrosoftOfficeFormat formatOf(DocumentType documentType);
 
     protected abstract MicrosoftOfficeScript getAssertionScript();
+
+    protected abstract Logger getLogger();
 
     @Override
     public boolean isOperational() {

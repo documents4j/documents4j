@@ -21,10 +21,9 @@ import static org.junit.Assert.*;
 
 public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicrosoftOfficeBasedTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMicrosoftOfficeConversionTest.class);
-
     protected static final int CONVERSION_THREADS = 3;
     protected static final int CONVERSION_INVOCATIONS = 4;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMicrosoftOfficeConversionTest.class);
 
     protected AbstractMicrosoftOfficeConversionTest(DocumentTypeProvider documentTypeProvider) {
         super(documentTypeProvider);

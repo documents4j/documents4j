@@ -20,11 +20,19 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
 
     private static File externalConverterDirectory;
     private static AbstractMicrosoftOfficeBridge externalConverter;
+    private final DocumentTypeProvider documentTypeProvider;
+    private AtomicInteger nameGenerator;
+    private File files;
+    private Set<File> fileCopies;
+    protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
+        this.documentTypeProvider = documentTypeProvider;
+        assertNotNull(getClass() + "was not set up properly", externalConverter);
+    }
 
     // Must be called from a @BeforeClass method in the inheriting class.
     protected static void setUp(Class<? extends AbstractMicrosoftOfficeBridge> bridge,
-                             MicrosoftOfficeScript assertionScript,
-                             MicrosoftOfficeScript shutdownScript) throws Exception {
+                                MicrosoftOfficeScript assertionScript,
+                                MicrosoftOfficeScript shutdownScript) throws Exception {
         AbstractMicrosoftOfficeAssertingTest.setUp(assertionScript, shutdownScript);
         externalConverterDirectory = Files.createTempDir();
         externalConverter = bridge.getDeclaredConstructor(File.class, long.class, TimeUnit.class)
@@ -51,16 +59,6 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
 
     protected static AbstractMicrosoftOfficeBridge getOfficeBridge() {
         return externalConverter;
-    }
-
-    private final DocumentTypeProvider documentTypeProvider;
-    private AtomicInteger nameGenerator;
-    private File files;
-    private Set<File> fileCopies;
-
-    protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
-        this.documentTypeProvider = documentTypeProvider;
-        assertNotNull(getClass() + "was not set up properly", externalConverter);
     }
 
     @Before

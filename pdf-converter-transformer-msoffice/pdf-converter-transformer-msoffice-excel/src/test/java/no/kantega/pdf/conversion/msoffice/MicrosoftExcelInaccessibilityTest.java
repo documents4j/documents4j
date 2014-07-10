@@ -5,11 +5,6 @@ import org.junit.BeforeClass;
 
 public class MicrosoftExcelInaccessibilityTest extends AbstractMicrosoftOfficeInaccessibilityTest {
 
-    @BeforeClass
-    public static void setUpConverter() throws Exception {
-        AbstractMicrosoftOfficeConversionTest.setUp(MicrosoftExcelBridge.class, MicrosoftExcelScript.ASSERTION, MicrosoftExcelScript.SHUTDOWN);
-    }
-
     public MicrosoftExcelInaccessibilityTest() {
         super(new DocumentTypeProvider(MicrosoftExcelDocument.XLSX_VALID,
                 MicrosoftExcelDocument.XLSX_CORRUPT,
@@ -18,5 +13,10 @@ public class MicrosoftExcelInaccessibilityTest extends AbstractMicrosoftOfficeIn
                 DocumentType.PDF,
                 "pdf",
                 true));
+    }
+
+    @BeforeClass
+    public static void setUpConverter() throws Exception {
+        AbstractMicrosoftOfficeConversionTest.setUp(MicrosoftExcelBridge.class, MicrosoftExcelScript.ASSERTION, MicrosoftExcelScript.SHUTDOWN);
     }
 }

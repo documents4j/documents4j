@@ -33,12 +33,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class StandaloneClient {
 
-    private StandaloneClient() {
-        throw new UnsupportedOperationException();
-    }
-
     private static final Map<DocumentType, String> FILE_NAME_EXTENSIONS;
-
     static {
         FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
         FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
@@ -53,6 +48,10 @@ public class StandaloneClient {
         FILE_NAME_EXTENSIONS.put(DocumentType.XML, "xml");
         FILE_NAME_EXTENSIONS.put(DocumentType.TEXT, "txt");
         FILE_NAME_EXTENSIONS.put(DocumentType.CSV, "csv");
+    }
+
+    private StandaloneClient() {
+        throw new UnsupportedOperationException();
     }
 
     public static void main(String[] args) {

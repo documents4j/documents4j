@@ -12,9 +12,8 @@ import java.io.File;
 class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftOfficeTargetNameCorrector.class);
-
-    private final File target;
     protected final String fileExtension;
+    private final File target;
 
     public MicrosoftOfficeTargetNameCorrector(File target, String fileExtension) {
         this.target = target;

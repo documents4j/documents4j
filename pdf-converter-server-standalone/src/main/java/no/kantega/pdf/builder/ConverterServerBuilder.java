@@ -25,6 +25,7 @@ import static no.kantega.pdf.builder.AbstractConverterBuilder.assertNumericArgum
  */
 public class ConverterServerBuilder {
 
+    private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
     private URI baseUri;
     private File baseFolder = null;
     private int corePoolSize = LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE;
@@ -32,7 +33,6 @@ public class ConverterServerBuilder {
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
-    private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
 
     private ConverterServerBuilder() {
         converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();

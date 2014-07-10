@@ -13,6 +13,16 @@ import static no.kantega.pdf.conversion.msoffice.MicrosoftWordDocument.*;
 @RunWith(Parameterized.class)
 public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversionTest {
 
+    public MicrosoftWordConversionTest(Document valid,
+                                       Document corrupt,
+                                       Document inexistent,
+                                       DocumentType sourceDocumentType,
+                                       DocumentType targetDocumentType,
+                                       String targetFileNameSuffix,
+                                       boolean supportsLockedConversion) {
+        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
+    }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -32,15 +42,5 @@ public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversi
     @BeforeClass
     public static void setUpConverter() throws Exception {
         AbstractMicrosoftOfficeConversionTest.setUp(MicrosoftWordBridge.class, MicrosoftWordScript.ASSERTION, MicrosoftWordScript.SHUTDOWN);
-    }
-
-    public MicrosoftWordConversionTest(Document valid,
-                                       Document corrupt,
-                                       Document inexistent,
-                                       DocumentType sourceDocumentType,
-                                       DocumentType targetDocumentType,
-                                       String targetFileNameSuffix,
-                                       boolean supportsLockedConversion) {
-        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
     }
 }

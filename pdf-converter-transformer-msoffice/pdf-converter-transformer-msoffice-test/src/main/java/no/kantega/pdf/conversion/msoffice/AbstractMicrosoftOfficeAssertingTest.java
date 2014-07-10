@@ -15,6 +15,10 @@ public abstract class AbstractMicrosoftOfficeAssertingTest {
     private static File assertionEngineFolder;
     private static MicrosoftOfficeAssertionEngine msOfficeAssertionEngine;
 
+    protected AbstractMicrosoftOfficeAssertingTest() {
+        assertNotNull(getClass() + "was not set up properly", msOfficeAssertionEngine);
+    }
+
     // Must be called from a @BeforeClass method in the inheriting class.
     protected static void setUp(MicrosoftOfficeScript assertionScript, MicrosoftOfficeScript shutdownScript) throws Exception {
         assertionEngineFolder = Files.createTempDir();
@@ -45,9 +49,5 @@ public abstract class AbstractMicrosoftOfficeAssertingTest {
 
     public static MicrosoftOfficeAssertionEngine getAssertionEngine() {
         return msOfficeAssertionEngine;
-    }
-
-    protected AbstractMicrosoftOfficeAssertingTest() {
-        assertNotNull(getClass() + "was not set up properly", msOfficeAssertionEngine);
     }
 }

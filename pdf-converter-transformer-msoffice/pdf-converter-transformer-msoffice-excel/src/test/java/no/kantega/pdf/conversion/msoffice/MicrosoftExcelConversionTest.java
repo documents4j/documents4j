@@ -13,6 +13,16 @@ import static no.kantega.pdf.conversion.msoffice.MicrosoftExcelDocument.*;
 @RunWith(Parameterized.class)
 public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConversionTest {
 
+    public MicrosoftExcelConversionTest(Document valid,
+                                        Document corrupt,
+                                        Document inexistent,
+                                        DocumentType sourceDocumentType,
+                                        DocumentType targetDocumentType,
+                                        String targetFileNameSuffix,
+                                        boolean supportsLockedConversion) {
+        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
+    }
+
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
@@ -29,15 +39,5 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
     @BeforeClass
     public static void setUpConverter() throws Exception {
         AbstractMicrosoftOfficeConversionTest.setUp(MicrosoftExcelBridge.class, MicrosoftExcelScript.ASSERTION, MicrosoftExcelScript.SHUTDOWN);
-    }
-
-    public MicrosoftExcelConversionTest(Document valid,
-                                        Document corrupt,
-                                        Document inexistent,
-                                        DocumentType sourceDocumentType,
-                                        DocumentType targetDocumentType,
-                                        String targetFileNameSuffix,
-                                        boolean supportsLockedConversion) {
-        super(new DocumentTypeProvider(valid, corrupt, inexistent, sourceDocumentType, targetDocumentType, targetFileNameSuffix, supportsLockedConversion));
     }
 }

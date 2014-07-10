@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>documents4j-parent</artifactId>
+        <groupId>com.documents4j</groupId>
+        <version>0.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>documents4j-transformer-msoffice</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>documents4j-transformer-msoffice-word</module>
+        <module>documents4j-transformer-msoffice-excel</module>
+        <module>documents4j-transformer-msoffice-base</module>
+        <module>documents4j-transformer-msoffice-test</module>
+    </modules>
+
+    <properties>
+        <test.office.skip>true</test.office.skip>
+    </properties>
+
+    <dependencies>
+        <!-- Local dependencies -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>documents4j-transformer-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>documents4j-util-transformer-process</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>ms-office</id>
+            <properties>
+                <test.office.skip>false</test.office.skip>
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${version.maven.surefire-plugin}</version>
+                <configuration>
+                    <skipTests>${test.office.skip}</skipTests>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>no.kantega</groupId>
-    <artifactId>pdf-converter-parent</artifactId>
+    <groupId>com.documents4j</groupId>
+    <artifactId>documents4j-parent</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <!--
-     Note: This project can be built on any machine. However, running the tests of the pdf-converter-transformer-msoffice-word
+     Note: This project can be built on any machine. However, running the tests of the documents4j-transformer-msoffice-word
      module requires the following configuration:
       (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
       (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
@@ -21,7 +21,7 @@
      tests will be skipped. In general, unit tests for the converters can fail since MS Word was not built for
      short-interval restarting. However, this happens rarely.
 
-     Furthermore, for running the tests of the pdf-converter-server-standalone module, you require:
+     Furthermore, for running the tests of the documents4j-server-standalone module, you require:
       (4) Your machine must have a free port and it must be possible to bind a server listener to this port
           (the Jersey related tests suggest port 9998 to be available for testing)
 
@@ -57,22 +57,22 @@
     -->
 
     <modules>
-        <module>pdf-converter-api</module>
-        <module>pdf-converter-local</module>
-        <module>pdf-converter-local-demo</module>
-        <module>pdf-converter-transformer</module>
-        <module>pdf-converter-transformer-api</module>
-        <module>pdf-converter-transformer-msoffice</module>
-        <module>pdf-converter-client</module>
-        <module>pdf-converter-client-standalone</module>
-        <module>pdf-converter-server</module>
-        <module>pdf-converter-server-standalone</module>
-        <module>pdf-converter-util-all</module>
-        <module>pdf-converter-util-conversion</module>
-        <module>pdf-converter-util-ws</module>
-        <module>pdf-converter-util-standalone</module>
-        <module>pdf-converter-util-transformer-process</module>
-        <module>pdf-converter-test</module>
+        <module>documents4j-api</module>
+        <module>documents4j-local</module>
+        <module>documents4j-local-demo</module>
+        <module>documents4j-transformer</module>
+        <module>documents4j-transformer-api</module>
+        <module>documents4j-transformer-msoffice</module>
+        <module>documents4j-client</module>
+        <module>documents4j-client-standalone</module>
+        <module>documents4j-server</module>
+        <module>documents4j-server-standalone</module>
+        <module>documents4j-util-all</module>
+        <module>documents4j-util-conversion</module>
+        <module>documents4j-util-ws</module>
+        <module>documents4j-util-standalone</module>
+        <module>documents4j-util-transformer-process</module>
+        <module>documents4j-test</module>
     </modules>
 
     <properties>
@@ -81,7 +81,8 @@
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <version.jersey>2.10.1</version.jersey>
+        <!-- Late versions of Jersey require Java 7 -->
+        <version.jersey>2.6</version.jersey>
         <version.guava>17.0</version.guava>
         <version.zt-exec>1.7</version.zt-exec>
         <version.jopt-simple>4.6</version.jopt-simple>
@@ -120,26 +121,26 @@
     </developers>
 
     <organization>
-        <name>Kantega AS</name>
-        <url>http://www.kantega.no</url>
+        <name>documents4j</name>
+        <url>http://www.documents4j.com</url>
     </organization>
 
     <inceptionYear>2013</inceptionYear>
-    <url>https://github.com/kantega/pdf-converter</url>
+    <url>https://github.com/documents4j/documents4j</url>
 
-    <name>pdf-converter</name>
-    <description>A converter tool for converting MS Word files to PDF in a Java application.</description>
+    <name>documents4j</name>
+    <description>A Java library for converting documents.</description>
 
     <scm>
-        <connection>scm:git:git@github.com:kantega/pdf-converter.git</connection>
-        <developerConnection>scm:git:git@github.com:kantega/pdf-converter.git</developerConnection>
-        <url>git@github.com:kantega/pdf-converter.git</url>
-        <tag>pdf-converter-parent-0.1.2</tag>
+        <connection>scm:git:git@github.com:documents4j/documents4j.git</connection>
+        <developerConnection>scm:git:git@github.com:documents4j/documents4j.git</developerConnection>
+        <url>git@github.com:documents4j/documents4j.git</url>
+        <tag>documents4j-parent-0.1.2</tag>
     </scm>
 
     <issueManagement>
         <system>github.com</system>
-        <url>https://github.com/kantega/pdf-converter/issues</url>
+        <url>https://github.com/documents4j/documents4j/issues</url>
     </issueManagement>
 
     <licenses>

@@ -1,5 +1,8 @@
 package com.documents4j.builder;
 
+import com.documents4j.conversion.msoffice.MicrosoftExcelBridge;
+import com.documents4j.conversion.msoffice.MicrosoftWordBridge;
+import com.documents4j.job.PseudoConverter;
 import com.documents4j.ws.PortAssert;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.Before;
@@ -19,7 +22,12 @@ public class ConverterServerBuilderTest {
     @Test(timeout = TIMEOUT)
     public void testStartup() throws Exception {
         PortAssert.assertPortFree(port);
-        HttpServer httpServer = ConverterServerBuilder.make(String.format("http://localhost:%d", port));
+        HttpServer httpServer = ConverterServerBuilder.builder()
+                .disable(MicrosoftWordBridge.class)
+                .disable(MicrosoftExcelBridge.class)
+                .enable(PseudoConverter.class)
+                .baseUri(String.format("http://localhost:%d", port))
+                .build();
         PortAssert.assertPortBusy(port);
         httpServer.shutdownNow();
         PortAssert.assertPortFree(port);

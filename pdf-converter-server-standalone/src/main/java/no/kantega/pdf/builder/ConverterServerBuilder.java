@@ -148,6 +148,30 @@ public class ConverterServerBuilder {
     }
 
     /**
+     * Enables the given {@link no.kantega.pdf.conversion.IExternalConverter}. Any converter that is shipped with
+     * this library is discovered automatically from the class path and does not need to be enabled explicitly.
+     *
+     * @param externalConverter The converter to be enabled.
+     * @return This builder.
+     */
+    public ConverterServerBuilder enable(Class<? extends IExternalConverter> externalConverter) {
+        converterConfiguration.put(externalConverter, Boolean.TRUE);
+        return this;
+    }
+
+    /**
+     * Enables the given {@link no.kantega.pdf.conversion.IExternalConverter}. Any converter that is shipped with
+     * this library is discovered automatically but can be disabled by invoking this method.
+     *
+     * @param externalConverter The converter to be disabled.
+     * @return This builder.
+     */
+    public ConverterServerBuilder disable(Class<? extends IExternalConverter> externalConverter) {
+        converterConfiguration.put(externalConverter, Boolean.FALSE);
+        return this;
+    }
+
+    /**
      * Creates the conversion server that is specified by this builder.
      *
      * @return The conversion server that is specified by this builder.

@@ -69,11 +69,26 @@ class CommandDescription {
             "by the converter. Valid log levels are 'off', 'error', 'warn', 'info', 'debug' and 'trace'. Without explicit configuration, " +
             "the 'warn' level is activated which is also the recommended level for production use of the converter.";
 
+    public static final String ARGUMENT_LONG_ENABLED_CONVERTER = "enable";
+    public static final String ARGUMENT_SHORT_ENABLED_CONVERTER = "E";
+    public static final String DESCRIPTION_CONTEXT_ENABLED_CONVERTER = "The fully qualified Java class name of the document converter to enable.";
+    public static final String DESCRIPTION_ARGUMENT_ENABLED_CONVERTER = "Without any explicit setup, the conversion server picks up any known " +
+            "document converter from the class path. By using this command, a custom conversion server can be installed, additionally to those " +
+            "that are discovered automatically.";
+
+    public static final String ARGUMENT_LONG_DISABLED_CONVERTER = "disable";
+    public static final String ARGUMENT_SHORT_DISABLED_CONVERTER = "D";
+    public static final String DESCRIPTION_CONTEXT_DISABLED_CONVERTER = "The fully qualified Java class name of the document converter to disable.";
+    public static final String DESCRIPTION_ARGUMENT_DISABLED_CONVERTER = "The conversion server picks up any known document converter from the class " +
+            "path. A converter can be disabled by either removing it from the class path or by specifying it by this command. If a converter is both " +
+            "specified to be enabled and disabled, it is considered to be enabled.";
+
     public static final String ARGUMENT_LONG_HELP = "help";
     public static final String ARGUMENT_SHORT_HELP = "?";
     public static final String DESCRIPTION_CONTEXT_HELP = "Displays information about this application.";
 
     public static final String DESCRIPTION_BASE_URI = "The base URI of the conversion server. (e.g. http://localhost:8080)";
+
 
     private CommandDescription() {
         throw new UnsupportedOperationException();

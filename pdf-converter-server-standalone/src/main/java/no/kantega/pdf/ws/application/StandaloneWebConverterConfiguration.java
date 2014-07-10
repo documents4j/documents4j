@@ -59,7 +59,10 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
                 .baseFolder(baseFolder)
                 .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
                 .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS);
-        // TODO: Configure enabled and disabled converters.
+        for (Map.Entry<Class<? extends IExternalConverter>, Boolean> entry : converterConfiguration.entrySet()) {
+            LOGGER.info("{} converter: %s", entry.getValue() ? "ENABLED" : "DISABLED", entry.getKey());
+            builder = entry.getValue() ? builder.enable(entry.getKey()) : builder.disable(entry.getKey());
+        }
         this.converter = builder.build();
         LOGGER.info("Standalone conversion server is starting: local converter is started");
     }

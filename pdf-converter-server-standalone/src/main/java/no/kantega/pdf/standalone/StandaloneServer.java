@@ -12,6 +12,7 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
 import joptsimple.*;
 import no.kantega.pdf.builder.ConverterServerBuilder;
+import no.kantega.pdf.conversion.IExternalConverter;
 import no.kantega.pdf.job.LocalConverter;
 import no.kantega.pdf.ws.application.IWebConverterConfiguration;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -81,6 +82,9 @@ public class StandaloneServer {
         ArgumentAcceptingOptionSpec<Long> processTimeoutSpec = makeProcessTimeoutSpec(optionParser);
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
+        ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterEnabledSpec = makeConverterEnabledSpec(optionParser);
+        ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterDisabledSpec = makeConverterDisabledSpec(optionParser);
+
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -123,12 +127,19 @@ public class StandaloneServer {
         Level level = logLevelSpec.value(optionSet);
         configureLogging(logFile, level);
 
-        return ConverterServerBuilder.builder()
+        ConverterServerBuilder builder = ConverterServerBuilder.builder()
                 .baseUri(baseUri)
                 .baseFolder(baseFolder)
                 .workerPool(corePoolSize, corePoolSize + fallbackPoolSize, keepAliveTime, TimeUnit.MILLISECONDS)
                 .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS);
+        for (Class<? extends IExternalConverter> externalConverter : converterDisabledSpec.values(optionSet)) {
+            builder = builder.disable(externalConverter);
+        }
+        for (Class<? extends IExternalConverter> externalConverter : converterEnabledSpec.values(optionSet)) {
+            builder = builder.enable(externalConverter);
+        }
+        return builder;
     }
 
     private static void configureLogging(File logFile, Level level) {
@@ -292,6 +303,30 @@ public class StandaloneServer {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_LEVEL)
                 .withValuesConvertedBy(new LogLevelValueConverter())
                 .defaultsTo(Level.WARN);
+    }
+
+    private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterDisabledSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                                CommandDescription.ARGUMENT_LONG_DISABLED_CONVERTER,
+                                CommandDescription.ARGUMENT_SHORT_DISABLED_CONVERTER),
+                        CommandDescription.DESCRIPTION_CONTEXT_DISABLED_CONVERTER
+                )
+                .withRequiredArg()
+                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_DISABLED_CONVERTER)
+                .withValuesConvertedBy(new ExternalConverterValueConverter());
+    }
+
+    private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterEnabledSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                                CommandDescription.ARGUMENT_LONG_ENABLED_CONVERTER,
+                                CommandDescription.ARGUMENT_SHORT_ENABLED_CONVERTER),
+                        CommandDescription.DESCRIPTION_CONTEXT_ENABLED_CONVERTER
+                )
+                .withRequiredArg()
+                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_ENABLED_CONVERTER)
+                .withValuesConvertedBy(new ExternalConverterValueConverter());
     }
 
     private static NonOptionArgumentSpec<URI> makeBaseUriSpec(OptionParser optionParser) {

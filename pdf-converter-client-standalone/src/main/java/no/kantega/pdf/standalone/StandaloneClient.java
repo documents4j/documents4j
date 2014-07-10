@@ -34,6 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class StandaloneClient {
 
     private static final Map<DocumentType, String> FILE_NAME_EXTENSIONS;
+
     static {
         FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
         FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
@@ -76,6 +77,8 @@ public class StandaloneClient {
                             break;
                         } else if (argument.equals("\\f")) {
                             documentTypes = configureConversion(console, converter.getSupportedConversions());
+                        } else if (argument.trim().equals("")) {
+                            continue;
                         }
                         int targetIndex = argument.indexOf("->");
                         String source = targetIndex == -1 ? argument : argument.substring(0, targetIndex);
@@ -84,7 +87,7 @@ public class StandaloneClient {
                             console.printf("Input file does not exist: %s%n", sourceFile);
                             continue;
                         }
-                        String target = targetIndex == -1 ? source + extensionFor(documentTypes[1]) : argument.substring(targetIndex + 1);
+                        String target = targetIndex == -1 ? source + "." + extensionFor(documentTypes[1]) : argument.substring(targetIndex + 1);
                         File targetFile = normalize(target);
                         converter.convert(sourceFile).as(documentTypes[0])
                                 .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(documentTypes[1])
@@ -109,13 +112,13 @@ public class StandaloneClient {
     }
 
     private static DocumentType[] configureConversion(Console console, Map<DocumentType, Set<DocumentType>> supportedConversions) {
-        console.printf("The connected converter supports the following conversion formats:");
+        console.printf("The connected converter supports the following conversion formats:%n");
         Map<Integer, DocumentType[]> conversionsByIndex = new HashMap<Integer, DocumentType[]>();
         int index = 0;
         for (Map.Entry<DocumentType, Set<DocumentType>> entry : supportedConversions.entrySet()) {
             for (DocumentType targetType : entry.getValue()) {
                 conversionsByIndex.put(index, new DocumentType[]{entry.getKey(), targetType});
-                console.printf("  | [%i]: '%s' to '%s'%n", entry.getKey(), targetType);
+                console.printf("  | [%d]: '%s' -> '%s'%n", index++, entry.getKey(), targetType);
             }
         }
         do {

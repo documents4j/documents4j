@@ -24,6 +24,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
     private AtomicInteger nameGenerator;
     private File files;
     private Set<File> fileCopies;
+
     protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
         this.documentTypeProvider = documentTypeProvider;
         assertNotNull(getClass() + "was not set up properly", externalConverter);

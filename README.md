@@ -68,8 +68,22 @@ Note that MS Windows's process model requires GUI processes (such as MS Word) to
 #### Microsoft Excel converter ####
 The MS Excel converter is represented by a `MicrosoftExcelBridge` instance. All information that was given on the `MicrosoftWordBridge` apply to the MS Excel bridge. However, note that MS Excel is not equally robust as MS Word when it comes to concurrent access. For this reason, the `MicrosoftExcelBridge` only allows for the concurrent conversion of a single file. This property is enforced by documents4j by using an internal lock.
 
-
 **Important**: Note that you have to manually add a dependency to either the `MicrosoftWordBridge` or the `MicrosoftExcelBridge` when using the `LocalConverter`. The MS Word bridge is contained by the *com.documents4j/documents4j-transformer-msoffice-word* Maven module and the MS Excel bridge by the *com.documents4j/documents4j-transformer-msoffice-excel* module.
+
+#### Give it a try ####
+documents4j was written after evaluating several solutions for converting *docx* files into *pdf* which unfortunately all produced files with layout distortions of different degrees. If you are evaluating documents4j and want to see its results, simply run the following on a Windows machine's command line:   
+
+```shell
+git clone https://github.com/documents4j/documents4j.git
+cd documents4j
+cd documents4j-local-demo
+mvn jetty:run
+```
+
+You can now open `http://localhost:8080` on you machine's browser and convert files from the browser window. In order for this to work, you need to run MS Windows and have MS Word and MS Excel installed.
+
+#### Custom converters ####
+Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` prameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `ViableConversions` annotation allows to define several `ViableConversion` annotations.
 
 Remote converter
 ----------------
@@ -94,6 +108,8 @@ java -jar documents4j-server-standalone-shaded.jar http://localhost:9998
 ```
 
 The above command starts the conversion server to listen for a HTTP connection on port 9998 wich is not accessible for the `LocalConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
+
+A conversion server can also be started programatically using a `ConversionServerBuilder`.
 
 #### Conversion client ####
 Similarly to the conversion server, documents4j ships with a small console client which is mainly intended for debugging purposes. Using the client it is possible to connect to a conversion server in order to validate that a connection is possible and not prevented by for example active fire walls. The client is contained in the *com.documents4j/documents4j-client-standalone* module. You can connect to a server by:

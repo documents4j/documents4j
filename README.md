@@ -1,6 +1,6 @@
 documents4j
 ===========
-documents4j is a Java library for converting documents into another document format. This is achieved by delegating the conversion to any native application which understands the conversion of the given file into the desired target format. documents4j comes with adaptations for MS Word and MS Excel for Windows what allows for example for the conversion of a *docx* file into a *pdf* file without the usual distorions in the resulting document which are often observed for conversions that were coducted using non-Microsoft products.
+documents4j is a Java library for converting documents into another document format. This is achieved by delegating the conversion to any native application which understands the conversion of the given file into the desired target format. documents4j comes with adaptations for MS Word and MS Excel for Windows what allows for example for the conversion of a *docx* file into a *pdf* file without the usual distortions in the resulting document which are often observed for conversions that were conducted using non-Microsoft products.
 
 documents4j offers a simple API and two implementations of this API:
 
@@ -23,14 +23,14 @@ Future<Boolean> conversion = converter
                                 .schedule();
 ```
 
-All methods of the `IConverter` interface and its builder types offer overloadeded methods. Instead of providing `File` instances, it is also possible to provide an `InputStream` as a source document and an `OutputStream` for writing the result. These streams are never closed by documents4j. As another option, the source document can be retreived by querying an `IInputStreamSource` or an `IFileSource` which offer generic callback methods which are then used by documents4j. Similarly, the `IInputStreamConsumer` and `IFileConsumer` interfaces allow for implementing a generic way of processing the result of a conversion. However, note that these callbacks are normally triggered from another thread. These threads are used by documents4j internally such that you should not perform heavy tasks from these callbacks. documents4j is fully thread-safe as long as it is not stated differently.
+All methods of the `IConverter` interface and its builder types offer overloaded methods. Instead of providing `File` instances, it is also possible to provide an `InputStream` as a source document and an `OutputStream` for writing the result. These streams are never closed by documents4j. As another option, the source document can be obtained by querying an `IInputStreamSource` or an `IFileSource` which offer generic callback methods which are then used by documents4j. Similarly, the `IInputStreamConsumer` and `IFileConsumer` interfaces allow for implementing a generic way of processing the result of a conversion. However, note that these callbacks are normally triggered from another thread. These threads are used by documents4j internally such that you should not perform heavy tasks from these callbacks. documents4j is fully thread-safe as long as it is not stated differently.
 
-Finally, a conversion can be prioritized via `prioritizeWith` where a higher priority signals to the converter that a conversion should be conducted before a conversion with lower priority if both conversions are getting queued. documents4j is capable of performing document conversions concurrently and puts conversion into an internal job queue which is organized by these priorities. There is however not guarantee that a conversion with higher priority is performed befor a conversion with lower priority.
+Finally, a conversion can be prioritized via `prioritizeWith` where a higher priority signals to the converter that a conversion should be conducted before a conversion with lower priority if both conversions are getting queued. documents4j is capable of performing document conversions concurrently and puts conversion into an internal job queue which is organized by these priorities. There is however not guarantee that a conversion with higher priority is performed before a conversion with lower priority.
 
 A conversion can be scheduled to be executed in the background by calling `schedule` after 
 specifying a conversion. Alternatively, by calling `execute`, the current thread will block until the conversion is finished. The resulting `boolean` incicates if a conversion was successful. Exceptional conversion results are however communicated by exceptions which are described belwo.
 
-For finding out which conversions are supported by an `IConverter`, you can query the `getSupportedConversions` method which returns a map of source formats to their supported target formats. Furthermore, you can call the `isOperational` in order to check the functionality of a converter. A converter might not be operational because its prerequesits are not met. Those prerequesits are described below for each implementation of an `IConverter`.
+For finding out which conversions are supported by an `IConverter`, you can query the `getSupportedConversions` method which returns a map of source formats to their supported target formats. Furthermore, you can call the `isOperational` in order to check the functionality of a converter. A converter might not be operational because its prerequisites are not met. Those prerequisites are described below for each implementation of an `IConverter`.
 
 Note that an `IConverter` implementation might describe a rather expensive structure as it is normally backed by external resources such as native processes or a network connection. For repeated conversions, you should reuse the same instance of an `IConverter`. Furthermore, note that an `IConverter` has an explicit life-cycle and must be shut down by invoking `shutDown`. documents4j registers a shut-down hook for shutting down converter instances, but you should never rely on this mechanism. Once an `IConverter` was shut down, it cannot be restarted. After a converter was shut down, its `isOperational` always returns `false`.
 
@@ -46,9 +46,9 @@ IConverter converter = LocalConverter.builder()
                            .build();
 ```
 
-The above converter was configured to write temporary files into the given folder. If this property is set, documents4j creates a random folder. By setting a worker pool, you determine the maximum number of concurrent conversions that are attempted by documents4j. A meaningsful value is ultimately determined by the capabilities of the backing converters. It is however also determined by the executing machine's CPU and memory. An optimal value is best found by trial-and-error. 
+The above converter was configured to write temporary files into the given folder. If this property is set, documents4j creates a random folder. By setting a worker pool, you determine the maximum number of concurrent conversions that are attempted by documents4j. A meaningful value is ultimately determined by the capabilities of the backing converters. It is however also determined by the executing machine's CPU and memory. An optimal value is best found by trial-and-error. 
 
-Furthermore, a timeout for external processes of 5 seconds is set. In order to convert a file into another document format, the conversion is delegated to an implementation of `IExternalConverter`. Such external converters normally start a process on the OS for invocing a conversion by some installed software. documents4j ships with two such external converters, once implementation for MS Word on Windows and one for MS Excel on Windows. If these converters are found on the class path, the `LocalConverter` discovers and loads them automatically unless they are explicitly deregistered by the builder's `disable` method. Custom converters need to be registered explicitly by the builder's `enable` method.
+Furthermore, a timeout for external processes of 5 seconds is set. In order to convert a file into another document format, the conversion is delegated to an implementation of `IExternalConverter`. Such external converters normally start a process on the OS for invoking a conversion by some installed software. documents4j ships with two such external converters, once implementation for MS Word on Windows and one for MS Excel on Windows. If these converters are found on the class path, the `LocalConverter` discovers and loads them automatically unless they are explicitly deregistered by the builder's `disable` method. Custom converters need to be registered explicitly by the builder's `enable` method.
 
 Note that the builder itself is mutable and not thread-safe. The resulting `LocalConverter` on the other side is fully thread-safe.
 
@@ -59,9 +59,9 @@ Furthermore, the `LocalConverter` can only be run if:
 
 - The JVM is run on a MS Windows platform that ships with the Microsoft Scripting Host for VBS (this is true for all contemporary versions of MS Windows.
 - MS Word is installed in version 2007 or higher. PDF conversion is only supported when the PDF plugin is installed. The plugin is included into MS Word from Word 2010 and higher.
--   MS Word is not already running when the `LocalConverter` starts. This is in particularly true for MS Word instances that are run by another instance of `LocalConverter`. (As mentioned, be aware that this is also true for instances running on a different JVM or that are loaded by a different class loader.)
--   MS Word is properly activated and configured for the user running the JVM. MS Word does therefore not require any configuration on program startup or any other wizard.
--   When the JVM application which uses the `LocalConverter` is run as a service, note the information on using MS Word from the MS Windows service profile below.
+- MS Word is not already running when the `LocalConverter` starts. This is in particularly true for MS Word instances that are run by another instance of `LocalConverter`. (As mentioned, be aware that this is also true for instances running on a different JVM or that are loaded by a different class loader.)
+- MS Word is properly activated and configured for the user running the JVM. MS Word does therefore not require any configuration on program startup or any other wizard.
+- When the JVM application which uses the `LocalConverter` is run as a service, note the information on using MS Word from the MS Windows service profile below.
 
 Note that MS Windows's process model requires GUI processes (such as MS Word) to be started as a child of a specific MS Windows process. Thus, the MS Word process is never a child process of the JVM process. Thus, the MS Word process will survive in case that the JVM process is killed without triggering its shut-down hooks. Make sure to always end your JVM process normally when using documents4j. Otherwise, orphan processes might live without the JVM process. documents4j will however attempt to reuse these processes after a restart.
 
@@ -83,7 +83,7 @@ mvn jetty:run
 You can now open `http://localhost:8080` on you machine's browser and convert files from the browser window. Do not kill the application process but shut it down gracefully such that documents4j can shut down its MS Word and MS Excel processes. In order for this application to function, MS Word and MS Excel must not be started on application startup.
 
 #### Custom converters ####
-Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` prameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `ViableConversions` annotation allows to define several `ViableConversion` annotations.
+Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` parameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `ViableConversions` annotation allows to define several `ViableConversion` annotations.
 
 Remote converter
 ----------------
@@ -98,7 +98,7 @@ IConverter converter = RemoteConverter.builder()
                            .build();
 ```
 
-Similary to the `LocalConverter`, the `RemoteConverter` requires a folder for writing temporary files which is created implicitly if no such forlder is specified. This time however, the worker pool implicitly determines the number of concurrent REST requests for converting a file where the request timeout specifies the maximal time such a conversion is allowed to take. As the base URI, the remote converter specifies the address of a *conversion server* which offers a REST API for performing document conversions. Note that all the `IConverter`'s `getSupportedConversions` and `isOperational` methods delegate to this REST API as well and are not cached. 
+Similary to the `LocalConverter`, the `RemoteConverter` requires a folder for writing temporary files which is created implicitly if no such folder is specified. This time however, the worker pool implicitly determines the number of concurrent REST requests for converting a file where the request timeout specifies the maximal time such a conversion is allowed to take. As the base URI, the remote converter specifies the address of a *conversion server* which offers a REST API for performing document conversions. Note that all the `IConverter`'s `getSupportedConversions` and `isOperational` methods delegate to this REST API as well and are not cached. 
 
 #### Conversion server ####
 documents4j offers a standalone conversion server which implements the required REST API by using a `LocalConverter` under the covers. This conversion server is contained in the *com.documents4j/documents4j-server-standalone* module. The Maven build creates a shaded artifact for this module which contains all dependencies. This way, the conversion server can be started from the command line, simply by:
@@ -107,9 +107,9 @@ documents4j offers a standalone conversion server which implements the required 
 java -jar documents4j-server-standalone-shaded.jar http://localhost:9998
 ```
 
-The above command starts the conversion server to listen for a HTTP connection on port 9998 wich is not accessible for the `LocalConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
+The above command starts the conversion server to listen for a HTTP connection on port 9998 which is not accessible for the `LocalConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
 
-A conversion server can also be started programatically using a `ConversionServerBuilder`.
+A conversion server can also be started programmatically using a `ConversionServerBuilder`.
 
 #### Conversion client ####
 Similarly to the conversion server, documents4j ships with a small console client which is mainly intended for debugging purposes. Using the client it is possible to connect to a conversion server in order to validate that a connection is possible and not prevented by for example active fire walls. The client is contained in the *com.documents4j/documents4j-client-standalone* module. You can connect to a server by:
@@ -118,7 +118,7 @@ Similarly to the conversion server, documents4j ships with a small console clien
 java -jar documents4j-client-standalone-shaded.jar http://localhost:9998
 ```
 
-Again, the `-?` option can be supplied for retreiving a list of options.
+Again, the `-?` option can be supplied for obtaining a list of options.
 
 Exception hierarchy
 -------------------
@@ -128,7 +128,7 @@ The native exceptions thrown by an `IConverter` are either instances of `Convert
 
 - `ConversionInputException`: The source file that was provided for a conversion could not be read in the given source file format. This means that the input data either represents another file format or the input data is corrupt and cannot be read by the responsible converter.
 - `FileSystemInteractionException`: The source file does not exist or is locked by the JVM or another application. (*Note*: You must **not** lock files in the JVM when using a `LocalConverter` since they might need to be processed by another software which is then prevented to do so.) This exception is also thrown when the target file is locked. Unlocked, existing files are simply overwritten when a conversion is triggered. Finally, the exception is also thrown when using a file stream causes an `IOException` where the IO exception is wrapped before it is rethrown. 
-- `ConverterAccessException`: This exception is thrown when a `IConverter` instance is in invalid state. This occurs when an `IConverter` was either shut down or the conditions for using a converter are not met, either because a remote converter cannot longer connect to its conversion server or because a backing conversion software is inaccessible. This exception can also occure when creating a `LocalConverter` or a `RemoteConverter`.
+- `ConverterAccessException`: This exception is thrown when a `IConverter` instance is in invalid state. This occurs when an `IConverter` was either shut down or the conditions for using a converter are not met, either because a remote converter cannot longer connect to its conversion server or because a backing conversion software is inaccessible. This exception can also occur when creating a `LocalConverter` or a `RemoteConverter`.
 
 **Note**: Be aware that `IConverter` implementations do not follow a prevalence of exceptions. When a user is trying to convert a non-existent file with a converter in a bad state, it cannot be guaranteed that this will always throw a `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ on different implementations of the `IConverter` API.
 
@@ -136,11 +136,11 @@ Logging
 -------
 All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can therefore be processed independently of this application. The verbosity of this application's logging behavior is determined by the overall logging level where *info* or *warn* are recommended as minimum logging levels in production. The different logging levels will determine the following events to be logged:
 
-- *trace*: On this level, all concurrent code will log the aquiration and release of monitors.
-- *info*: On this level, non-exceptional state interactions with external ressources will be logged. A logging message will for example expose when MS Word is started or stopped or when a conversion server is bound to a port.
+- *trace*: On this level, all concurrent code will log the acquisition and release of monitors.
+- *info*: On this level, non-exceptional state interactions with external resources will be logged. A logging message will for example expose when MS Word is started or stopped or when a conversion server is bound to a port.
 - *debug*: This logging level is not used by this application.
 - *warn*: On this level, non-fatal errors are logged such as the timeout of a HTTP conversion due to high traffic. Normally, such log events are accompanied by an exception being thrown.
-- *error*: On this level, all user errors are logged. For example, the attemt of converting a non-existant file would cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
+- *error*: On this level, all user errors are logged. For example, the attempt of converting a non-existent file would cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
 
 Efficiency considerations
 -------------------------
@@ -155,7 +155,7 @@ MS Office components are (of course) not run within the Java virtual machine's p
 
 Running documents4j application as Windows service
 --------------------------------------
-documents4j might misfunction when run as a Windows service together with MS Office conversion. Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service context. When run as a service, MS Office is always started with MS Window's local service account which does not configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there are two possible approaches of which the first approach is more recommended:
+documents4j might malfunction when run as a Windows service together with MS Office conversion. Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service context. When run as a service, MS Office is always started with MS Window's local service account which does not configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there are two possible approaches of which the first approach is more recommended:
 
 1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*. On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*. [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).
 2. You can manipulate MS Window's registry such that MS Office applications are run with another account than the local service account. [This approach is documented on MSDN](http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy). Note that this breaks MS Window's sandbox model and imposes additional security threats to the machine that runs MS Office.
@@ -185,7 +185,6 @@ Credits
 -------
 This application was developed by [Kantega AS](http://kantega.no) as a project order of the [municipality of Oslo](http://www.oslo.kommune.no) and was open-sourced thanks to their generous endorsement. 
 
-This library would not possible without the use of [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handling
-command line processes in a Java application. Also, I want to thank the makers of [*thread-weaver*](http://code.google.com/p/thread-weaver/) for their great framework for unit testing concurrent applications. Finally, without the help of [*mockito*](http://code.google.com/p/mockito/), it would have been impossible to write proper unit tests that run without the integration of MS Word.  
+This library would not possible without the use of [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handling command line processes in a Java application. Also, I want to thank the makers of [*thread-weaver*](http://code.google.com/p/thread-weaver/) for their great framework for unit testing concurrent applications. Finally, without the help of [*mockito*](http://code.google.com/p/mockito/), it would have been impossible to write proper unit tests that run without the integration of MS Word.  
 
 [![Build Status](https://travis-ci.org/documents4j/documents4j.png)](https://travis-ci.org/documents4j/documents4j) 

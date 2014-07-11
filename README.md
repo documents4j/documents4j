@@ -71,7 +71,7 @@ The MS Excel converter is represented by a `MicrosoftExcelBridge` instance. All 
 **Important**: Note that you have to manually add a dependency to either the `MicrosoftWordBridge` or the `MicrosoftExcelBridge` when using the `LocalConverter`. The MS Word bridge is contained by the *com.documents4j/documents4j-transformer-msoffice-word* Maven module and the MS Excel bridge by the *com.documents4j/documents4j-transformer-msoffice-excel* module.
 
 #### Give it a try ####
-documents4j was written after evaluating several solutions for converting *docx* files into *pdf* which unfortunately all produced files with layout distortions of different degrees. If you are evaluating documents4j and want to see its results, simply run the following on a Windows machine's command line:   
+documents4j was written after evaluating several solutions for converting *docx* files into *pdf* which unfortunately all produced files with layout distortions of different degrees. For these experiences, documents4j comes with an evaluation application which is run in the browser. For starting this application, simply run the following commands on a Windows machine with MS Word and MS Excel installed:   
 
 ```shell
 git clone https://github.com/documents4j/documents4j.git
@@ -80,7 +80,7 @@ cd documents4j-local-demo
 mvn jetty:run
 ```
 
-You can now open `http://localhost:8080` on you machine's browser and convert files from the browser window. In order for this to work, you need to run MS Windows and have MS Word and MS Excel installed.
+You can now open `http://localhost:8080` on you machine's browser and convert files from the browser window. Do not kill the application process but shut it down gracefully such that documents4j can shut down its MS Word and MS Excel processes. In order for this application to function, MS Word and MS Excel must not be started on application startup.
 
 #### Custom converters ####
 Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` prameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `ViableConversions` annotation allows to define several `ViableConversion` annotations.

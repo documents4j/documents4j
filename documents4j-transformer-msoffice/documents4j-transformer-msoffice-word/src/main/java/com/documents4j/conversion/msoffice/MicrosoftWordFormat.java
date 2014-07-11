@@ -5,7 +5,7 @@ import com.documents4j.api.DocumentType;
 /**
  * A format <a href="http://msdn.microsoft.com/en-us/library/bb238158%28v=office.12%29.aspx">enumeration for MS Office</a>.
  */
-public enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
+enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
 
     PDF("17", "pdf", DocumentType.PDF),
     PDFA("999", "pdf", DocumentType.PDFA),

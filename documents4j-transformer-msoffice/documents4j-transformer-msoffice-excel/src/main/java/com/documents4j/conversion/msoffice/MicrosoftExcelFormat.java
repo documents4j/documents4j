@@ -2,7 +2,11 @@ package com.documents4j.conversion.msoffice;
 
 import com.documents4j.api.DocumentType;
 
-public enum MicrosoftExcelFormat implements MicrosoftOfficeFormat {
+/**
+ * An enumeration of <a href="http://msdn.microsoft.com/en-us/library/bb241279%28v=office.12%29.aspx">MS Excel file
+ * format encodings</a>.
+ */
+enum MicrosoftExcelFormat implements MicrosoftOfficeFormat {
 
     PDF("999", "pdf", DocumentType.PDF),
     XLSX("51", "xlsx", DocumentType.XLSX),

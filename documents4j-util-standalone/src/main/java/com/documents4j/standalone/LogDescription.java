@@ -1,6 +1,6 @@
 package com.documents4j.standalone;
 
-public class LogDescription {
+class LogDescription {
 
     public static final String LOG_PATTERN = "%date %-5level [%thread] %logger{42} - %message%n";
 

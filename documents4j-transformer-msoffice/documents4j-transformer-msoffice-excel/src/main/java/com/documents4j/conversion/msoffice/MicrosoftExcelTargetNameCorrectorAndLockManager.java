@@ -6,12 +6,19 @@ import org.zeroturnaround.exec.ProcessExecutor;
 import java.io.File;
 import java.util.concurrent.Semaphore;
 
-public class MicrosoftExcelTargetNameCorrectorAndLockManager extends MicrosoftOfficeTargetNameCorrector {
+/**
+ * A target name corrector for MS Excel which also obtains a lock before a process is triggered and releases this
+ * lock after the process which is required for MS Excel which cannot work concurrently.
+ */
+class MicrosoftExcelTargetNameCorrectorAndLockManager extends MicrosoftOfficeTargetNameCorrector {
 
     private final Semaphore conversionLock;
     private final Logger logger;
 
-    public MicrosoftExcelTargetNameCorrectorAndLockManager(File target, String fileExtension, Semaphore conversionLock, Logger logger) {
+    public MicrosoftExcelTargetNameCorrectorAndLockManager(File target,
+                                                           String fileExtension,
+                                                           Semaphore conversionLock,
+                                                           Logger logger) {
         super(target, fileExtension);
         this.conversionLock = conversionLock;
         this.logger = logger;
@@ -38,7 +45,7 @@ public class MicrosoftExcelTargetNameCorrectorAndLockManager extends MicrosoftOf
     }
 
     @Override
-    protected boolean targetHasWrongFileExtensionForPdf() {
-        return fileExtension.equals("pdf") && super.targetHasWrongFileExtensionForPdf();
+    protected boolean targetHasWrongFileExtension() {
+        return fileExtension.equals("pdf") && super.targetHasWrongFileExtension();
     }
 }

@@ -18,7 +18,8 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Builds a standalone remote conversion server. This builder is usually run from the command line.
+ * Builds a standalone remote conversion server. This builder is usually run from a command line tool but can also
+ * be used for creating a standalone server programmatically.
  *
  * @see com.documents4j.standalone.StandaloneServer#main(String[])
  */

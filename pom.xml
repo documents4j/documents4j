@@ -9,44 +9,46 @@
     <packaging>pom</packaging>
 
     <!--
-     Note: This project can be built on any machine. However, running the tests of the documents4j-transformer-msoffice-word
-     module requires the following configuration:
-      (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows)
-      (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin)
-      (3) Microsoft Word is not running when the built process is started and is neither started manually while the
-          tests are running
-      (4) Microsoft Word is properly activated and does not require any startup configuration - if MS Word is querying
-          for configuration on program startup, any conversion attempts will fail
-     If you cannot provide this setup, build this project with active "no-msoffice" profile and the corresponding
-     tests will be skipped. In general, unit tests for the converters can fail since MS Word was not built for
-     short-interval restarting. However, this happens rarely.
+     Note: This project can be built on any machine. However, any MS Office specific test requires an installation
+     of MS Office for Windows on the same physical machine. For running these tests, activate the 'ms-office' profile.
+     Additionally, the following setup is required:
+      (1) An installation of the Microsoft Scripting Host (comes with most versions of MS Windows).
+      (2) An installation of Microsoft Word 2007 or higher (MS Word 2007 additionally requires the PDF plugin) or
+          and installation of Microsoft Excel 2007 or higher.
+      (3) Microsoft Word and Microsoft Excel are not running when the built process is started and are neither started
+          manually while the tests are running.
+      (4) Microsoft Word and Microsoft Excel are properly activated and do not require any startup configuration.
+          If MS Word or MS Excel are starting a wizard on program startup, any conversion attempts will fail.
 
      Furthermore, for running the tests of the documents4j-server-standalone module, you require:
       (4) Your machine must have a free port and it must be possible to bind a server listener to this port
-          (the Jersey related tests suggest port 9998 to be available for testing)
+          (the Jersey related tests suggest port 9998 to be available for testing).
 
      Many tests throughout all modules require:
       (5) Possibility to create temporary folders on the local file system and creating, deleting and executing
-          files in these folders
+          files in these folders.
 
      Please note that Microsoft does not recommend or officially supports MS Office automation. Also note the legal
      requirements to run MS Office in a server context on 'http://support.microsoft.com/kb/257757'.
 
-     Also, be careful when running a local MS Word transformer since it requires synchronization with MS Word.
-     When the JVM running this program exits abnormally (for example by a user interrupt causing a process termination
-     signal), the application cannot run any shut down hooks to terminate MS Word. The MS Word process will
-     therefore leak. When developing and testing this application, always keep an eye on your machine's task manager.
+     Also, be careful when running a local MS Word or MS Excel transformer since they require synchronization with
+     the MS Office installation. When the JVM running this program exits abnormally (for example by a user interrupt
+     causing a process termination signal), the application cannot run any shut down hooks to terminate MS Office
+     components. The MS Office process will therefore leak. When developing and testing this application, always
+     keep an eye on your machine's task manager. However, note that documents4j attempts to pick up orphaned MS
+     Office processes on startup, i.e. due to an unexpected restart.
 
      Profile summary:
-      (1) ms-office: Runs tests that require MS Word and MS Windows.
+      (1) ms-office: Runs tests that require MS Word and MS Excel installed on MS Windows.
       (2) extras: Build a shaded jar for the standalone conversion server as well as javadoc and source artifacts.
-      (3) checks: Perform additional source code checks (activated by default)
+      (3) checks: Perform additional source code checks (activated by default).
 
-     Note that MS Office does not officially support its execution in a service context. When run as a service, MS
-     Office is always started with MS Window's local service account which does not configure a desktop. However, MS
-     Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will
-     start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there
-     are two possible approaches of which the first approach is more recommended:
+     Note that MS Office components do not officially support their execution in a service context. When run as a
+     service, MS Office components are always started with MS Window's local service account which does not configure
+     a desktop. However, MS Office components expect a desktop to exist in order to run properly. Without such a
+     desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow
+     MS Office components to run in a service context, there are two possible approaches of which the first approach is
+     more recommended:
       (1) On a 32-bit system, create the folder 'C:\Windows\System32\config\systemprofile\Desktop'.
           On a 64-bit system, create the folder 'C:\Windows\SysWOW64\config\systemprofile\Desktop'.
           For more information, see
@@ -81,7 +83,7 @@
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <!-- Late versions of Jersey require Java 7 -->
+        <!-- Note: Later versions of Jersey require Java 7 -->
         <version.jersey>2.6</version.jersey>
         <version.guava>17.0</version.guava>
         <version.zt-exec>1.7</version.zt-exec>
@@ -104,14 +106,16 @@
         <version.maven.resources>2.6</version.maven.resources>
         <version.maven.compiler>3.1</version.maven.compiler>
         <version.maven.install>2.5.1</version.maven.install>
+        <version.maven.jxr>2.3</version.maven.jxr>
         <version.java>1.6</version.java>
+        <distribution.bintray>https://api.bintray.com/maven/raphw/maven/documents4j</distribution.bintray>
     </properties>
 
     <developers>
         <developer>
             <id>raphw</id>
             <name>Rafael Winterhalter</name>
-            <email>rafael.wth@.gmail.com</email>
+            <email>rafael.wth@gmail.com</email>
             <url>http://rafael.codes</url>
             <roles>
                 <role>developer</role>
@@ -120,13 +124,8 @@
         </developer>
     </developers>
 
-    <organization>
-        <name>documents4j</name>
-        <url>http://www.documents4j.com</url>
-    </organization>
-
     <inceptionYear>2013</inceptionYear>
-    <url>https://github.com/documents4j/documents4j</url>
+    <url>http://documents4j.com</url>
 
     <name>documents4j</name>
     <description>A Java library for converting documents.</description>
@@ -151,6 +150,23 @@
             <comments>A business-friendly OSS license</comments>
         </license>
     </licenses>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>${version.maven.jxr}</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>${distribution.bintray}</url>
+        </repository>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>

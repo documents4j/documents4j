@@ -9,7 +9,8 @@ import org.apache.wicket.model.Model;
 
 import java.util.Iterator;
 
-public class FileDataProvider implements IDataProvider<FileRow>, ISortStateLocator {
+class FileDataProvider implements IDataProvider<FileRow>, ISortStateLocator {
+
     @Override
     public Iterator<? extends FileRow> iterator(long l, long l2) {
         return FileRow.findAll().subList((int) l, (int) l2).iterator();

@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A converter that allows the conversion of MS Word files to PDF. A converter might have an active life cycle such
- * that its {@link IConverter#shutDown()} method must be called when a converter is not longer used. After a converter
- * is shut down, it cannot be reused.
+ * A converter that allows the conversion of documents. A converter might have an active life cycle such that
+ * its {@link IConverter#shutDown()} method must be called when a converter is not longer used. After a converter
+ * is shut down, it cannot be reused but needs to be recreated.
  */
 public interface IConverter {
 
@@ -76,12 +76,12 @@ public interface IConverter {
      * Returns a mapping of all conversions that are supported by the backing conversion engine.
      *
      * @return A map of all possible conversions with the key describing the input types and the set
-     * describing the formats that this input type can be converted into.
+     * describing the formats that these input types can be converted into.
      */
     Map<DocumentType, Set<DocumentType>> getSupportedConversions();
 
     /**
-     * Checks if this converter is currently operational.
+     * Checks if this converter is currently operational, i.e. it can convert documents and is not shut down.
      *
      * @return {@code true} if the converter is operational.
      */

@@ -9,7 +9,7 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 
 import java.io.Serializable;
 
-public class ColoredFeedbackPanel extends FeedbackPanel {
+class ColoredFeedbackPanel extends FeedbackPanel {
 
     public ColoredFeedbackPanel(String id) {
         super(id);

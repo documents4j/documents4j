@@ -8,7 +8,7 @@ import org.apache.wicket.model.Model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileTable extends DataTable<FileRow, Void> {
+class FileTable extends DataTable<FileRow, Void> {
 
     @SuppressWarnings("unchecked")
     public FileTable(String id) {

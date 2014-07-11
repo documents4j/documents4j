@@ -39,7 +39,7 @@ public class StandaloneServer {
 
     /**
      * Starts a standalone conversion server. Detailed documentation can be retrieved by invoking
-     * the application via the command line.
+     * the application via the command line with the {@code -?} option.
      *
      * @param args The parameters for configuring this server.
      */

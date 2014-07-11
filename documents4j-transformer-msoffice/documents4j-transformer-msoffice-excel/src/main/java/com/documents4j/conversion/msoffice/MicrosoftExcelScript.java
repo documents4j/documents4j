@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+ * VBS Scripts for communicating with MS Excel.
+ */
 enum MicrosoftExcelScript implements MicrosoftOfficeScript {
 
     CONVERSION("/excel_convert.vbs"),

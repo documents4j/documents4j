@@ -8,6 +8,9 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A default implementation of an {@link com.documents4j.conversion.IConversionManager}.
+ */
 public class DefaultConversionManager implements IConversionManager {
 
     private final ConverterRegistry converterRegistry;
@@ -23,8 +26,8 @@ public class DefaultConversionManager implements IConversionManager {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, DocumentType inputFormat, File target, DocumentType outputFormat) {
-        return converterRegistry.lookup(inputFormat, outputFormat).startConversion(source, inputFormat, target, outputFormat);
+    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
+        return converterRegistry.lookup(sourceFormat, targetFormat).startConversion(source, sourceFormat, target, targetFormat);
     }
 
     @Override

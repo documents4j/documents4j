@@ -9,6 +9,12 @@ import org.zeroturnaround.exec.listener.ProcessListener;
 
 import java.io.File;
 
+/**
+ * For some file formats, MS Office components requires a target file to end with a given suffix. Otherwise, the file
+ * is renamed automatically. This target name converter offers a base implementation for a process callback which
+ * corrects the file name if the user expected a different file name but the original file was renamed by a MS Office
+ * component.
+ */
 class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftOfficeTargetNameCorrector.class);
@@ -22,7 +28,7 @@ class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
 
     @Override
     public void afterStop(Process process) {
-        if (conversionSuccessful(process) && (targetHasNoFileExtension() || targetHasWrongFileExtensionForPdf())) {
+        if (conversionSuccessful(process) && (targetHasNoFileExtension() || targetHasWrongFileExtension())) {
             File renamedTarget = makeRenamedTarget();
             LOGGER.trace("Rename file {} to {}", renamedTarget, target);
             tryCleanTarget(renamedTarget);
@@ -52,7 +58,7 @@ class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
         return Files.getFileExtension(target.getName()).length() == 0;
     }
 
-    protected boolean targetHasWrongFileExtensionForPdf() {
+    protected boolean targetHasWrongFileExtension() {
         return !Files.getFileExtension(target.getName()).equals(fileExtension);
     }
 

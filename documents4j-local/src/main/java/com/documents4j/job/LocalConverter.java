@@ -22,7 +22,10 @@ import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * A converter that relies on an external converter such as MS Word on the local file system.
+ * A converter that relies on an external converter such as an MS Office component on the local machine.
+ * A {@code LocalConverter} delegates its conversions to a {@link com.documents4j.conversion.IExternalConverter}.
+ * Such converters must be registered manually as long as they are shipped with documents4j where they are discovered
+ * on the class path.
  * <p>&nbsp;</p>
  * <i>Important</i>: There should only exist <b>one</b> {@link LocalConverter} per <b>physical machine</b>!
  * This instance needs to communicate with external applications via command line and needs to shut down

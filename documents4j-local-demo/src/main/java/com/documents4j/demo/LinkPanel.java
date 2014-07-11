@@ -7,7 +7,7 @@ import org.apache.wicket.model.IModel;
 
 import java.io.File;
 
-public class LinkPanel extends Panel {
+class LinkPanel extends Panel {
 
     LinkPanel(String id, IModel<File> file, IModel<String> type, IModel<String> name) {
         super(id);

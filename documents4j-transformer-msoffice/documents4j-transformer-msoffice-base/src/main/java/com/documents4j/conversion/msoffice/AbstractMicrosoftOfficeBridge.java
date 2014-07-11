@@ -14,6 +14,9 @@ import java.io.IOException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A base implementation of converting a file using a MS Office component.
+ */
 public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConverter {
 
     private final File conversionScript;

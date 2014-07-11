@@ -3,6 +3,9 @@ package com.documents4j.util;
 import com.documents4j.throwables.*;
 import com.google.common.base.Objects;
 
+/**
+ * Represents a reaction to an event within the conversion chain.
+ */
 public abstract class Reaction {
 
     Reaction() {
@@ -17,10 +20,23 @@ public abstract class Reaction {
         return new ExceptionalReaction(builder);
     }
 
+    /**
+     * Applies the reaction to a given event.
+     *
+     * @return The result of the conversion.
+     */
     public abstract boolean apply();
 
+    /**
+     * A builder for obtaining a runtime exception for a given error event.
+     */
     public static interface IExceptionBuilder {
 
+        /**
+         * Creates a runtime exception for a given error event.
+         *
+         * @return The exception for the given error event.
+         */
         RuntimeException make();
     }
 

@@ -8,7 +8,7 @@ import org.apache.wicket.model.IModel;
 
 import java.io.File;
 
-public class LinkColumn extends AbstractColumn<FileRow, Void> {
+class LinkColumn extends AbstractColumn<FileRow, Void> {
 
     private final FileInput fileInput;
 

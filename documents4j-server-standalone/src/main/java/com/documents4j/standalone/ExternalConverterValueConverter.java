@@ -4,7 +4,7 @@ import com.documents4j.conversion.IExternalConverter;
 import joptsimple.ValueConversionException;
 import joptsimple.ValueConverter;
 
-public class ExternalConverterValueConverter implements ValueConverter<Class<? extends IExternalConverter>> {
+class ExternalConverterValueConverter implements ValueConverter<Class<? extends IExternalConverter>> {
 
     @Override
     @SuppressWarnings("unchecked")

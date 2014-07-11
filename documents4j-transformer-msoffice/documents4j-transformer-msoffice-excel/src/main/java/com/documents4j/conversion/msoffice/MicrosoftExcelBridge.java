@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.documents4j.api.DocumentType.Value.*;
 
+/**
+ * A converter back-end for MS Excel.
+ */
 @ViableConversion(
         from = {APPLICATION + "/" + XLS,
                 APPLICATION + "/" + XLSX,

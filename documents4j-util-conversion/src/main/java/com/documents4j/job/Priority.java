@@ -3,6 +3,9 @@ package com.documents4j.job;
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 
+/**
+ * Canonical representation of a conversion's priority.
+ */
 class Priority implements Comparable<Priority> {
 
     private final int value;

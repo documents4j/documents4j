@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * A converter that relies on a remote converter.
+ * A converter that relies on a remote conversion server to which all conversion requests are dispatched via a
+ * REST API.
  */
 public class RemoteConverter extends ConverterAdapter {
 

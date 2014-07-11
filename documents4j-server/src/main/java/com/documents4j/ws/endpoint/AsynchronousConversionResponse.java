@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
-public class AsynchronousConversionResponse implements IInputStreamConsumer, TimeoutHandler {
+class AsynchronousConversionResponse implements IInputStreamConsumer, TimeoutHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AsynchronousConversionResponse.class);
 

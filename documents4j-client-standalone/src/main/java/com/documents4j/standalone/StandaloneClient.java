@@ -31,6 +31,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+/**
+ * A standalone client for communicating with a conversion server via command line.
+ */
 public class StandaloneClient {
 
     private static final Map<DocumentType, String> FILE_NAME_EXTENSIONS;
@@ -55,6 +58,12 @@ public class StandaloneClient {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Starts a standalone conversion client. Detailed documentation can be retrieved by invoking
+     * the application via the command line with the {@code -?} option.
+     *
+     * @param args The parameters for configuring this server.
+     */
     public static void main(String[] args) {
         try {
             Console console = System.console();

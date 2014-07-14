@@ -27,8 +27,7 @@ All methods of the `IConverter` interface and its builder types offer overloaded
 
 Finally, a conversion can be prioritized via `prioritizeWith` where a higher priority signals to the converter that a conversion should be conducted before a conversion with lower priority if both conversions are getting queued. documents4j is capable of performing document conversions concurrently and puts conversion into an internal job queue which is organized by these priorities. There is however not guarantee that a conversion with higher priority is performed before a conversion with lower priority.
 
-A conversion can be scheduled to be executed in the background by calling `schedule` after 
-specifying a conversion. Alternatively, by calling `execute`, the current thread will block until the conversion is finished. The resulting `boolean` incicates if a conversion was successful. Exceptional conversion results are however communicated by exceptions which are described belwo.
+A conversion can be scheduled to be executed in the background by calling `schedule` after specifying a conversion. Alternatively, by calling `execute`, the current thread will block until the conversion is finished. The resulting `boolean` indicates if a conversion was successful. Exceptional conversion results are however communicated by exceptions which are described below.
 
 For finding out which conversions are supported by an `IConverter`, you can query the `getSupportedConversions` method which returns a map of source formats to their supported target formats. Furthermore, you can call the `isOperational` in order to check the functionality of a converter. A converter might not be operational because its prerequisites are not met. Those prerequisites are described below for each implementation of an `IConverter`.
 
@@ -83,7 +82,7 @@ mvn jetty:run
 You can now open `http://localhost:8080` on you machine's browser and convert files from the browser window. Do not kill the application process but shut it down gracefully such that documents4j can shut down its MS Word and MS Excel processes. In order for this application to function, MS Word and MS Excel must not be started on application startup.
 
 #### Custom converters ####
-Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` parameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `ViableConversions` annotation allows to define several `ViableConversion` annotations.
+Any converter engine is represented by an implementation of `IExternalConverter`. Any implementation is required to define a public constructor which accepts arguments of type `File`, `long` and `TimeUnit` as its parameters. The first argument represents an existing folder for writing temporary files, the second and third parameters describe the user-defined time out for conversions. Additionally, any class must be annotated with `@ViableConversion` where the annotation's `from` parameter describes accepted input formats and the `to` parameter accepted output formats. All these formats must be encoded as [parameterless MIME types](http://en.wikipedia.org/wiki/Internet_media_type). If a converter allows for distinct conversions of specific formats to another then the `@ViableConversions` annotation allows to define several `ViableConversion` annotations.
 
 Remote converter
 ----------------
@@ -98,7 +97,7 @@ IConverter converter = RemoteConverter.builder()
                            .build();
 ```
 
-Similary to the `LocalConverter`, the `RemoteConverter` requires a folder for writing temporary files which is created implicitly if no such folder is specified. This time however, the worker pool implicitly determines the number of concurrent REST requests for converting a file where the request timeout specifies the maximal time such a conversion is allowed to take. As the base URI, the remote converter specifies the address of a *conversion server* which offers a REST API for performing document conversions. Note that all the `IConverter`'s `getSupportedConversions` and `isOperational` methods delegate to this REST API as well and are not cached. 
+Similarly to the `LocalConverter`, the `RemoteConverter` requires a folder for writing temporary files which is created implicitly if no such folder is specified. This time however, the worker pool implicitly determines the number of concurrent REST requests for converting a file where the request timeout specifies the maximal time such a conversion is allowed to take. As the base URI, the remote converter specifies the address of a *conversion server* which offers a REST API for performing document conversions. Note that all the `IConverter`'s `getSupportedConversions` and `isOperational` methods delegate to this REST API as well and are not cached. 
 
 #### Conversion server ####
 documents4j offers a standalone conversion server which implements the required REST API by using a `LocalConverter` under the covers. This conversion server is contained in the *com.documents4j/documents4j-server-standalone* module. The Maven build creates a shaded artifact for this module which contains all dependencies. This way, the conversion server can be started from the command line, simply by:
@@ -131,7 +130,7 @@ The native exceptions thrown by an `IConverter` are either instances of `Convert
 - `FileSystemInteractionException`: The source file does not exist or is locked by the JVM or another application. (*Note*: You must **not** lock files in the JVM when using a `LocalConverter` since they might need to be processed by another software which is then prevented to do so.) This exception is also thrown when the target file is locked. Unlocked, existing files are simply overwritten when a conversion is triggered. Finally, the exception is also thrown when using a file stream causes an `IOException` where the IO exception is wrapped before it is rethrown. 
 - `ConverterAccessException`: This exception is thrown when a `IConverter` instance is in invalid state. This occurs when an `IConverter` was either shut down or the conditions for using a converter are not met, either because a remote converter cannot longer connect to its conversion server or because a backing conversion software is inaccessible. This exception can also occur when creating a `LocalConverter` or a `RemoteConverter`.
 
-**Note**: Be aware that `IConverter` implementations do not follow a prevalence of exceptions. When a user is trying to convert a non-existent file with a converter in a bad state, it cannot be guaranteed that this will always throw a `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ on different implementations of the `IConverter` API.
+**Note**: Be aware that `IConverter` implementations do not follow a prevalence of exceptions. When a user is trying to convert a non-existent file with a converter in a bad state, it cannot be guaranteed that this will always throw a `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ for different implementations of the `IConverter` API.
 
 Logging
 -------
@@ -146,7 +145,7 @@ All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can the
 Efficiency considerations
 -------------------------
 
-#### Input and target desription ####
+#### Input and target description ####
 The API intents to hide the implementation details of a specific `IConverter` implementation from the end user. However, a `RemoteConverter` needs to send data as a stream which requires reading it to memory first. (As of today, documents4j does not make use of Java NIO.) This is why a `RemoteConverter` will always perform better when handed instances of `InputStream` and `OutputStream` as source and target compared to files. The `LocalConverter` on the other hand, communicates with a backing conversion software such as MS Word by using the file system. Therefore, instances of `File` as source and target input will perform better when using a `LocalConverter`.
 
 In the end, a user should however always try to hand the available data to the `IConverter` implementation. The implementation will then figure out by itself what data it requires and convert the data to the desired format. In doing so, the converter will also clean up after itself (e.g. closing streams, deleting temporary files). There is no performance advantage when input formats are converted manually.

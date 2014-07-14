@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.documents4j</groupId>
@@ -93,20 +94,21 @@
         <version.mockito>1.9.5</version.mockito>
         <version.thread-weaver>0.2</version.thread-weaver>
         <version.jetty>8.1.13.v20130916</version.jetty>
-        <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
+        <version.maven.compiler-plugin-plugin>3.1</version.maven.compiler-plugin-plugin>
         <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
         <version.maven.source-plugin>2.2.1</version.maven.source-plugin>
         <version.maven.javadoc-plugin>2.9.1</version.maven.javadoc-plugin>
+        <version.maven.gpg-plugin>1.4</version.maven.gpg-plugin>
         <version.maven.war-plugin>2.3</version.maven.war-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
-        <version.maven.release-plugin>2.4.1</version.maven.release-plugin>
-        <version.maven.cobertura>2.6</version.maven.cobertura>
-        <version.maven.checkstyle>2.12.1</version.maven.checkstyle>
-        <version.maven.resources>2.6</version.maven.resources>
-        <version.maven.compiler>3.1</version.maven.compiler>
-        <version.maven.release>2.5</version.maven.release>
-        <version.maven.install>2.5.1</version.maven.install>
-        <version.maven.jxr>2.3</version.maven.jxr>
+        <version.maven.release-plugin-plugin>2.4.1</version.maven.release-plugin-plugin>
+        <version.maven.cobertura-plugin>2.6</version.maven.cobertura-plugin>
+        <version.maven.checkstyle-plugin>2.12.1</version.maven.checkstyle-plugin>
+        <version.maven.resources-plugin>2.6</version.maven.resources-plugin>
+        <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
+        <version.maven.release-plugin>2.5</version.maven.release-plugin>
+        <version.maven.install-plugin>2.5.1</version.maven.install-plugin>
+        <version.maven.jxr-plugin>2.3</version.maven.jxr-plugin>
         <version.java>1.6</version.java>
         <distribution.bintray>https://api.bintray.com/maven/raphw/maven/documents4j</distribution.bintray>
     </properties>
@@ -156,7 +158,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jxr-plugin</artifactId>
-                <version>${version.maven.jxr}</version>
+                <version>${version.maven.jxr-plugin}</version>
             </plugin>
         </plugins>
     </reporting>
@@ -273,7 +275,7 @@
             <!-- Release configuration -->
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>${version.maven.release-plugin}</version>
+                <version>${version.maven.release-plugin-plugin}</version>
                 <configuration>
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>extras</releaseProfiles>
@@ -285,14 +287,14 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
-                <version>${version.maven.cobertura}</version>
+                <version>${version.maven.cobertura-plugin}</version>
                 <configuration>
                     <aggregate>true</aggregate>
                     <formats>
                         <format>html</format>
                         <format>xml</format>
                     </formats>
-                    <check />
+                    <check/>
                 </configuration>
             </plugin>
         </plugins>
@@ -302,17 +304,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>${version.maven.resources}</version>
+                    <version>${version.maven.resources-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>${version.maven.install}</version>
+                    <version>${version.maven.install-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${version.maven.compiler}</version>
+                    <version>${version.maven.compiler-plugin}</version>
                     <inherited>true</inherited>
                     <configuration>
                         <source>${version.java}</source>
@@ -322,7 +324,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>${version.maven.release}</version>
+                    <version>${version.maven.release-plugin}</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
                         <releaseProfiles>extras</releaseProfiles>
@@ -360,31 +362,33 @@
                         <version>${version.maven.javadoc-plugin}</version>
                         <executions>
                             <execution>
-                                <id>attach-javadocs</id>
+                                <id>attach-javadoc</id>
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
                             </execution>
+                            <execution>
+                                <id>aggregate-javadoc</id>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
                         </executions>
                     </plugin>
 
-                    <!-- Check style on build -->
+                    <!-- Sign artifacts -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>${version.maven.checkstyle}</version>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>${version.maven.gpg-plugin}</version>
                         <executions>
                             <execution>
-                                <id>validate</id>
-                                <phase>validate</phase>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
                                 <goals>
-                                    <goal>check</goal>
+                                    <goal>sign</goal>
                                 </goals>
-                                <configuration>
-                                    <configLocation>checkstyle.xml</configLocation>
-                                    <consoleOutput>true</consoleOutput>
-                                    <failsOnError>true</failsOnError>
-                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -403,7 +407,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>${version.maven.checkstyle}</version>
+                        <version>${version.maven.checkstyle-plugin}</version>
                         <executions>
                             <execution>
                                 <id>validate</id>

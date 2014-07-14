@@ -153,8 +153,8 @@ In the end, a user should however always try to hand the available data to the `
 #### Configuring an executing JVM ####
 MS Office components are (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of a significant amount of memory to the JVM should be considered as a cause. 
 
-Running documents4j application as Windows service
---------------------------------------
+Running as Windows service
+--------------------------
 documents4j might malfunction when run as a Windows service together with MS Office conversion. Note that MS Office does [not officially support](http://support.microsoft.com/kb/257757) execution in a service context. When run as a service, MS Office is always started with MS Window's local service account which does not configure a desktop. However, MS Office expects a desktop to exist in order to run properly. Without such a desktop configuration, MS Office will start up correctly but fail to read any input file. In order to allow MS Office to run in a service context, there are two possible approaches of which the first approach is more recommended:
 
 1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*. On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*. [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).

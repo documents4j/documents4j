@@ -105,6 +105,7 @@
         <version.maven.checkstyle>2.12.1</version.maven.checkstyle>
         <version.maven.resources>2.6</version.maven.resources>
         <version.maven.compiler>3.1</version.maven.compiler>
+        <version.maven.release>2.5</version.maven.release>
         <version.maven.install>2.5.1</version.maven.install>
         <version.maven.jxr>2.3</version.maven.jxr>
         <version.java>1.6</version.java>
@@ -318,6 +319,15 @@
                         <source>${version.java}</source>
                         <target>${version.java}</target>
                         <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>${version.maven.release}</version>
+                    <configuration>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <releaseProfiles>extras</releaseProfiles>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
             </plugins>

@@ -173,6 +173,8 @@ When you are testing native converters such as the `MicrosoftWordBridge` or the 
 
 Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar for the standalone server are only executed when the `extras` profile is active.
 
+[![Build Status](https://travis-ci.org/documents4j/documents4j.png)](https://travis-ci.org/documents4j/documents4j) 
+
 Licensing
 ---------
 This software is licensed under the [*Apache Licence, Version 2.0*](http://www.apache.org/licenses/LICENSE-2.0.html). When using this converter in correspondence with MS Office products, please note Microsoft's commentary on [the use of MS Office in a server context](http://support.microsoft.com/kb/257757) which is not officially supported. Also note
@@ -187,5 +189,3 @@ Credits
 This application was developed by [Kantega AS](http://kantega.no) as a project order of the [municipality of Oslo](http://www.oslo.kommune.no) and was open-sourced thanks to their generous endorsement. 
 
 This library would not possible without the use of [*zt-exec*](https://github.com/zeroturnaround/zt-exec) library from ZeroTurnaround is a great help for handling command line processes in a Java application. Also, I want to thank the makers of [*thread-weaver*](http://code.google.com/p/thread-weaver/) for their great framework for unit testing concurrent applications. Finally, without the help of [*mockito*](http://code.google.com/p/mockito/), it would have been impossible to write proper unit tests that run without the integration of MS Word.  
-
-[![Build Status](https://travis-ci.org/documents4j/documents4j.png)](https://travis-ci.org/documents4j/documents4j) 

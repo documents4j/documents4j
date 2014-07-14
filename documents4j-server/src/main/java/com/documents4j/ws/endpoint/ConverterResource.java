@@ -47,7 +47,7 @@ public class ConverterResource {
         // If the stream was closed manually, this would in contrast lead to a NullPointerException since the channel was already detached.
         webConverterConfiguration.getConverter()
                 .convert(inputStream, false).as(new DocumentType(inputType))
-                .to(new AsynchronousConversionResponse(asyncResponse, targetType, webConverterConfiguration.getTimeout())).as(targetType)
+                .to(AsynchronousConversionResponse.to(asyncResponse, targetType, webConverterConfiguration.getTimeout())).as(targetType)
                 .prioritizeWith(priority)
                 .schedule();
     }

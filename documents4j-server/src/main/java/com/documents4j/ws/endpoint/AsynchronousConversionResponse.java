@@ -21,12 +21,17 @@ class AsynchronousConversionResponse implements IInputStreamConsumer, TimeoutHan
 
     private final Object answerLock;
 
-    public AsynchronousConversionResponse(AsyncResponse asyncResponse, DocumentType targetType, long requestTimeout) {
+    public static IInputStreamConsumer to(AsyncResponse asyncResponse, DocumentType targetType, long requestTimeout) {
+        AsynchronousConversionResponse response = new AsynchronousConversionResponse(asyncResponse, targetType);
+        asyncResponse.setTimeoutHandler(response);
+        asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
+        return response;
+    }
+
+    private AsynchronousConversionResponse(AsyncResponse asyncResponse, DocumentType targetType) {
         this.asyncResponse = asyncResponse;
         this.targetType = targetType;
         this.answerLock = new Object();
-        asyncResponse.setTimeout(requestTimeout, TimeUnit.MILLISECONDS);
-        asyncResponse.setTimeoutHandler(this);
         LOGGER.info("Registered conversion request for {}", asyncResponse);
     }
 

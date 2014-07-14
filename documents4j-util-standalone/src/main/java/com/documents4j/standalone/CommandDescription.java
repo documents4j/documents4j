@@ -1,6 +1,6 @@
 package com.documents4j.standalone;
 
-class CommandDescription {
+public class CommandDescription {
 
     public static final String ARGUMENT_LONG_BASE_FOLDER = "base-folder";
     public static final String ARGUMENT_SHORT_BASE_FOLDER = "F";

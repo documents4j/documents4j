@@ -165,7 +165,7 @@ Building the project
 This project is set up to allow running as many tests as possible without requiring MS Office or even MS Windows installed. For this purpose, the project includes several rich stubs that step in place of the MS Office bridges. When you are building this project on a machine with MS Windows and MS Office installed, you should build the project with the `ms-office` profile which triggers tests that rely on an actual MS Office instance. You can then build the project using Maven:
 
 ```shell
-mvn clean package -Pms-office
+mvn package -Pms-office
 ```
  
 When you are testing native converters such as the `MicrosoftWordBridge` or the `MicrosoftExcelBridge`, do not forget to keep an eye on your task manager. Consider an alternative to the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx) for debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx). 

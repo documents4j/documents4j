@@ -106,7 +106,7 @@ documents4j offers a standalone conversion server which implements the required 
 java -jar documents4j-server-standalone-shaded.jar http://localhost:9998
 ```
 
-The above command starts the conversion server to listen for a HTTP connection on port 9998 which is not accessible for the `LocalConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
+The above command starts the conversion server to listen for a HTTP connection on port 9998 which is now accessible to the `RemoteConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
 
 A conversion server can also be started programmatically using a `ConversionServerBuilder`.
 

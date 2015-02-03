@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.*;
 
 abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionContext>
-        implements RunnableFuture<Boolean>, IPendingConditionedFuture<Boolean>, Comparable<Runnable> {
+        implements RunnableFuture<Boolean>, Comparable<Runnable> {
 
     private final Logger logger;
 
@@ -28,7 +28,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         this.priority = new Priority(priority);
         this.futureExchangeLock = new Object();
         this.pendingCondition = new CountDownLatch(1);
-        this.underlyingFuture = new PendingConversionFuture(this);
+        this.underlyingFuture = new InitialConversionFuture();
     }
 
     @Override
@@ -44,8 +44,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         return priority;
     }
 
-    @Override
-    public CountDownLatch getPendingCondition() {
+    protected CountDownLatch getPendingCondition() {
         return pendingCondition;
     }
 
@@ -107,7 +106,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                     return;
                 }
                 logger.trace("Conversion caused an error", exception);
-                // The underlying future might require external resources and should be canceled.
+                // The underlying future might require external resources and should be canceled subsequently.
                 initialFuture = underlyingFuture;
                 underlyingFuture = new FailedConversionFuture(runtimeException);
             }

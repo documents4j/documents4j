@@ -172,9 +172,9 @@ When you are testing native converters such as the `MicrosoftWordBridge` or the 
 
 Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar for the standalone server are only executed when the `extras` profile is active.
 
-[![Build Status](https://travis-ci.org/documents4j/documents4j.png)](https://travis-ci.org/documents4j/documents4j) 
+[![Build Status](https://travis-ci.org/documents4j/documents4j.svg)](https://travis-ci.org/documents4j/documents4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j)
-[![Download](https://api.bintray.com/packages/raphw/maven/documents4j/images/download.png)](https://bintray.com/raphw/maven/documents4j/_latestVersion)
+[![Download](https://api.bintray.com/packages/raphw/maven/documents4j/images/download.svg)](https://bintray.com/raphw/maven/documents4j/_latestVersion)
 
 Licensing
 ---------

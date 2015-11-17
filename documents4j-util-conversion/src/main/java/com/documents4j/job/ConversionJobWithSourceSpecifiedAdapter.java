@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.documents4j.api.IConversionJobWithSourceSpecified;
 import com.documents4j.api.IConversionJobWithTargetUnspecified;
@@ -8,9 +8,11 @@ import com.documents4j.api.IInputStreamConsumer;
 import java.io.File;
 import java.io.OutputStream;
 
-public abstract class ConversionJobWithSourceSpecifiedAdapter implements IConversionJobWithSourceSpecified {
+abstract class ConversionJobWithSourceSpecifiedAdapter implements IConversionJobWithSourceSpecified {
 
     private static final String PDF_FILE_EXTENSION = ".pdf";
+
+    static final boolean DEFAULT_CLOSE_STREAM = true;
 
     @Override
     public IConversionJobWithTargetUnspecified to(File target) {
@@ -24,7 +26,7 @@ public abstract class ConversionJobWithSourceSpecifiedAdapter implements IConver
 
     @Override
     public IConversionJobWithTargetUnspecified to(OutputStream target) {
-        return to(target, true);
+        return to(target, DEFAULT_CLOSE_STREAM);
     }
 
     @Override

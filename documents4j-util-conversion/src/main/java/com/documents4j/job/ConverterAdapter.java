@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.documents4j.api.IConversionJobWithSourceUnspecified;
 import com.documents4j.api.IConverter;
@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class ConverterAdapter implements IConverter {
+abstract class ConverterAdapter implements IConverter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConverterAdapter.class);
 

@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.documents4j.api.IFileConsumer;
 import com.google.common.base.MoreObjects;
@@ -9,7 +9,7 @@ class NoopFileConsumer implements IFileConsumer {
 
     private static final NoopFileConsumer INSTANCE = new NoopFileConsumer();
 
-    private NoopFileConsumer() {
+    NoopFileConsumer() {
         /* empty */
     }
 

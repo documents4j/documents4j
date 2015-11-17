@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.FileSystemInteractionException;

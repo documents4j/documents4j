@@ -1,6 +1,7 @@
 package com.documents4j.builder;
 
 import com.documents4j.conversion.IExternalConverter;
+import com.documents4j.job.AbstractConverterBuilder;
 import com.documents4j.job.LocalConverter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;

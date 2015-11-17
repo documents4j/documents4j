@@ -1,4 +1,4 @@
-package com.documents4j.builder;
+package com.documents4j.job;
 
 import com.documents4j.api.IConverter;
 import com.google.common.io.Files;
@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public abstract class AbstractConverterBuilder<T extends AbstractConverterBuilder<T>> {
+abstract class AbstractConverterBuilder<T extends AbstractConverterBuilder<T>> {
 
     /**
      * The default core pool size of a converter's worker pool.

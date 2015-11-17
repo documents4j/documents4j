@@ -1,5 +1,6 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
+import com.documents4j.job.OutputStreamToInputStreamConsumer;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.OngoingStubbing;

@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteSource;

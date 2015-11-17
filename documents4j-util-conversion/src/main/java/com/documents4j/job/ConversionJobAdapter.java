@@ -1,11 +1,11 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import com.documents4j.api.IConversionJob;
 import com.documents4j.throwables.ConverterException;
 
 import java.util.concurrent.ExecutionException;
 
-public abstract class ConversionJobAdapter implements IConversionJob {
+abstract class ConversionJobAdapter implements IConversionJob {
 
     @Override
     public boolean execute() {

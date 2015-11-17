@@ -59,6 +59,7 @@
 
     <modules>
         <module>documents4j-api</module>
+        <module>documents4j-api-extension</module>
         <module>documents4j-local</module>
         <module>documents4j-local-demo</module>
         <module>documents4j-transformer</module>

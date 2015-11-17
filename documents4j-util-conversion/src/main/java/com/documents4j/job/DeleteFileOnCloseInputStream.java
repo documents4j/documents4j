@@ -1,4 +1,4 @@
-package com.documents4j.adapter;
+package com.documents4j.job;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

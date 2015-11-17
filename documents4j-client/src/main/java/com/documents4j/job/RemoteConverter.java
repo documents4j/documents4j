@@ -1,10 +1,6 @@
 package com.documents4j.job;
 
-import com.documents4j.adapter.ConversionJobAdapter;
-import com.documents4j.adapter.ConversionJobWithSourceSpecifiedAdapter;
-import com.documents4j.adapter.ConverterAdapter;
 import com.documents4j.api.*;
-import com.documents4j.builder.AbstractConverterBuilder;
 import com.documents4j.ws.ConverterNetworkProtocol;
 import com.documents4j.ws.ConverterServerInformation;
 import com.google.common.primitives.Ints;

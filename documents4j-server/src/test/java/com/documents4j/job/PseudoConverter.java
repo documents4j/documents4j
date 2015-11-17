@@ -1,8 +1,5 @@
 package com.documents4j.job;
 
-import com.documents4j.adapter.ConversionJobAdapter;
-import com.documents4j.adapter.ConversionJobWithSourceSpecifiedAdapter;
-import com.documents4j.adapter.ConverterAdapter;
 import com.documents4j.api.*;
 import com.google.common.io.Files;
 

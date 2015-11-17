@@ -1,7 +1,7 @@
 package com.documents4j.adapter;
 
 import com.documents4j.api.IFileSource;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.File;
 
@@ -25,7 +25,7 @@ class FileSourceFromFile implements IFileSource {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(FileSourceFromFile.class)
+        return MoreObjects.toStringHelper(FileSourceFromFile.class)
                 .add("file", file)
                 .toString();
     }

@@ -1,5 +1,6 @@
 package com.documents4j.job;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 
@@ -9,6 +10,7 @@ import com.google.common.collect.ComparisonChain;
 class Priority implements Comparable<Priority> {
 
     private final int value;
+
     private final long creationTime;
 
     public Priority(int value) {
@@ -48,7 +50,7 @@ class Priority implements Comparable<Priority> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
                 .add("value", value)
                 .add("creationTime", creationTime)
                 .toString();

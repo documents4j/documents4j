@@ -1,7 +1,7 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ enum MicrosoftExcelScript implements MicrosoftOfficeScript {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(MicrosoftExcelScript.class)
+        return MoreObjects.toStringHelper(MicrosoftExcelScript.class)
                 .add("resource", path)
                 .toString();
     }

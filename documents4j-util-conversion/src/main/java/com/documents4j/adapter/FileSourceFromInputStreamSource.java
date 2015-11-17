@@ -3,7 +3,7 @@ package com.documents4j.adapter;
 import com.documents4j.api.IFileSource;
 import com.documents4j.api.IInputStreamSource;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 import org.slf4j.Logger;
@@ -19,6 +19,7 @@ class FileSourceFromInputStreamSource implements IFileSource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileSourceFromInputStreamSource.class);
 
     private final IInputStreamSource inputStreamSource;
+
     private final File tempStorage;
 
     private InputStream inputStream;
@@ -59,7 +60,7 @@ class FileSourceFromInputStreamSource implements IFileSource {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(FileSourceFromInputStreamSource.class)
+        return MoreObjects.toStringHelper(FileSourceFromInputStreamSource.class)
                 .add("inputStreamSource", inputStreamSource)
                 .add("temporaryFile", tempStorage)
                 .toString();

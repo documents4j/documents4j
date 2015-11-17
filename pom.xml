@@ -82,10 +82,10 @@
         <version.javax.rs>2.0</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <!-- Note: Later versions of Jersey require Java 7 -->
+        <!-- Note: Later versions of Jersey than 2.6 require Java 7 -->
         <version.jersey>2.6</version.jersey>
-        <version.guava>17.0</version.guava>
-        <version.zt-exec>1.7</version.zt-exec>
+        <version.guava>18.0</version.guava>
+        <version.zt-exec>1.8</version.zt-exec>
         <version.jopt-simple>4.6</version.jopt-simple>
         <version.slf4j>1.7.7</version.slf4j>
         <version.logback>1.1.2</version.logback>

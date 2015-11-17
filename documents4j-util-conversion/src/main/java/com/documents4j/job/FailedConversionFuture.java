@@ -1,6 +1,6 @@
 package com.documents4j.job;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -42,7 +42,7 @@ final class FailedConversionFuture implements Future<Boolean> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(FailedConversionFuture.class)
+        return MoreObjects.toStringHelper(FailedConversionFuture.class)
                 .add("exception", exception.getClass().getCanonicalName())
                 .add("message", exception.getMessage())
                 .toString();

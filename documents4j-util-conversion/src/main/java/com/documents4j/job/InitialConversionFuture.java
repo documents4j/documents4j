@@ -1,6 +1,6 @@
 package com.documents4j.job;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -48,7 +48,7 @@ final class InitialConversionFuture implements Future<Boolean> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(InitialConversionFuture.class)
+        return MoreObjects.toStringHelper(InitialConversionFuture.class)
                 .add("cancelled", cancelled.get())
                 .toString();
     }

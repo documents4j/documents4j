@@ -4,7 +4,7 @@ import com.documents4j.api.DocumentType;
 import com.documents4j.api.IFileConsumer;
 import com.documents4j.api.IFileSource;
 import com.documents4j.conversion.IConversionManager;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.File;
 
@@ -67,7 +67,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
 
     @Override
     public String toString() {
-        return Objects.toStringHelper("LocalConversion")
+        return MoreObjects.toStringHelper("LocalConversion")
                 .add("pending", !(getPendingCondition().getCount() == 0L))
                 .add("cancelled", isCancelled())
                 .add("done", isDone())

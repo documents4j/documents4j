@@ -1,6 +1,6 @@
 package com.documents4j.conversion;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.util.concurrent.*;
 
@@ -57,7 +57,7 @@ abstract class MockProcessResult implements Future<Boolean> {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(BooleanResult.class).add("value", value).toString();
+            return MoreObjects.toStringHelper(BooleanResult.class).add("value", value).toString();
         }
     }
 
@@ -75,7 +75,7 @@ abstract class MockProcessResult implements Future<Boolean> {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(CancelledResult.class).toString();
+            return MoreObjects.toStringHelper(CancelledResult.class).toString();
         }
     }
 
@@ -94,7 +94,7 @@ abstract class MockProcessResult implements Future<Boolean> {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ExceptionalResult.class).add("exception", e).toString();
+            return MoreObjects.toStringHelper(ExceptionalResult.class).add("exception", e).toString();
         }
     }
 
@@ -142,7 +142,7 @@ abstract class MockProcessResult implements Future<Boolean> {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(BlockingResult.class).add("destructionMark", destructionMark).toString();
+            return MoreObjects.toStringHelper(BlockingResult.class).add("destructionMark", destructionMark).toString();
         }
     }
 }

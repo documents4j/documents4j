@@ -5,7 +5,7 @@ import com.documents4j.job.AbstractConverterTest;
 import com.documents4j.job.MockConversion;
 import com.documents4j.throwables.ConversionFormatException;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Closeables;
 
 import java.io.File;
@@ -93,7 +93,7 @@ public abstract class MockConversionManager implements IConversionManager {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(OperationalMockConversionManager.class)
+            return MoreObjects.toStringHelper(OperationalMockConversionManager.class)
                     .add("baseFolder", getBaseFolder())
                     .add("shutDown", shutDown)
                     .toString();
@@ -123,7 +123,7 @@ public abstract class MockConversionManager implements IConversionManager {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(InoperationalMockConversionManager.class)
+            return MoreObjects.toStringHelper(InoperationalMockConversionManager.class)
                     .add("baseFolder", getBaseFolder())
                     .toString();
         }

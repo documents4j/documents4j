@@ -1,7 +1,7 @@
 package com.documents4j.util;
 
 import com.documents4j.throwables.*;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 /**
  * Represents a reaction to an event within the conversion chain.
@@ -30,7 +30,7 @@ public abstract class Reaction {
     /**
      * A builder for obtaining a runtime exception for a given error event.
      */
-    public static interface IExceptionBuilder {
+    public interface IExceptionBuilder {
 
         /**
          * Creates a runtime exception for a given error event.
@@ -55,7 +55,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(BooleanReaction.class)
+            return MoreObjects.toStringHelper(BooleanReaction.class)
                     .add("value", value)
                     .toString();
         }
@@ -77,7 +77,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(BooleanReaction.class)
+            return MoreObjects.toStringHelper(BooleanReaction.class)
                     .add("exceptionBuilder", builder)
                     .toString();
         }
@@ -98,7 +98,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ConverterExceptionBuilder.class)
+            return MoreObjects.toStringHelper(ConverterExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }
@@ -119,7 +119,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ConverterAccessExceptionBuilder.class)
+            return MoreObjects.toStringHelper(ConverterAccessExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }
@@ -140,7 +140,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ConversionFormatExceptionBuilder.class)
+            return MoreObjects.toStringHelper(ConversionFormatExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }
@@ -161,7 +161,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ConversionInputExceptionBuilder.class)
+            return MoreObjects.toStringHelper(ConversionInputExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }
@@ -182,7 +182,7 @@ public abstract class Reaction {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(ConversionInputExceptionBuilder.class)
+            return MoreObjects.toStringHelper(ConversionInputExceptionBuilder.class)
                     .add("message", message)
                     .toString();
         }

@@ -5,7 +5,7 @@ import com.documents4j.conversion.AbstractExternalConverter;
 import com.documents4j.conversion.ExternalConverterScriptResult;
 import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.StartedProcess;
 
@@ -98,7 +98,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(getClass())
+        return MoreObjects.toStringHelper(getClass())
                 .add("baseFolder", getBaseFolder())
                 .add("processTimeout", getProcessTimeout())
                 .toString();

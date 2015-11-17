@@ -2,7 +2,7 @@ package com.documents4j.job;
 
 import com.documents4j.throwables.ConverterException;
 import com.documents4j.ws.ConverterNetworkProtocol;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import javax.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
@@ -53,7 +53,7 @@ class WebserviceRequestFutureWrapper implements Future<Boolean> {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(WebserviceRequestFutureWrapper.class)
+        return MoreObjects.toStringHelper(WebserviceRequestFutureWrapper.class)
                 .add("futureResponse", futureResponse)
                 .toString();
     }

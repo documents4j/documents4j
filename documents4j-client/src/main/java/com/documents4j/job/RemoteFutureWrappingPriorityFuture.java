@@ -4,7 +4,7 @@ import com.documents4j.api.DocumentType;
 import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.api.IInputStreamSource;
 import com.documents4j.ws.ConverterNetworkProtocol;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -84,7 +84,7 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
 
     @Override
     public String toString() {
-        return Objects.toStringHelper("RemoteConversion")
+        return MoreObjects.toStringHelper("RemoteConversion")
                 .add("pending", !(getPendingCondition().getCount() == 0L))
                 .add("cancelled", isCancelled())
                 .add("done", isDone())

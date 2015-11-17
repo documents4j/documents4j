@@ -2,7 +2,7 @@ package com.documents4j.adapter;
 
 import com.documents4j.api.IInputStreamSource;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Closeables;
 
 import java.io.IOException;
@@ -11,6 +11,7 @@ import java.io.InputStream;
 class InputStreamSourceFromInputStream implements IInputStreamSource {
 
     private final InputStream inputStream;
+
     private final boolean close;
 
     public InputStreamSourceFromInputStream(InputStream inputStream, boolean close) {
@@ -36,7 +37,7 @@ class InputStreamSourceFromInputStream implements IInputStreamSource {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(InputStreamSourceFromInputStream.class)
+        return MoreObjects.toStringHelper(InputStreamSourceFromInputStream.class)
                 .add("inputStream", inputStream)
                 .add("close", close)
                 .toString();

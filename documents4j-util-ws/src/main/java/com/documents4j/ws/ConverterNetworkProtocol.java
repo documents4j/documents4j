@@ -3,6 +3,7 @@ package com.documents4j.ws;
 import com.documents4j.throwables.ConversionFormatException;
 import com.documents4j.throwables.ConversionInputException;
 import com.documents4j.util.Reaction;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import javax.ws.rs.core.Response;
@@ -99,7 +100,7 @@ public final class ConverterNetworkProtocol {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(Status.class)
+            return MoreObjects.toStringHelper(Status.class)
                     .add("statusCode", statusCode)
                     .add("reaction", reaction)
                     .toString();

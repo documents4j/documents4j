@@ -2,7 +2,7 @@ package com.documents4j.adapter;
 
 import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 
@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
 
     private final OutputStream outputStream;
+
     private final AtomicBoolean closeMark;
 
     public OutputStreamToInputStreamConsumer(OutputStream outputStream, boolean closeStream) {
@@ -62,7 +63,7 @@ class OutputStreamToInputStreamConsumer implements IInputStreamConsumer {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(OutputStreamToInputStreamConsumer.class)
+        return MoreObjects.toStringHelper(OutputStreamToInputStreamConsumer.class)
                 .add("outputStream", outputStream)
                 .add("closeMark", closeMark.get())
                 .toString();

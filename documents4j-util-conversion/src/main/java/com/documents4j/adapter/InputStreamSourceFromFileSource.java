@@ -3,7 +3,7 @@ package com.documents4j.adapter;
 import com.documents4j.api.IFileSource;
 import com.documents4j.api.IInputStreamSource;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.Closeables;
 
 import java.io.*;
@@ -11,6 +11,7 @@ import java.io.*;
 class InputStreamSourceFromFileSource implements IInputStreamSource {
 
     private final IFileSource fileSource;
+
     private volatile File file;
 
     public InputStreamSourceFromFileSource(IFileSource fileSource) {
@@ -50,7 +51,7 @@ class InputStreamSourceFromFileSource implements IInputStreamSource {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(InputStreamSourceFromFileSource.class)
+        return MoreObjects.toStringHelper(InputStreamSourceFromFileSource.class)
                 .add("file", file)
                 .add("fileSource", fileSource)
                 .toString();

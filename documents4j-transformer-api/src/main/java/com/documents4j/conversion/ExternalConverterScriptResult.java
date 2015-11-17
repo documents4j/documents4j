@@ -1,6 +1,7 @@
 package com.documents4j.conversion;
 
 import com.documents4j.util.Reaction;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 /**
@@ -37,7 +38,7 @@ public enum ExternalConverterScriptResult {
     /**
      * Represents an interaction with a converter which was not accepted by a converter for formal reasons.
      */
-    ILLEGAL_CALL(-5, Reaction.with(new Reaction.ConverterAccessExceptionBuilder("A converter script seems to be erroneous"))),
+    ILLEGAL_CALL(-5, Reaction.with(new Reaction.ConverterExceptionBuilder("A converter script seems to be erroneous"))),
 
     /**
      * Represents an interaction with a converter where the converter did not respond.
@@ -75,7 +76,7 @@ public enum ExternalConverterScriptResult {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(ExternalConverterScriptResult.class)
+        return MoreObjects.toStringHelper(ExternalConverterScriptResult.class)
                 .add("exitValue", exitValue)
                 .add("reaction", reaction)
                 .toString();

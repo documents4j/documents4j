@@ -3,7 +3,7 @@ package com.documents4j.adapter;
 import com.documents4j.api.IFileConsumer;
 import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.FileSystemInteractionException;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
 
@@ -15,6 +15,7 @@ import java.io.InputStream;
 class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
 
     private final File file;
+
     private final IFileConsumer fileConsumer;
 
     public FileConsumerToInputStreamConsumer(File file, IFileConsumer fileConsumer) {
@@ -52,7 +53,7 @@ class FileConsumerToInputStreamConsumer implements IInputStreamConsumer {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(FileConsumerToInputStreamConsumer.class)
+        return MoreObjects.toStringHelper(FileConsumerToInputStreamConsumer.class)
                 .add("file", file)
                 .add("fileConsumer", fileConsumer)
                 .toString();

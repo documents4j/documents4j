@@ -1,7 +1,7 @@
 package com.documents4j.conversion;
 
 import com.documents4j.api.DocumentType;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.File;
 import java.util.concurrent.Future;
@@ -46,7 +46,7 @@ public class MockExternalConverter implements IExternalConverter {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(MockExternalConverter.class)
+        return MoreObjects.toStringHelper(MockExternalConverter.class)
                 .add("folder", folder)
                 .add("timeout", timeout)
                 .toString();

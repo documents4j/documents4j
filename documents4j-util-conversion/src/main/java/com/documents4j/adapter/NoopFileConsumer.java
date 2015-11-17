@@ -1,7 +1,7 @@
 package com.documents4j.adapter;
 
 import com.documents4j.api.IFileConsumer;
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 
 import java.io.File;
 
@@ -34,7 +34,7 @@ class NoopFileConsumer implements IFileConsumer {
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(NoopFileConsumer.class)
+        return MoreObjects.toStringHelper(NoopFileConsumer.class)
                 .addValue("<singleton>")
                 .toString();
     }

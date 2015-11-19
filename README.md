@@ -138,10 +138,10 @@ IConverterFailureCallback converterFailureCallback = ... ;
 ISelectionStrategy selectionStrategy = ... ;
 
 IAggregatingConverter converter = AggregatingConverter.builder()
-                           .aggregates(first, second)
-                           .selectionStrategy(selectionStrategy)
-                           .callback(converterFailureCallback)
-                           .build();
+                                      .aggregates(first, second)
+                                      .selectionStrategy(selectionStrategy)
+                                      .callback(converterFailureCallback)
+                                      .build();
 ```
 
 An `AggregatingConverter` cannot generally guarantee the success of an individual conversion if an aggregated `IConverter` becomes inoperative during a conversion process. The aggregating converter does however eventually discover a converter' inaccessibility and removes it from cerculation. For being notified of such events, it is possible to register a delegate as an `IConverterFailureCallback`. It is also possible to request regular health checks when creating a converter. Doing so, inoperative converters are checked for their state and removed on failure by fixed intervals.

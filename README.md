@@ -132,11 +132,10 @@ Using this extension serves three main purposes:
 An `AggregatingConverter` is created using a similar builder as when creating a `LocalConverter` or `RemoteConverter` which allows to specify the converter's behavior:
 
 ```java
-IConverter first = ...
-IConverter second = ...
+IConverter first = ... , second = ... ;
 
-IConverterFailureCallback converterFailureCallback = ...
-ISelectionStrategy selectionStrategy = ...
+IConverterFailureCallback converterFailureCallback = ... ;
+ISelectionStrategy selectionStrategy = ... ;
 
 IAggregatingConverter converter = AggregatingConverter.builder()
                            .aggregates(first, second)

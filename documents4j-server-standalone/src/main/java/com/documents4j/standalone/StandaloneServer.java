@@ -20,14 +20,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -90,8 +87,6 @@ public class StandaloneServer {
         ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterEnabledSpec = makeConverterEnabledSpec(optionParser);
         ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterDisabledSpec = makeConverterDisabledSpec(optionParser);
 
-        ArgumentAcceptingOptionSpec<SSLContext> sslSpec = makeSslSpec(optionParser);
-
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -102,7 +97,7 @@ public class StandaloneServer {
             System.out.println("The converter was started with unknown arguments: " + e.options());
             optionParser.printHelpOn(System.out);
             System.exit(-1);
-            throw e; // In theory, System.exit does not guarantee a JVM exit.
+            throw e; // To satisfy the Java compiler.
         }
 
         if (optionSet.has(helpSpec)) {
@@ -130,8 +125,6 @@ public class StandaloneServer {
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
-        SSLContext sslContext = sslSpec.value(optionSet);
-
         File logFile = logFileSpec.value(optionSet);
         Level level = logLevelSpec.value(optionSet);
         configureLogging(logFile, level);
@@ -148,8 +141,10 @@ public class StandaloneServer {
         for (Class<? extends IExternalConverter> externalConverter : converterEnabledSpec.values(optionSet)) {
             builder = builder.enable(externalConverter);
         }
-        if (sslContext != null) {
-            builder = builder.sslContext(sslContext);
+        try {
+            builder = builder.sslContext(SSLContext.getDefault());
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Could not initialize default SSL context: " + e.getMessage());
         }
         return builder;
     }
@@ -289,19 +284,6 @@ public class StandaloneServer {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT)
                 .ofType(Long.class)
                 .defaultsTo(IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT);
-    }
-
-    private static ArgumentAcceptingOptionSpec<SSLContext> makeSslSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_SSL,
-                        CommandDescription.ARGUMENT_SHORT_SSL),
-                        CommandDescription.DESCRIPTION_CONTEXT_SSL
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_SSL)
-                .withValuesConvertedBy(new SslContextValueConverter());
-        // defaults to null such that no SSL configuration is applied
     }
 
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {

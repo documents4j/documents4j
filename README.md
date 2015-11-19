@@ -120,7 +120,9 @@ java -jar documents4j-client-standalone-shaded.jar http://localhost:9998
 Again, the `-?` option can be supplied for obtaining a list of options.
 
 #### Encryption ####
-If a document conversion is realized via an insecure connection, it is possible to specify a `SSLContext` to be used by both a server and a client. If a server or client is started via the command line, any [supported protocol can be specified by its name](http://docs.oracle.com/javase/6/docs/technotes/guides/security/StandardNames.html#SSLContext). To modify the used trust store or key store, it is possible to specify a default via the designated Java properties.
+If a document conversion is realized via an insecure connection, it is possible to specify a `SSLContext` to secure the connection between conversion server and client. 
+
+The standalone implementations of server and client converters always attempt to use the `SSLContext.getDefault()` instance and notify on the console if this default instance is not available. The default trust store and key store configuration can be adjusted by setting `javax.net.ssl.*` system properties when running a standalone application from the console. The used default encryption algorithms can be adjusted by setting `deployment.security.*` properties.
 
 Aggregating converter
 ----------------

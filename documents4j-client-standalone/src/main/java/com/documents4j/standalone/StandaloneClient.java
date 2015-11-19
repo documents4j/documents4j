@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -172,8 +173,6 @@ public class StandaloneClient {
 
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
-        ArgumentAcceptingOptionSpec<SSLContext> sslSpec = makeSslSpec(optionParser);
-
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -201,8 +200,6 @@ public class StandaloneClient {
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
-        SSLContext sslContext = sslSpec.value(optionSet);
-
         File logFile = logFileSpec.value(optionSet);
         Level level = logLevelSpec.value(optionSet);
         configureLogging(logFile, level);
@@ -212,13 +209,10 @@ public class StandaloneClient {
         RemoteConverter.Builder builder = RemoteConverter.builder()
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS)
                 .baseUri(baseUri);
-        if (sslContext != null) {
-            try {
-                sslContext.init(null, null, null);
-            } catch (KeyManagementException e) {
-                throw new IllegalStateException("Cannot initialize SSL context");
-            }
-            builder = builder.sslContext(sslContext);
+        try {
+            builder = builder.sslContext(SSLContext.getDefault());
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Could not initialize default SSL context: " + e.getMessage());
         }
         return builder.build();
     }
@@ -297,19 +291,6 @@ public class StandaloneClient {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT)
                 .ofType(Long.class)
                 .defaultsTo(RemoteConverter.Builder.DEFAULT_REQUEST_TIMEOUT);
-    }
-
-    private static ArgumentAcceptingOptionSpec<SSLContext> makeSslSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_SSL,
-                        CommandDescription.ARGUMENT_SHORT_SSL),
-                        CommandDescription.DESCRIPTION_CONTEXT_SSL
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_SSL)
-                .withValuesConvertedBy(new SslContextValueConverter());
-        // defaults to null such that no SSL configuration is applied
     }
 
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {

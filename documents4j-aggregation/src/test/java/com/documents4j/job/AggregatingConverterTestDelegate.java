@@ -31,8 +31,8 @@ class AggregatingConverterTestDelegate implements IConverterTestDelegate {
         temporaryFolder = Files.createTempDir();
         converter = AggregatingConverter.builder()
                 .callback(converterFailureCallback)
-                .delegates(new CopyConverter(temporaryFolder, operational))
-                .make();
+                .aggregates(new CopyConverter(temporaryFolder, operational))
+                .build();
     }
 
     public void tearDown() {

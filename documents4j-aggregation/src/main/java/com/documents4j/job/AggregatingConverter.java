@@ -71,7 +71,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
      */
     public static IAggregatingConverter make(Collection<? extends IConverter> converters) {
         checkNotNull(converters);
-        return builder().delegates(converters).make();
+        return builder().aggregates(converters).build();
     }
 
     @Override
@@ -241,6 +241,29 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         }
 
         /**
+         * Registers the given converters for delegation for the built converter.
+         *
+         * @param converters The additional converters to delegate to.
+         * @return This builder instance.
+         */
+        public Builder aggregates(IConverter... converters) {
+            checkNotNull(converters);
+            return aggregates(Arrays.asList(converters));
+        }
+
+        /**
+         * Registers the given converters for delegation for the built converter.
+         *
+         * @param converters The additional converters to delegate to.
+         * @return This builder instance.
+         */
+        public Builder aggregates(Collection<? extends IConverter> converters) {
+            checkNotNull(converters);
+            this.converters.addAll(converters);
+            return this;
+        }
+
+        /**
          * Registers a callback that is invoked when a converter is failing. Any previously registered callback is removed.
          *
          * @param converterFailureCallback The callback to notify over failed conversions.
@@ -266,29 +289,6 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         }
 
         /**
-         * Registers the given converters for delegation for the built converter.
-         *
-         * @param converters The additional converters to delegate to.
-         * @return This builder instance.
-         */
-        public Builder delegates(IConverter... converters) {
-            checkNotNull(converters);
-            return delegates(Arrays.asList(converters));
-        }
-
-        /**
-         * Registers the given converters for delegation for the built converter.
-         *
-         * @param converters The additional converters to delegate to.
-         * @return This builder instance.
-         */
-        public Builder delegates(Collection<? extends IConverter> converters) {
-            checkNotNull(converters);
-            this.converters.addAll(converters);
-            return this;
-        }
-
-        /**
          * @param propagateShutDown {@code true} if shutting down this converter should also shut down any aggregated converters.
          * @return This builder instance.
          */
@@ -302,7 +302,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
          *
          * @return The specified converter.
          */
-        public IAggregatingConverter make() {
+        public IAggregatingConverter build() {
             return new AggregatingConverter(new CopyOnWriteArrayList<IConverter>(converters),
                     selectionStrategy, converterFailureCallback,
                     propagateShutDown);
@@ -317,7 +317,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
          * @param timeUnit        The time unit of the delay.
          * @return The specified converter.
          */
-        public IAggregatingConverter make(ScheduledExecutorService executorService, long delay, TimeUnit timeUnit) {
+        public IAggregatingConverter build(ScheduledExecutorService executorService, long delay, TimeUnit timeUnit) {
             AggregatingConverter converter = new AggregatingConverter(new CopyOnWriteArrayList<IConverter>(converters),
                     selectionStrategy, converterFailureCallback,
                     propagateShutDown);

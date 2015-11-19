@@ -121,14 +121,31 @@ Again, the `-?` option can be supplied for obtaining a list of options.
 
 Aggregating converter
 ----------------
-Additionally to the `LocalConverter` and the `RemoteConverter`, documents4j extends the `IConverter` API by `IAggregatingConverter` which allows to delegate conversions to a collection of underlying converters. This interface is implemented by the `AggregationConverter` class. 
-
-Using this extension serves two purposes:
+Additionally to the `LocalConverter` and the `RemoteConverter`, documents4j extends the `IConverter` API by `IAggregatingConverter` which allows to delegate conversions to a collection of underlying converters. This interface is implemented by the `AggregationConverter` class.
+ 
+Using this extension serves three main purposes:
 
 1. It allows for the aggregation of several `IConverter`s to achieve a load balancing for multiple conversions. By default, an `AggregatingConverter` applies a *round robin* strategy. A custom strategy can be implemented as an `ISelectionStrategy`.
 2. Using the methods of the `IAggregatingConverter` interface, it is possible to register or remove aggregated `IConverter`s after the creation of the `AggregatingConverter`. This way, it is for example possible to migrate to another conversion server without restarting an application or to restart an inoperative local converter.
+3. It allows to expose multiple converters that support different conversion formats by a single instance of `IConverter`. 
 
-An `AggregatingConverter` cannot generally guarantee the success of an individual conversion if an aggregated `IConverter` becomes inoperative during a conversion process. The aggregating converter does however eventually discover a converter' inaccessibility and removes it from cerculation. For being notified of such events, it is possible to register a delegate as an `IConverterFailureCallback`. It is also possible to introduce a health check in regular intervals when creating a converter such that inoperative converters are removed on a regular basis.
+An `AggregatingConverter` is created using a similar builder as when creating a `LocalConverter` or `RemoteConverter` which allows to specify the converter's behavior:
+
+```java
+IConverter first = ...
+IConverter second = ...
+
+IConverterFailureCallback converterFailureCallback = ...
+ISelectionStrategy selectionStrategy = ...
+
+IAggregatingConverter converter = AggregatingConverter.builder()
+                           .aggregates(first, second)
+                           .selectionStrategy(selectionStrategy)
+                           .callback(converterFailureCallback)
+                           .build();
+```
+
+An `AggregatingConverter` cannot generally guarantee the success of an individual conversion if an aggregated `IConverter` becomes inoperative during a conversion process. The aggregating converter does however eventually discover a converter' inaccessibility and removes it from cerculation. For being notified of such events, it is possible to register a delegate as an `IConverterFailureCallback`. It is also possible to request regular health checks when creating a converter. Doing so, inoperative converters are checked for their state and removed on failure by fixed intervals.
 
 Exception hierarchy
 -------------------

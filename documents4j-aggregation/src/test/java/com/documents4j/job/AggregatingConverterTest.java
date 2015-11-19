@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -85,7 +84,7 @@ public class AggregatingConverterTest {
         IConverter converter = new CopyConverter(folder, true);
         assertTrue(converter.isOperational());
 
-        IAggregatingConverter aggregatingConverter = AggregatingConverter.builder().propagateShutDown(false).make();
+        IAggregatingConverter aggregatingConverter = AggregatingConverter.builder().propagateShutDown(false).build();
         assertTrue(aggregatingConverter.register(converter));
         assertTrue(aggregatingConverter.isOperational());
 
@@ -104,9 +103,9 @@ public class AggregatingConverterTest {
 
         ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
         IAggregatingConverter aggregatingConverter = AggregatingConverter.builder()
-                .delegates(converter)
+                .aggregates(converter)
                 .callback(converterFailureCallback)
-                .make(scheduledExecutorService, WAIT_TIME, TimeUnit.MILLISECONDS);
+                .build(scheduledExecutorService, WAIT_TIME, TimeUnit.MILLISECONDS);
 
         try {
             Thread.sleep(WAIT_TIME * 2);
@@ -135,9 +134,9 @@ public class AggregatingConverterTest {
         when(selectionStrategy.select(Collections.singletonList(supportingConverter))).thenReturn(Mockito.mock(IConverter.class));
 
         AggregatingConverter aggregatingConverter = (AggregatingConverter) AggregatingConverter.builder()
-                .delegates(supportingConverter, nonSupportingConverter)
+                .aggregates(supportingConverter, nonSupportingConverter)
                 .selectionStrategy(selectionStrategy)
-                .make();
+                .build();
 
         assertNotNull(aggregatingConverter.nextConverter(AbstractConverterTest.MOCK_INPUT_TYPE, AbstractConverterTest.MOCK_RESPONSE_TYPE));
 
@@ -159,9 +158,9 @@ public class AggregatingConverterTest {
         when(selectionStrategy.select(Arrays.asList(supportingConverter, otherSupportingConverter))).thenReturn(Mockito.mock(IConverter.class));
 
         AggregatingConverter aggregatingConverter = (AggregatingConverter) AggregatingConverter.builder()
-                .delegates(supportingConverter, otherSupportingConverter)
+                .aggregates(supportingConverter, otherSupportingConverter)
                 .selectionStrategy(selectionStrategy)
-                .make();
+                .build();
 
         assertNotNull(aggregatingConverter.nextConverter(AbstractConverterTest.MOCK_INPUT_TYPE, AbstractConverterTest.MOCK_RESPONSE_TYPE));
 

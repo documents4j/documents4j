@@ -132,13 +132,12 @@ public class PseudoConverter extends ConverterAdapter {
         public Future<Boolean> schedule() {
             InputStream inputStream = source.getInputStream();
             try {
-                IStrategyCallback strategyCallback = new InputStreamConsumerStrategyCallbackAdapter(callback);
                 if (!legalSourceFormat.equals(sourceFormat) || !legalTargetFormat.equals(targetFormat)) {
-                    MockConversion.from(inputStream).overrideWith(MockConversion.FORMAT_ERROR).applyTo(strategyCallback);
+                    MockConversion.from(inputStream).overrideWith(MockConversion.FORMAT_ERROR).applyTo(callback);
                 } else if (operational) {
-                    MockConversion.from(inputStream).applyTo(strategyCallback);
+                    MockConversion.from(inputStream).applyTo(callback);
                 } else {
-                    MockConversion.from(inputStream).overrideWith(MockConversion.CONVERTER_ERROR).applyTo(strategyCallback);
+                    MockConversion.from(inputStream).overrideWith(MockConversion.CONVERTER_ERROR).applyTo(callback);
                 }
             } finally {
                 source.onConsumed(inputStream);

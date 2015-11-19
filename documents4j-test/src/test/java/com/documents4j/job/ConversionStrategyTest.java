@@ -1,5 +1,6 @@
 package com.documents4j.job;
 
+import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.ConverterException;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class ConversionStrategyTest {
         assertEquals(MockConversion.OK, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
-        IStrategyCallback callback = mock(IStrategyCallback.class);
+        IInputStreamConsumer callback = mock(IInputStreamConsumer.class);
         richMessage.applyTo(callback);
         verify(callback).onComplete(any(InputStream.class));
         verifyNoMoreInteractions(callback);
@@ -33,7 +34,7 @@ public class ConversionStrategyTest {
         assertEquals(MockConversion.CANCEL, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
-        IStrategyCallback callback = mock(IStrategyCallback.class);
+        IInputStreamConsumer callback = mock(IInputStreamConsumer.class);
         richMessage.applyTo(callback);
         verify(callback).onCancel();
         verifyNoMoreInteractions(callback);
@@ -46,7 +47,7 @@ public class ConversionStrategyTest {
         assertEquals(MockConversion.CONVERTER_ERROR, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
-        IStrategyCallback callback = mock(IStrategyCallback.class);
+        IInputStreamConsumer callback = mock(IInputStreamConsumer.class);
         richMessage.applyTo(callback);
         verify(callback).onException(any(ConverterException.class));
         verifyNoMoreInteractions(callback);
@@ -59,7 +60,7 @@ public class ConversionStrategyTest {
         assertEquals(MockConversion.TIMEOUT, richMessage.getMockConversion());
         assertEquals(MESSAGE, richMessage.getMessage());
 
-        IStrategyCallback callback = mock(IStrategyCallback.class);
+        IInputStreamConsumer callback = mock(IInputStreamConsumer.class);
         richMessage.applyTo(callback);
         verifyZeroInteractions(callback);
     }

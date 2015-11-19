@@ -1,7 +1,6 @@
 package com.documents4j.builder;
 
 import com.documents4j.conversion.IExternalConverter;
-import com.documents4j.job.AbstractConverterBuilder;
 import com.documents4j.job.LocalConverter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
@@ -16,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -114,10 +114,10 @@ public class ConverterServerBuilder {
      * @return This builder instance.
      */
     public ConverterServerBuilder workerPool(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit) {
-        AbstractConverterBuilder.assertNumericArgument(corePoolSize, true);
-        AbstractConverterBuilder.assertNumericArgument(maximumPoolSize, true);
-        AbstractConverterBuilder.assertNumericArgument(corePoolSize + maximumPoolSize, false);
-        AbstractConverterBuilder.assertNumericArgument(keepAliveTime, true);
+        assertNumericArgument(corePoolSize, true);
+        assertNumericArgument(maximumPoolSize, true);
+        assertNumericArgument(corePoolSize + maximumPoolSize, false);
+        assertNumericArgument(keepAliveTime, true);
         this.corePoolSize = corePoolSize;
         this.maximumPoolSize = maximumPoolSize;
         this.keepAliveTime = unit.toMillis(keepAliveTime);
@@ -132,7 +132,7 @@ public class ConverterServerBuilder {
      * @return This builder instance.
      */
     public ConverterServerBuilder requestTimeout(long timeout, TimeUnit unit) {
-        AbstractConverterBuilder.assertNumericArgument(timeout, true);
+        assertNumericArgument(timeout, true);
         this.requestTimeout = unit.toMillis(timeout);
         return this;
     }
@@ -143,7 +143,7 @@ public class ConverterServerBuilder {
      * @return The process time out in milliseconds.
      */
     public ConverterServerBuilder processTimeout(long processTimeout, TimeUnit timeUnit) {
-        AbstractConverterBuilder.assertNumericArgument(processTimeout, false);
+        assertNumericArgument(processTimeout, false);
         this.processTimeout = timeUnit.toMillis(processTimeout);
         return this;
     }
@@ -257,5 +257,13 @@ public class ConverterServerBuilder {
      */
     public long getRequestTimeout() {
         return requestTimeout;
+    }
+
+    private static void assertNumericArgument(long number, boolean zeroAllowed) {
+        assertNumericArgument(number, zeroAllowed, Long.MAX_VALUE);
+    }
+
+    private static void assertNumericArgument(long number, boolean zeroAllowed, long maximum) {
+        checkArgument(((zeroAllowed && number == 0L) || number > 0L) && number < maximum);
     }
 }

@@ -1,5 +1,6 @@
 package com.documents4j.job;
 
+import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.*;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
@@ -9,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,32 +60,32 @@ public enum MockConversion {
         return messageCode;
     }
 
-    public void handle(String message, IStrategyCallback callback) {
+    public void handle(String message, IInputStreamConsumer callback) {
         try {
             switch (this) {
                 case OK:
-                    onSuccess(message, callback);
+                    callback.onComplete(new ByteArrayInputStream(asReply(message).getBytes(Charsets.UTF_8)));
                     break;
                 case CANCEL:
-                    onCancel(callback);
+                    callback.onCancel();
                     break;
                 case CONVERTER_ERROR:
-                    onError(new ConverterAccessException(asReply(message)), callback);
+                    callback.onException(new ConverterAccessException(asReply(message)));
                     break;
                 case INPUT_ERROR:
-                    onError(new ConversionInputException(asReply(message)), callback);
+                    callback.onException(new ConversionInputException(asReply(message)));
                     break;
                 case FORMAT_ERROR:
-                    onError(new ConversionFormatException(asReply(message)), callback);
+                    callback.onException(new ConversionFormatException(asReply(message)));
                     break;
                 case FILE_SYSTEM_ERROR:
-                    onError(new FileSystemInteractionException(asReply(message)), callback);
+                    callback.onException(new FileSystemInteractionException(asReply(message)));
                     break;
                 case GENERIC_ERROR:
-                    onError(new ConverterException(asReply(message)), callback);
+                    callback.onException(new ConverterException(asReply(message)));
                     break;
                 case TIMEOUT:
-                    // Emulate timeout: Do not answer at all.
+                    // Emulate timeout: Do not invoke callback.
                     break;
                 default:
                     throw new AssertionError(String.format("Unexpected conversion result: %s", this));
@@ -91,18 +93,6 @@ public enum MockConversion {
         } catch (Exception e) {
             throw new AssertionError(String.format("Unexpected exception: %s", e.getMessage()));
         }
-    }
-
-    private void onSuccess(String message, IStrategyCallback callback) throws IOException {
-        callback.onComplete(new ByteArrayInputStream(asReply(message).getBytes(Charsets.UTF_8)));
-    }
-
-    private void onCancel(IStrategyCallback callback) {
-        callback.onCancel();
-    }
-
-    private void onError(Exception exception, IStrategyCallback callback) {
-        callback.onException(exception);
     }
 
     public InputStream toInputStream(String message) {
@@ -142,7 +132,7 @@ public enum MockConversion {
             return message;
         }
 
-        public void applyTo(IStrategyCallback callback) {
+        public void applyTo(IInputStreamConsumer callback) {
             MockConversion.this.handle(message, callback);
         }
 

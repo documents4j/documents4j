@@ -1,6 +1,6 @@
 package com.documents4j.conversion;
 
-import com.documents4j.job.IStrategyCallback;
+import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.FileSystemInteractionException;
 import com.google.common.io.ByteStreams;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertTrue;
 
-class MockConversionManagerCallback implements IStrategyCallback {
+class MockConversionManagerCallback implements IInputStreamConsumer {
 
     private final File target;
     private Future<Boolean> future;

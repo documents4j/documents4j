@@ -1,7 +1,7 @@
 package com.documents4j.ws.endpoint;
 
 import com.documents4j.api.DocumentType;
-import com.documents4j.job.IStrategyCallback;
+import com.documents4j.api.IInputStreamConsumer;
 import com.documents4j.throwables.ConversionFormatException;
 import com.documents4j.throwables.ConversionInputException;
 import com.documents4j.throwables.ConverterException;
@@ -10,7 +10,7 @@ import com.documents4j.ws.ConverterNetworkProtocol;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
 
-class MockWebServiceCallback implements IStrategyCallback {
+class MockWebServiceCallback implements IInputStreamConsumer {
 
     private final DocumentType targetType;
     private Response.ResponseBuilder responseBuilder;

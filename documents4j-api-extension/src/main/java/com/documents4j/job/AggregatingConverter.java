@@ -46,7 +46,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
      *
      * @return A new builder instance.
      */
-    public Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -56,7 +56,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
      * @param converters The converters to aggregate.
      * @return A new aggregation converter
      */
-    public IAggregatingConverter make(IConverter... converters) {
+    public static IAggregatingConverter make(IConverter... converters) {
         checkNotNull(converters);
         return make(Arrays.asList(converters));
     }
@@ -67,7 +67,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
      * @param converters The available converters.
      * @return A new aggregation converter
      */
-    public IAggregatingConverter make(Collection<? extends IConverter> converters) {
+    public static IAggregatingConverter make(Collection<? extends IConverter> converters) {
         checkNotNull(converters);
         return builder().delegates(converters).make();
     }

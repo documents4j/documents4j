@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import javax.net.ssl.SSLContext;
 import java.io.Console;
 import java.io.File;
 import java.io.IOException;
@@ -170,6 +171,8 @@ public class StandaloneClient {
 
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
+        ArgumentAcceptingOptionSpec<SSLContext> sslSpec = makeSslSpec(optionParser);
+
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -197,16 +200,21 @@ public class StandaloneClient {
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
+        SSLContext sslContext = sslSpec.value(optionSet);
+
         File logFile = logFileSpec.value(optionSet);
         Level level = logLevelSpec.value(optionSet);
         configureLogging(logFile, level);
 
         System.out.println("Connecting to: " + baseUri);
 
-        return RemoteConverter.builder()
+        RemoteConverter.Builder builder = RemoteConverter.builder()
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS)
-                .baseUri(baseUri)
-                .build();
+                .baseUri(baseUri);
+        if (sslContext != null) {
+            builder = builder.sslContext(sslContext);
+        }
+        return builder.build();
     }
 
     private static void configureLogging(File logFile, Level level) {
@@ -275,8 +283,8 @@ public class StandaloneClient {
     private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
-                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
+                        CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
+                        CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
                         CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIMEOUT
                 )
                 .withRequiredArg()
@@ -285,11 +293,25 @@ public class StandaloneClient {
                 .defaultsTo(RemoteConverter.Builder.DEFAULT_REQUEST_TIMEOUT);
     }
 
+    private static ArgumentAcceptingOptionSpec<SSLContext> makeSslSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                        CommandDescription.ARGUMENT_LONG_SSL,
+                        CommandDescription.ARGUMENT_SHORT_SSL),
+                        CommandDescription.DESCRIPTION_CONTEXT_SSL
+                )
+                .withRequiredArg()
+                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_SSL)
+                .withValuesConvertedBy(new SslContextValueConverter())
+                .ofType(SSLContext.class);
+        // defaults to null such that no SSL configuration is applied
+    }
+
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
-                                CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
+                        CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
+                        CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
                         CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE
                 )
                 .withRequiredArg()
@@ -301,8 +323,8 @@ public class StandaloneClient {
     private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
-                                CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
+                        CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
+                        CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
                         CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
                 )
                 .withRequiredArg()
@@ -314,8 +336,8 @@ public class StandaloneClient {
     private static OptionSpec<Void> makeHelpSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_HELP,
-                                CommandDescription.ARGUMENT_SHORT_HELP),
+                        CommandDescription.ARGUMENT_LONG_HELP,
+                        CommandDescription.ARGUMENT_SHORT_HELP),
                         CommandDescription.DESCRIPTION_CONTEXT_HELP
                 )
                 .forHelp();
@@ -339,6 +361,7 @@ public class StandaloneClient {
     private static class LoggingFileConsumer implements IFileConsumer {
 
         private final File sourceFile;
+
         private final Logger logger;
 
         private LoggingFileConsumer(File sourceFile, Logger logger) {

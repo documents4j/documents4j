@@ -8,6 +8,8 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.net.ssl.SSLContext;
+
 public class ConverterServerBuilderTest {
 
     private static final long TIMEOUT = 10000L;
@@ -26,6 +28,7 @@ public class ConverterServerBuilderTest {
                 .disable(MicrosoftWordBridge.class)
                 .disable(MicrosoftExcelBridge.class)
                 .enable(PseudoConverter.class)
+                .sslContext(SSLContext.getDefault())
                 .baseUri(String.format("http://localhost:%d", port))
                 .build();
         PortAssert.assertPortBusy(port);

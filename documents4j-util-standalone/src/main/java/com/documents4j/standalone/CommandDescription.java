@@ -54,6 +54,13 @@ public class CommandDescription {
             "of a conversion process. A too low value will result in requesting entities to be denied file conversion if the server " +
             "is currently very busy.";
 
+    public static final String ARGUMENT_LONG_SSL = "ssl";
+    public static final String ARGUMENT_SHORT_SSL = "C";
+    public static final String DESCRIPTION_ARGUMENT_SSL = "The name of the encryption algorithm to use for establishing a secured connection";
+    public static final String DESCRIPTION_CONTEXT_SSL = "A conversion can communicate input and output files by using a secured connection. " +
+            "The connection is established by using the executing JVM's default trust and key stores. These stores can be set by system " +
+            "properties which also allows for the configuration of a certificate to use.";
+
     public static final String ARGUMENT_LONG_LOG_TO_FILE = "log";
     public static final String ARGUMENT_SHORT_LOG_TO_FILE = "L";
     public static final String DESCRIPTION_ARGUMENT_LOG_TO_FILE = "A file to which all log information will be written. If " +

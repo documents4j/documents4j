@@ -15,6 +15,7 @@ import org.glassfish.jersey.message.GZipEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -43,9 +44,10 @@ public class RemoteConverter extends ConverterAdapter {
     private final ExecutorService executorService;
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
-                              int corePoolSize, int maximumPoolSize, long keepAliveTime) {
+                              int corePoolSize, int maximumPoolSize, long keepAliveTime,
+                              SSLContext sslContext) {
         super(baseFolder);
-        this.client = makeClient(requestTimeout, maximumPoolSize);
+        this.client = makeClient(requestTimeout, maximumPoolSize, sslContext);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         LOGGER.info("The documents4j remote converter has started successfully (URI: {})", baseUri);
@@ -80,7 +82,7 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-    private static Client makeClient(long requestTimeout, int maxConnections) {
+    private static Client makeClient(long requestTimeout, int maxConnections, SSLContext sslContext) {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.register(makeGZipFeature());
@@ -89,7 +91,11 @@ public class RemoteConverter extends ConverterAdapter {
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
         clientConfig.connectorProvider(new ApacheConnectorProvider());
-        return ClientBuilder.newClient(clientConfig);
+        if (sslContext != null) {
+            return ClientBuilder.newBuilder().sslContext(sslContext).withConfig(clientConfig).build();
+        } else {
+            return ClientBuilder.newClient(clientConfig);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -177,6 +183,8 @@ public class RemoteConverter extends ConverterAdapter {
         private URI baseUri;
         private long requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
+        private SSLContext sslContext;
+
         private Builder() {
             /* empty */
         }
@@ -218,11 +226,24 @@ public class RemoteConverter extends ConverterAdapter {
             return this;
         }
 
+        /**
+         * Configures to use SSL for the server connection using the given context.
+         *
+         * @param sslContext The SSL context to use.
+         * @return This builder instance.
+         */
+        public Builder sslContext(SSLContext sslContext) {
+            checkNotNull(sslContext);
+            this.sslContext = sslContext;
+            return this;
+        }
+
         @Override
         public IConverter build() {
             checkNotNull(baseUri, "The base URI was not set");
             return new RemoteConverter(baseUri, normalizedBaseFolder(), requestTimeout,
-                    corePoolSize, maximumPoolSize, keepAliveTime);
+                    corePoolSize, maximumPoolSize, keepAliveTime,
+                    sslContext);
         }
 
         /**

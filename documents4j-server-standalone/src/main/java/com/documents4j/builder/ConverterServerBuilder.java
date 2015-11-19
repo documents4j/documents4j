@@ -6,9 +6,11 @@ import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
 import com.documents4j.ws.application.WebConverterApplication;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ public class ConverterServerBuilder {
     private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
     private URI baseUri;
     private File baseFolder = null;
+    private SSLContext sslContext;
     private int corePoolSize = LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE;
     private int maximumPoolSize = LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE;
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
@@ -173,6 +176,18 @@ public class ConverterServerBuilder {
     }
 
     /**
+     * Enables SSL for the server using the given context.
+     *
+     * @param sslContext The SSL context to use.
+     * @return This builder.
+     */
+    public ConverterServerBuilder sslContext(SSLContext sslContext) {
+        checkNotNull(sslContext);
+        this.sslContext = sslContext;
+        return this;
+    }
+
+    /**
      * Creates the conversion server that is specified by this builder.
      *
      * @return The conversion server that is specified by this builder.
@@ -185,7 +200,11 @@ public class ConverterServerBuilder {
         ResourceConfig resourceConfig = ResourceConfig
                 .forApplication(new WebConverterApplication(configuration))
                 .register(configuration);
-        return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
+        if (sslContext == null) {
+            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
+        } else {
+            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig, true, new SSLEngineConfigurator(sslContext));
+        }
     }
 
     private StandaloneWebConverterConfiguration makeConfiguration() {

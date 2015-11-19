@@ -1,6 +1,5 @@
 documents4j
 ===========
-===========
 documents4j is a Java library for converting documents into another document format. This is achieved by delegating the conversion to any native application which understands the conversion of the given file into the desired target format. documents4j comes with adaptations for MS Word and MS Excel for Windows what allows for example for the conversion of a *docx* file into a *pdf* file without the usual distortions in the resulting document which are often observed for conversions that were conducted using non-Microsoft products.
 
 documents4j offers a simple API and two implementations of this API:

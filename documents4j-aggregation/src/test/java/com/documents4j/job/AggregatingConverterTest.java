@@ -5,6 +5,7 @@ import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import java.io.File;
@@ -14,7 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.Assert.assertEquals;
+import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
@@ -117,26 +118,5 @@ public class AggregatingConverterTest {
             aggregatingConverter.shutDown();
             scheduledExecutorService.shutdown();
         }
-    }
-
-    @Test
-    public void testSelectionStrategyApplication() throws Exception {
-        ISelectionStrategy selectionStrategy = Mockito.mock(ISelectionStrategy.class);
-        IConverter first = Mockito.mock(IConverter.class), second = Mockito.mock(IConverter.class);
-
-        IAggregatingConverter aggregatingConverter = AggregatingConverter.builder()
-                .delegates(first, second)
-                .selectionStrategy(selectionStrategy)
-                .make();
-
-        IFileSource fileSource = Mockito.mock(IFileSource.class);
-        when(selectionStrategy.select(Arrays.asList(first, second))).thenReturn(Mockito.mock(IConverter.class));
-
-        aggregatingConverter.convert(fileSource);
-        aggregatingConverter.convert(fileSource);
-        aggregatingConverter.convert(fileSource);
-
-        verify(selectionStrategy, times(3)).select(Arrays.asList(first, second));
-        verifyNoMoreInteractions(selectionStrategy);
     }
 }

@@ -10,7 +10,7 @@
         <version>0.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>documents4j-api-extension</artifactId>
+    <artifactId>documents4j-aggregation</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>

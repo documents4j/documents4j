@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Future;
@@ -99,40 +100,46 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         return false;
     }
 
-    private IConverter nextConverter() {
-        List<IConverter> converterCopy = new ArrayList<IConverter>(converters);
-        if (converterCopy.isEmpty()) {
-            LOGGER.trace("No converter available for {}", this);
+    private IConverter nextConverter(DocumentType sourceFormat, DocumentType targetFormat) {
+        List<IConverter> supportingConverters = new ArrayList<IConverter>(converters.size());
+        for (IConverter converter : converters) {
+            Set<DocumentType> documentTypes = converter.getSupportedConversions().get(sourceFormat);
+            if (documentTypes != null && documentTypes.contains(targetFormat)) {
+                supportingConverters.add(converter);
+            }
+        }
+        if (supportingConverters.isEmpty()) {
+            LOGGER.trace("No converter available for conversion of {} to {}", sourceFormat, targetFormat);
             return new ImpossibleConverter();
         }
-        IConverter converter = selectionStrategy.select(converterCopy);
-        LOGGER.trace("Selected {} by applying {} for available converters {}", converter, selectionStrategy, converters);
+        IConverter converter = selectionStrategy.select(supportingConverters);
+        LOGGER.trace("Selected {} for conversion of {} to {}", converter, sourceFormat, targetFormat);
         return new FailureAwareConverter(converter, this);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(File source) {
-        return nextConverter().convert(source);
+        return convert(new FileSourceFromFile(source));
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(InputStream source) {
-        return nextConverter().convert(source);
+        return convert(source, ConverterAdapter.DEFAULT_CLOSE_STREAM);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(InputStream source, boolean close) {
-        return nextConverter().convert(source, close);
+        return convert(new InputStreamSourceFromInputStream(source, close));
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(IFileSource source) {
-        return nextConverter().convert(source);
+        return new AggregatedFileSourceConversionWithSourceUnspecified(source);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
-        return nextConverter().convert(source);
+        return new AggregatedInputStreamConversionWithSourceUnspecified(source);
     }
 
     @Override
@@ -316,6 +323,198 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
                     propagateShutDown);
             converter.selfCheck = executorService.schedule(converter, delay, timeUnit);
             return converter;
+        }
+    }
+
+    private class AggregatedFileSourceConversionWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
+
+        private final IFileSource source;
+
+        private AggregatedFileSourceConversionWithSourceUnspecified(IFileSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
+            return new AggregatedFileSourceConversionWithSourceSpecified(source, sourceFormat);
+        }
+    }
+
+    private class AggregatedFileSourceConversionWithSourceSpecified implements IConversionJobWithSourceSpecified {
+
+        private final IFileSource source;
+
+        private final DocumentType sourceFormat;
+
+        private AggregatedFileSourceConversionWithSourceSpecified(IFileSource source, DocumentType sourceFormat) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(File target) {
+            return to(target, new NoopFileConsumer());
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(File target, IFileConsumer callback) {
+            return new AggregatedFileSourceToFileConsumerConversionWithSourceSpecified(source, sourceFormat, target, callback);
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(OutputStream target) {
+            return to(target, ConversionJobWithSourceSpecifiedAdapter.DEFAULT_CLOSE_STREAM);
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(OutputStream target, boolean closeStream) {
+            return to(new OutputStreamToInputStreamConsumer(target, closeStream));
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
+            return new AggregatedFileSourceToInputStreamConsumerConversionWithSourceSpecified(source, sourceFormat, callback);
+        }
+    }
+
+    private class AggregatedFileSourceToFileConsumerConversionWithSourceSpecified implements IConversionJobWithTargetUnspecified {
+
+        private final IFileSource source;
+
+        private final DocumentType sourceFormat;
+
+        private final File target;
+
+        private final IFileConsumer callback;
+
+        private AggregatedFileSourceToFileConsumerConversionWithSourceSpecified(IFileSource source, DocumentType sourceFormat,
+                                                                                File target, IFileConsumer callback) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.target = target;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return nextConverter(sourceFormat, targetFormat).convert(source).as(sourceFormat).to(target, callback).as(targetFormat);
+        }
+    }
+
+    private class AggregatedFileSourceToInputStreamConsumerConversionWithSourceSpecified implements IConversionJobWithTargetUnspecified {
+
+        private final IFileSource source;
+
+        private final DocumentType sourceFormat;
+
+        private final IInputStreamConsumer callback;
+
+        private AggregatedFileSourceToInputStreamConsumerConversionWithSourceSpecified(IFileSource source, DocumentType sourceFormat,
+                                                                                       IInputStreamConsumer callback) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return nextConverter(sourceFormat, targetFormat).convert(source).as(sourceFormat).to(callback).as(targetFormat);
+        }
+    }
+
+    private class AggregatedInputStreamConversionWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
+
+        private final IInputStreamSource source;
+
+        public AggregatedInputStreamConversionWithSourceUnspecified(IInputStreamSource source) {
+            this.source = source;
+        }
+
+        @Override
+        public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
+            return new AggregatedInputStreamSourceConversionWithSourceSpecified(source, sourceFormat);
+        }
+    }
+
+    private class AggregatedInputStreamSourceConversionWithSourceSpecified implements IConversionJobWithSourceSpecified {
+
+        private final IInputStreamSource source;
+
+        private final DocumentType sourceFormat;
+
+        private AggregatedInputStreamSourceConversionWithSourceSpecified(IInputStreamSource source, DocumentType sourceFormat) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(File target) {
+            return to(target, new NoopFileConsumer());
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(File target, IFileConsumer callback) {
+            return new AggregatedInputStreamSourceToFileConsumerConversionWithSourceSpecified(source, sourceFormat, target, callback);
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(OutputStream target) {
+            return to(target, ConversionJobWithSourceSpecifiedAdapter.DEFAULT_CLOSE_STREAM);
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(OutputStream target, boolean closeStream) {
+            return to(new OutputStreamToInputStreamConsumer(target, closeStream));
+        }
+
+        @Override
+        public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
+            return new AggregatedInputStreamSourceToInputStreamConsumerConversionWithSourceSpecified(source, sourceFormat, callback);
+        }
+    }
+
+    private class AggregatedInputStreamSourceToFileConsumerConversionWithSourceSpecified implements IConversionJobWithTargetUnspecified {
+
+        private final IInputStreamSource source;
+
+        private final DocumentType sourceFormat;
+
+        private final File target;
+
+        private final IFileConsumer callback;
+
+        private AggregatedInputStreamSourceToFileConsumerConversionWithSourceSpecified(IInputStreamSource source, DocumentType sourceFormat,
+                                                                                       File target, IFileConsumer callback) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.target = target;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return nextConverter(sourceFormat, targetFormat).convert(source).as(sourceFormat).to(target, callback).as(targetFormat);
+        }
+    }
+
+    private class AggregatedInputStreamSourceToInputStreamConsumerConversionWithSourceSpecified implements IConversionJobWithTargetUnspecified {
+
+        private final IInputStreamSource source;
+
+        private final DocumentType sourceFormat;
+
+        private final IInputStreamConsumer callback;
+
+        private AggregatedInputStreamSourceToInputStreamConsumerConversionWithSourceSpecified(IInputStreamSource source, DocumentType sourceFormat,
+                                                                                              IInputStreamConsumer callback) {
+            this.source = source;
+            this.sourceFormat = sourceFormat;
+            this.callback = callback;
+        }
+
+        @Override
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return nextConverter(sourceFormat, targetFormat).convert(source).as(sourceFormat).to(callback).as(targetFormat);
         }
     }
 }

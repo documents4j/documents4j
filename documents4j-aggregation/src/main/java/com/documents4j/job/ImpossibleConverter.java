@@ -2,7 +2,6 @@ package com.documents4j.job;
 
 import com.documents4j.api.*;
 import com.documents4j.throwables.ConversionFormatException;
-import com.documents4j.throwables.ConverterAccessException;
 
 import java.io.File;
 import java.io.InputStream;
@@ -169,7 +168,7 @@ class ImpossibleConverter implements IConverter {
         }
     }
 
-    private static interface ExceptionCallback {
+    private interface ExceptionCallback {
 
         void onException(ConversionFormatException exception);
     }

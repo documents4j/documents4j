@@ -20,6 +20,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 abstract class ConverterAdapter implements IConverter {
 
+    public static final boolean DEFAULT_CLOSE_STREAM = true;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ConverterAdapter.class);
 
     private static final String NO_EXTENSION = "";
@@ -60,7 +62,7 @@ abstract class ConverterAdapter implements IConverter {
 
     @Override
     public IConversionJobWithSourceUnspecified convert(InputStream source) {
-        return convert(source, true);
+        return convert(source, DEFAULT_CLOSE_STREAM);
     }
 
     @Override

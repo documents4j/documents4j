@@ -59,7 +59,6 @@
 
     <modules>
         <module>documents4j-api</module>
-        <module>documents4j-api-extension</module>
         <module>documents4j-local</module>
         <module>documents4j-local-demo</module>
         <module>documents4j-transformer</module>
@@ -69,6 +68,7 @@
         <module>documents4j-client-standalone</module>
         <module>documents4j-server</module>
         <module>documents4j-server-standalone</module>
+        <module>documents4j-aggregation</module>
         <module>documents4j-util-all</module>
         <module>documents4j-util-conversion</module>
         <module>documents4j-util-ws</module>

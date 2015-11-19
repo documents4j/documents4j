@@ -9,8 +9,8 @@ import org.mockito.Mockito;
 
 import java.util.Set;
 
-import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 

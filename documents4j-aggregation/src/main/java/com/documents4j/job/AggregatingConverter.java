@@ -100,7 +100,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         return false;
     }
 
-    private IConverter nextConverter(DocumentType sourceFormat, DocumentType targetFormat) {
+    protected IConverter nextConverter(DocumentType sourceFormat, DocumentType targetFormat) {
         List<IConverter> supportingConverters = new ArrayList<IConverter>(converters.size());
         for (IConverter converter : converters) {
             Set<DocumentType> documentTypes = converter.getSupportedConversions().get(sourceFormat);

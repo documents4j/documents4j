@@ -5,18 +5,20 @@ import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Answers;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -118,5 +120,52 @@ public class AggregatingConverterTest {
             aggregatingConverter.shutDown();
             scheduledExecutorService.shutdown();
         }
+    }
+
+    @Test
+    public void testFormatSelectionSingleSupportingConverter() throws Exception {
+        IConverter supportingConverter = Mockito.mock(IConverter.class);
+        when(supportingConverter.getSupportedConversions())
+                .thenReturn(Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE)));
+
+        IConverter nonSupportingConverter = Mockito.mock(IConverter.class);
+        when(nonSupportingConverter.getSupportedConversions()).thenReturn(Collections.<DocumentType, Set<DocumentType>>emptyMap());
+
+        ISelectionStrategy selectionStrategy = Mockito.mock(ISelectionStrategy.class);
+        when(selectionStrategy.select(Collections.singletonList(supportingConverter))).thenReturn(Mockito.mock(IConverter.class));
+
+        AggregatingConverter aggregatingConverter = (AggregatingConverter) AggregatingConverter.builder()
+                .delegates(supportingConverter, nonSupportingConverter)
+                .selectionStrategy(selectionStrategy)
+                .make();
+
+        assertNotNull(aggregatingConverter.nextConverter(AbstractConverterTest.MOCK_INPUT_TYPE, AbstractConverterTest.MOCK_RESPONSE_TYPE));
+
+        verify(selectionStrategy).select(Collections.singletonList(supportingConverter));
+        verifyNoMoreInteractions(selectionStrategy);
+    }
+
+    @Test
+    public void testFormatSelectionMultipleSupportingConverter() throws Exception {
+        IConverter supportingConverter = Mockito.mock(IConverter.class);
+        when(supportingConverter.getSupportedConversions())
+                .thenReturn(Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE)));
+
+        IConverter otherSupportingConverter = Mockito.mock(IConverter.class);
+        when(otherSupportingConverter.getSupportedConversions())
+                .thenReturn(Collections.singletonMap(AbstractConverterTest.MOCK_INPUT_TYPE, Collections.singleton(AbstractConverterTest.MOCK_RESPONSE_TYPE)));
+
+        ISelectionStrategy selectionStrategy = Mockito.mock(ISelectionStrategy.class);
+        when(selectionStrategy.select(Arrays.asList(supportingConverter, otherSupportingConverter))).thenReturn(Mockito.mock(IConverter.class));
+
+        AggregatingConverter aggregatingConverter = (AggregatingConverter) AggregatingConverter.builder()
+                .delegates(supportingConverter, otherSupportingConverter)
+                .selectionStrategy(selectionStrategy)
+                .make();
+
+        assertNotNull(aggregatingConverter.nextConverter(AbstractConverterTest.MOCK_INPUT_TYPE, AbstractConverterTest.MOCK_RESPONSE_TYPE));
+
+        verify(selectionStrategy).select(Arrays.asList(supportingConverter, otherSupportingConverter));
+        verifyNoMoreInteractions(selectionStrategy);
     }
 }

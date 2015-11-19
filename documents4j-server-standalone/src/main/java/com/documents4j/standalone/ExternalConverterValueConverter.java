@@ -12,7 +12,7 @@ class ExternalConverterValueConverter implements ValueConverter<Class<? extends 
         try {
             return (Class<? extends IExternalConverter>) Class.forName(value);
         } catch (ClassNotFoundException e) {
-            throw new ValueConversionException("Not a class name or not on class path: " + value);
+            throw new ValueConversionException("Not a class name or not on class path: " + value, e);
         }
     }
 

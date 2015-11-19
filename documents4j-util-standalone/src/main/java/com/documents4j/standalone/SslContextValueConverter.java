@@ -24,6 +24,6 @@ public class SslContextValueConverter implements ValueConverter<SSLContext> {
 
     @Override
     public String valuePattern() {
-        return "<algorithm name>";
+        return "algorithm";
     }
 }

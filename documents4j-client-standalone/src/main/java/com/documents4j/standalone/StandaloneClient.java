@@ -302,8 +302,7 @@ public class StandaloneClient {
                 )
                 .withRequiredArg()
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_SSL)
-                .withValuesConvertedBy(new SslContextValueConverter())
-                .ofType(SSLContext.class);
+                .withValuesConvertedBy(new SslContextValueConverter());
         // defaults to null such that no SSL configuration is applied
     }
 

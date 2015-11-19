@@ -5,7 +5,6 @@ import com.documents4j.ws.endpoint.MockWebApplication;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 import org.glassfish.jersey.test.spi.TestContainerException;
-import org.junit.Ignore;
 
 import javax.ws.rs.core.Application;
 import java.net.URI;
@@ -13,8 +12,6 @@ import java.net.URI;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-// This is just a test delegate which should only be invoked by another test.
-@Ignore
 class RemoteConverterTestDelegate implements IConverterTestDelegate {
 
     private static final long REMOTE_CONVERTER_TIMEOUT = 2000L;

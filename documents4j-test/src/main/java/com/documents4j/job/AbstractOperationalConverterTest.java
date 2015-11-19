@@ -27,7 +27,7 @@ public abstract class AbstractOperationalConverterTest extends AbstractConverter
         assertTrue(target.exists());
     }
 
-    @Test//(timeout = DEFAULT_CONVERSION_TIMEOUT)
+    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testFileToFileFuture() throws Exception {
         File source = validFile(true), target = makeTarget(true);
         assertTrue(getConverter().convert(source).as(validInputType()).to(target).as(validTargetType()).schedule().get());

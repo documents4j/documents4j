@@ -17,7 +17,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class InoperationalConverterResourceTest extends AbstractEncodingJerseyTest {
+public class InoperativeConverterResourceTest extends AbstractEncodingJerseyTest {
 
     private static final String MESSAGE = "Hello converter!";
     private static final boolean CONVERTER_IS_OPERATIONAL = false;

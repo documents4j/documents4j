@@ -1,5 +1,6 @@
 documents4j
 ===========
+===========
 documents4j is a Java library for converting documents into another document format. This is achieved by delegating the conversion to any native application which understands the conversion of the given file into the desired target format. documents4j comes with adaptations for MS Word and MS Excel for Windows what allows for example for the conversion of a *docx* file into a *pdf* file without the usual distortions in the resulting document which are often observed for conversions that were conducted using non-Microsoft products.
 
 documents4j offers a simple API and two implementations of this API:
@@ -119,6 +120,17 @@ java -jar documents4j-client-standalone-shaded.jar http://localhost:9998
 
 Again, the `-?` option can be supplied for obtaining a list of options.
 
+Aggregating converter
+----------------
+Additionally to the `LocalConverter` and the `RemoteConverter`, documents4j extends the `IConverter` API by `IAggregatingConverter` which allows to delegate conversions to a collection of underlying converters. This interface is implemented by the `AggregationConverter` class. 
+
+Using this extension serves two purposes:
+
+1. It allows for the aggregation of several `IConverter`s to achieve a load balancing for multiple conversions. By default, an `AggregatingConverter` applies a *round robin* strategy. A custom strategy can be implemented as an `ISelectionStrategy`.
+2. Using the methods of the `IAggregatingConverter` interface, it is possible to register or remove aggregated `IConverter`s after the creation of the `AggregatingConverter`. This way, it is for example possible to migrate to another conversion server without restarting an application or to restart an inoperative local converter.
+
+An `AggregatingConverter` cannot generally guarantee the success of an individual conversion if an aggregated `IConverter` becomes inoperative during a conversion process. The aggregating converter does however eventually discover a converter' inaccessibility and removes it from cerculation. For being notified of such events, it is possible to register a delegate as an `IConverterFailureCallback`. It is also possible to introduce a health check in regular intervals when creating a converter such that inoperative converters are removed on a regular basis.
+
 Exception hierarchy
 -------------------
 The exception hierarchy was intentionally kept simple in order to hide the details of an `IConverter` implementation from the end user. All exceptions thrown by the converters [are unchecked](http://www.artima.com/intv/handcuffs.html). This is of course not true for futures which fulfill the [`Future` interface contract](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/Future.html) and wrap any exception in an [`java.util.concurrent.ExecutionException`](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutionException.html) whenever `Future#get()` or `Future#get(long, TimeUnit)` are invoked.
@@ -130,7 +142,7 @@ The native exceptions thrown by an `IConverter` are either instances of `Convert
 - `FileSystemInteractionException`: The source file does not exist or is locked by the JVM or another application. (*Note*: You must **not** lock files in the JVM when using a `LocalConverter` since they might need to be processed by another software which is then prevented to do so.) This exception is also thrown when the target file is locked. Unlocked, existing files are simply overwritten when a conversion is triggered. Finally, the exception is also thrown when using a file stream causes an `IOException` where the IO exception is wrapped before it is rethrown. 
 - `ConverterAccessException`: This exception is thrown when a `IConverter` instance is in invalid state. This occurs when an `IConverter` was either shut down or the conditions for using a converter are not met, either because a remote converter cannot longer connect to its conversion server or because a backing conversion software is inaccessible. This exception can also occur when creating a `LocalConverter` or a `RemoteConverter`.
 
-**Note**: Be aware that `IConverter` implementations do not follow a prevalence of exceptions. When a user is trying to convert a non-existent file with a converter in a bad state, it cannot be guaranteed that this will always throw a `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ for different implementations of the `IConverter` API.
+**Note**: Be aware that `IConverter` implementations do not follow a prevalence of exceptions. When a user is trying to convert a non-existent file with a converter in an inoperative state, it cannot be guaranteed that this will always throw a `FileSystemInteractionException` instead of a `ConverterAccessException`. The prevalence will differ for different implementations of the `IConverter` API.
 
 Logging
 -------

@@ -3,7 +3,7 @@ package com.documents4j.job;
 import org.junit.After;
 import org.junit.Before;
 
-public class InoperationalLocalConverterTest extends AbstractInoperationalConverterTest {
+public class InoperativeLocalConverterTest extends AbstractInoperativeConverterTest {
 
     private LocalConverterTestDelegate converterTestDelegate;
 

@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-public abstract class AbstractInoperationalConverterTest extends AbstractConverterTest {
+public abstract class AbstractInoperativeConverterTest extends AbstractConverterTest {
 
     protected abstract IConverterTestDelegate getConverterTestDelegate();
 
@@ -38,6 +38,7 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
             verify(inputStreamConsumer).onException(any(ConverterAccessException.class));
             verifyNoMoreInteractions(inputStreamConsumer);
             verify(inputStream).close();
+            assertPostConverterState();
             throw e;
         }
     }
@@ -56,6 +57,7 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
             verify(inputStreamConsumer).onException(any(ConverterAccessException.class));
             verifyNoMoreInteractions(inputStreamConsumer);
             verify(inputStream).close();
+            assertPostConverterState();
             throw (Exception) e.getCause();
         }
     }
@@ -74,6 +76,7 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
             verify(fileConsumer).onException(eq(target), any(ConverterAccessException.class));
             verifyNoMoreInteractions(fileConsumer);
             assertFalse(target.exists());
+            assertPostConverterState();
             throw e;
         }
     }
@@ -92,7 +95,12 @@ public abstract class AbstractInoperationalConverterTest extends AbstractConvert
             verify(fileConsumer).onException(eq(target), any(ConverterAccessException.class));
             verifyNoMoreInteractions(fileConsumer);
             assertFalse(target.exists());
+            assertPostConverterState();
             throw (Exception) e.getCause();
         }
+    }
+
+    protected void assertPostConverterState() {
+        /* do nothing */
     }
 }

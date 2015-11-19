@@ -55,7 +55,7 @@ public class MockWebService {
         } else if (operational) {
             MockConversion.from(new ByteArrayInputStream(message.getBytes(Charsets.UTF_8))).applyTo(mockWebServiceCallback);
         } else {
-            MockConversion.CONVERTER_ERROR.handle("Converter is inoperational", mockWebServiceCallback);
+            MockConversion.CONVERTER_ERROR.handle("Converter is inoperative", mockWebServiceCallback);
         }
         return mockWebServiceCallback.buildResponse();
     }

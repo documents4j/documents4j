@@ -30,7 +30,7 @@ public abstract class MockConversionManager implements IConversionManager {
         if (operational) {
             return new OperationalMockConversionManager(baseFolder);
         } else {
-            return new InoperationalMockConversionManager(baseFolder);
+            return new InoperativeMockConversionManager(baseFolder);
         }
     }
 
@@ -100,9 +100,9 @@ public abstract class MockConversionManager implements IConversionManager {
         }
     }
 
-    private static class InoperationalMockConversionManager extends MockConversionManager {
+    private static class InoperativeMockConversionManager extends MockConversionManager {
 
-        private InoperationalMockConversionManager(File baseFolder) {
+        private InoperativeMockConversionManager(File baseFolder) {
             super(baseFolder);
         }
 
@@ -123,7 +123,7 @@ public abstract class MockConversionManager implements IConversionManager {
 
         @Override
         public String toString() {
-            return MoreObjects.toStringHelper(InoperationalMockConversionManager.class)
+            return MoreObjects.toStringHelper(InoperativeMockConversionManager.class)
                     .add("baseFolder", getBaseFolder())
                     .toString();
         }

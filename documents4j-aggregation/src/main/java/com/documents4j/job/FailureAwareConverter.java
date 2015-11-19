@@ -62,7 +62,7 @@ class FailureAwareConverter implements IConverter {
 
     private void reportException(Exception e) {
         if (e instanceof ConverterAccessException) {
-            failureCallback.onFailure(this);
+            failureCallback.onFailure(converter);
         }
     }
 

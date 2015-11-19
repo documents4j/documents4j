@@ -5,7 +5,6 @@ import com.documents4j.conversion.IConversionManager;
 import com.documents4j.conversion.IExternalConverter;
 import com.documents4j.conversion.MockConversionManager;
 import com.google.common.io.Files;
-import org.junit.Ignore;
 
 import java.io.File;
 import java.util.Collections;
@@ -14,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
-// This is a delegate that should never be called by JUnit directly.
-@Ignore
 class LocalConverterTestDelegate implements IConverterTestDelegate {
 
     private final boolean operational;

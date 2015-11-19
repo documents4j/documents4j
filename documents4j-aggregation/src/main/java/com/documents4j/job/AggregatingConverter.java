@@ -26,6 +26,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     private final CopyOnWriteArrayList<IConverter> converters;
 
     private final ISelectionStrategy selectionStrategy;
+
     private final IConverterFailureCallback converterFailureCallback;
 
     private final boolean propagateShutDown;
@@ -101,9 +102,12 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     private IConverter nextConverter() {
         List<IConverter> converterCopy = new ArrayList<IConverter>(converters);
         if (converterCopy.isEmpty()) {
+            LOGGER.trace("No converter available for {}", this);
             return new ImpossibleConverter();
         }
-        return new FailureAwareConverter(selectionStrategy.select(converterCopy), this);
+        IConverter converter = selectionStrategy.select(converterCopy);
+        LOGGER.trace("Selected {} by applying {} for available converters {}", converter, selectionStrategy, converters);
+        return new FailureAwareConverter(converter, this);
     }
 
     @Override
@@ -134,7 +138,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     @Override
     public boolean register(IConverter converter) {
         if (converters.addIfAbsent(converter)) {
-            LOGGER.info("Registered converter {} to {}", converter, this);
+            LOGGER.info("Registered converter {} with {}", converter, this);
             return true;
         } else {
             return false;
@@ -152,22 +156,31 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     }
 
     @Override
+    public Set<IConverter> getConverters() {
+        return new HashSet<IConverter>(converters);
+    }
+
+    @Override
     public void shutDown() {
         if (selfCheck != null) {
             selfCheck.cancel(true);
         }
-        if (propagateShutDown) {
-            List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
-            for (IConverter converter : converters) {
-                try {
-                    converter.shutDown();
-                } catch (RuntimeException e) {
-                    exceptions.add(e);
+        try {
+            if (propagateShutDown) {
+                List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+                for (IConverter converter : converters) {
+                    try {
+                        converter.shutDown();
+                    } catch (RuntimeException e) {
+                        exceptions.add(e);
+                    }
+                }
+                if (!exceptions.isEmpty()) {
+                    throw new ConverterAccessException("Shutting down aggregated converters caused at least one exception", exceptions.get(0));
                 }
             }
-            if (!exceptions.isEmpty()) {
-                throw new ConverterAccessException("Shutting down aggregated converters caused exception");
-            }
+        } finally {
+            converters.clear();
         }
     }
 
@@ -211,6 +224,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         private final LinkedHashSet<IConverter> converters = new LinkedHashSet<IConverter>();
 
         private ISelectionStrategy selectionStrategy = new RoundRobinSelectionStrategy();
+
         private IConverterFailureCallback converterFailureCallback = new NoOpConverterFailureCallback();
 
         private boolean propagateShutDown = true;
@@ -268,8 +282,6 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         }
 
         /**
-         *
-         *
          * @param propagateShutDown {@code true} if shutting down this converter should also shut down any aggregated converters.
          * @return This builder instance.
          */
@@ -294,8 +306,8 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
          * its functionality. If a converter proves to no longer be operational, it is removed as if a conversion had failed.
          *
          * @param executorService The executor service to run the regular check.
-         * @param delay The delay between checks.
-         * @param timeUnit The time unit of the delay.
+         * @param delay           The delay between checks.
+         * @param timeUnit        The time unit of the delay.
          * @return The specified converter.
          */
         public IAggregatingConverter make(ScheduledExecutorService executorService, long delay, TimeUnit timeUnit) {

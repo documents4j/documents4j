@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkState;
 
-abstract class ConverterAdapter implements IConverter {
+public abstract class ConverterAdapter implements IConverter {
 
     public static final boolean DEFAULT_CLOSE_STREAM = true;
 

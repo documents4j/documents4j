@@ -7,14 +7,8 @@ import java.io.File;
 
 class NoopFileConsumer implements IFileConsumer {
 
-    private static final NoopFileConsumer INSTANCE = new NoopFileConsumer();
-
     NoopFileConsumer() {
         /* empty */
-    }
-
-    public static IFileConsumer getInstance() {
-        return INSTANCE;
     }
 
     @Override

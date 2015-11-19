@@ -16,7 +16,7 @@ abstract class ConversionJobWithSourceSpecifiedAdapter implements IConversionJob
 
     @Override
     public IConversionJobWithTargetUnspecified to(File target) {
-        return to(target, NoopFileConsumer.getInstance());
+        return to(target, new NoopFileConsumer());
     }
 
     @Override

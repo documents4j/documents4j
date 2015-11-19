@@ -178,7 +178,7 @@ public class ConverterServerBuilder {
     /**
      * Enables SSL for the server using the given context.
      *
-     * @param sslContext The SSL context to use.
+     * @param sslContext The SSL context to use. The context must be initialized before building the server.
      * @return This builder.
      */
     public ConverterServerBuilder sslContext(SSLContext sslContext) {

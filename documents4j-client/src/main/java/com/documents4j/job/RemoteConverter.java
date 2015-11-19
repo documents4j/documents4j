@@ -229,7 +229,7 @@ public class RemoteConverter extends ConverterAdapter {
         /**
          * Configures to use SSL for the server connection using the given context.
          *
-         * @param sslContext The SSL context to use.
+         * @param sslContext The SSL context to use. The context must be initialized before building the converter.
          * @return This builder instance.
          */
         public Builder sslContext(SSLContext sslContext) {

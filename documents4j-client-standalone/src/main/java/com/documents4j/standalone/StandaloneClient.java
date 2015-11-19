@@ -24,6 +24,7 @@ import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.security.KeyManagementException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -212,6 +213,11 @@ public class StandaloneClient {
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS)
                 .baseUri(baseUri);
         if (sslContext != null) {
+            try {
+                sslContext.init(null, null, null);
+            } catch (KeyManagementException e) {
+                throw new IllegalStateException("Cannot initialize SSL context");
+            }
             builder = builder.sslContext(sslContext);
         }
         return builder.build();

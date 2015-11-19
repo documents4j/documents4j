@@ -101,7 +101,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     private IConverter nextConverter() {
         List<IConverter> converterCopy = new ArrayList<IConverter>(converters);
         if (converterCopy.isEmpty()) {
-            return new InoperationalConverter();
+            return new ImpossibleConverter();
         }
         return new FailureAwareConverter(selectionStrategy.select(converterCopy), this);
     }

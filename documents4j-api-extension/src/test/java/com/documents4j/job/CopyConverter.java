@@ -1,6 +1,7 @@
 package com.documents4j.job;
 
 import com.documents4j.api.*;
+import com.documents4j.throwables.ConversionFormatException;
 
 import java.io.File;
 import java.io.InputStream;
@@ -8,14 +9,14 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 class CopyConverter extends ConverterAdapter {
 
-    private boolean operational = true;
+    private boolean operational;
 
-    public CopyConverter(File tempFileFolder) {
+    public CopyConverter(File tempFileFolder, boolean operational) {
         super(tempFileFolder);
+        this.operational = operational;
     }
 
     @Override
@@ -49,6 +50,9 @@ class CopyConverter extends ConverterAdapter {
 
         @Override
         public IConversionJobWithSourceSpecified as(DocumentType sourceFormat) {
+            if (!sourceFormat.equals(AbstractConverterTest.MOCK_INPUT_TYPE)) {
+                return new IllegalFormatConversionJobWithSourceSpecified();
+            }
             return new CopyConversionJobWithSourceSpecified(source);
         }
     }
@@ -85,6 +89,9 @@ class CopyConverter extends ConverterAdapter {
 
         @Override
         public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            if (!targetFormat.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
+                return new IllegalFormatConversionJob(callback);
+            }
             return new CopyConversionJob(source, callback);
         }
     }
@@ -107,45 +114,56 @@ class CopyConverter extends ConverterAdapter {
 
         @Override
         public Future<Boolean> schedule() {
-            return SuccessfulConversion.apply(source, callback);
-        }
-    }
-
-    private static class SuccessfulConversion implements Future<Boolean> {
-
-        public static Future<Boolean> apply(IInputStreamSource source, IInputStreamConsumer callback) {
             InputStream inputStream = source.getInputStream();
             try {
-                MockConversion.from(inputStream).applyTo(callback);
-                return null; // TODO
+                MockConversion.RichMessage richMessage = MockConversion.from(inputStream);
+                if (!operational) {
+                    richMessage = richMessage.overrideWith(MockConversion.CONVERTER_ERROR);
+                }
+                return richMessage.applyTo(callback);
             } finally {
                 source.onConsumed(inputStream);
             }
         }
+    }
 
-        @Override
-        public boolean cancel(boolean mayInterruptIfRunning) {
-            return false;
+    private class IllegalFormatConversionJob extends ConversionJobAdapter
+            implements IConversionJobWithPriorityUnspecified, IConversionJobWithTargetUnspecified {
+
+        private final IInputStreamConsumer callback;
+
+        private IllegalFormatConversionJob(IInputStreamConsumer callback) {
+            this.callback = callback;
         }
 
         @Override
-        public boolean isCancelled() {
-            return false;
+        public IConversionJob prioritizeWith(int priority) {
+            return this;
         }
 
         @Override
-        public boolean isDone() {
-            return true;
+        public Future<Boolean> schedule() {
+            ConversionFormatException exception = new ConversionFormatException("Did not convert from mock input to mock output");
+            callback.onException(exception);
+            throw exception;
         }
 
         @Override
-        public Boolean get() {
-            return true;
+        public IConversionJobWithPriorityUnspecified as(DocumentType targetFormat) {
+            return this;
+        }
+    }
+
+    private class IllegalFormatConversionJobWithSourceSpecified extends ConversionJobWithSourceSpecifiedAdapter {
+
+        @Override
+        protected File makeTemporaryFile(String suffix) {
+            return CopyConverter.this.makeTemporaryFile(suffix);
         }
 
         @Override
-        public Boolean get(long timeout, TimeUnit unit) {
-            return true;
+        public IConversionJobWithTargetUnspecified to(IInputStreamConsumer callback) {
+            return new IllegalFormatConversionJob(callback);
         }
     }
 }

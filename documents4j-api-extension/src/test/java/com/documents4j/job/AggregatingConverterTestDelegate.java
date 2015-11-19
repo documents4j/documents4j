@@ -12,13 +12,19 @@ import static org.junit.Assert.*;
 @Ignore
 class AggregatingConverterTestDelegate implements IConverterTestDelegate {
 
+    private final boolean operational;
+
     private File temporaryFolder;
 
     private IConverter converter;
 
+    public AggregatingConverterTestDelegate(boolean operational) {
+        this.operational = operational;
+    }
+
     public void setUp() {
         temporaryFolder = Files.createTempDir();
-        converter = new CopyConverter(temporaryFolder);
+        converter = AggregatingConverter.make(new CopyConverter(temporaryFolder, operational));
     }
 
     public void tearDown() {

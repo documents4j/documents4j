@@ -3,13 +3,13 @@ package com.documents4j.job;
 import org.junit.After;
 import org.junit.Before;
 
-public class OperationalAggregatingConverterTest extends AbstractOperationalConverterTest {
+public class InoperationalAggregatingConverterTest extends AbstractInoperationalConverterTest {
 
     private AggregatingConverterTestDelegate converterTestDelegate;
 
     @Before
     public void setUp() throws Exception {
-        converterTestDelegate = new AggregatingConverterTestDelegate(true);
+        converterTestDelegate = new AggregatingConverterTestDelegate(false);
         converterTestDelegate.setUp();
     }
 

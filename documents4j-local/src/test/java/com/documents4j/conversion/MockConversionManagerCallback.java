@@ -1,6 +1,7 @@
 package com.documents4j.conversion;
 
 import com.documents4j.api.IInputStreamConsumer;
+import com.documents4j.job.MockResult;
 import com.documents4j.throwables.FileSystemInteractionException;
 import com.google.common.io.ByteStreams;
 
@@ -15,11 +16,11 @@ import static org.junit.Assert.assertTrue;
 class MockConversionManagerCallback implements IInputStreamConsumer {
 
     private final File target;
+
     private Future<Boolean> future;
 
     public MockConversionManagerCallback(File target) {
         this.target = target;
-        this.future = MockProcessResult.forTimeout();
     }
 
     @Override
@@ -31,9 +32,9 @@ class MockConversionManagerCallback implements IInputStreamConsumer {
             FileOutputStream fileOutputStream = new FileOutputStream(target);
             ByteStreams.copy(inputStream, fileOutputStream);
             fileOutputStream.close();
-            future = MockProcessResult.indicating(true);
+            future = MockResult.indicating(true);
         } catch (IOException e) {
-            future = MockProcessResult.indicating(new FileSystemInteractionException(
+            future = MockResult.indicating(new FileSystemInteractionException(
                     String.format("Could not write to target %s", target), e));
         } finally {
             try {
@@ -46,12 +47,12 @@ class MockConversionManagerCallback implements IInputStreamConsumer {
 
     @Override
     public void onCancel() {
-        future = MockProcessResult.forCancellation();
+        future = MockResult.forCancellation();
     }
 
     @Override
     public void onException(Exception e) {
-        future = MockProcessResult.indicating(e);
+        future = MockResult.indicating(e);
     }
 
     public Future<Boolean> getResultAsFuture() {

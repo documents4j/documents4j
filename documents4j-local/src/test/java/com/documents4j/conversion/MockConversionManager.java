@@ -3,6 +3,7 @@ package com.documents4j.conversion;
 import com.documents4j.api.DocumentType;
 import com.documents4j.job.AbstractConverterTest;
 import com.documents4j.job.MockConversion;
+import com.documents4j.job.MockResult;
 import com.documents4j.throwables.ConversionFormatException;
 import com.documents4j.throwables.FileSystemInteractionException;
 import com.google.common.base.MoreObjects;
@@ -40,7 +41,7 @@ public abstract class MockConversionManager implements IConversionManager {
     @Override
     public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
         if (!sourceFormat.equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !targetFormat.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
-            return MockProcessResult.indicating(new ConversionFormatException("Unknown input/output format conversion"));
+            return MockResult.indicating(new ConversionFormatException("Unknown input/output format conversion"));
         }
         InputStream inputStream = null;
         try {
@@ -49,8 +50,7 @@ public abstract class MockConversionManager implements IConversionManager {
             resolve(inputStream).applyTo(callback);
             return callback.getResultAsFuture();
         } catch (IOException e) {
-            return MockProcessResult.indicating(new FileSystemInteractionException(
-                    String.format("Could not read input file %s", source), e));
+            return MockResult.indicating(new FileSystemInteractionException(String.format("Could not read input file %s", source), e));
         } finally {
             try {
                 Closeables.close(inputStream, false);

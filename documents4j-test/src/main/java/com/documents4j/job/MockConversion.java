@@ -28,6 +28,7 @@ public enum MockConversion {
 
     // Two one byte delimiters plus two byte status code.
     private static final char DELIMITER = '@';
+
     private final int messageCode;
 
     private MockConversion(int messageCode) {
@@ -60,33 +61,43 @@ public enum MockConversion {
         return messageCode;
     }
 
-    public void handle(String message, IInputStreamConsumer callback) {
+    public Future<Boolean> handle(String message, IInputStreamConsumer callback) {
         try {
             switch (this) {
                 case OK:
                     callback.onComplete(new ByteArrayInputStream(asReply(message).getBytes(Charsets.UTF_8)));
-                    break;
+                    return MockResult.indicating(true);
                 case CANCEL:
                     callback.onCancel();
-                    break;
-                case CONVERTER_ERROR:
-                    callback.onException(new ConverterAccessException(asReply(message)));
-                    break;
-                case INPUT_ERROR:
-                    callback.onException(new ConversionInputException(asReply(message)));
-                    break;
-                case FORMAT_ERROR:
-                    callback.onException(new ConversionFormatException(asReply(message)));
-                    break;
-                case FILE_SYSTEM_ERROR:
-                    callback.onException(new FileSystemInteractionException(asReply(message)));
-                    break;
-                case GENERIC_ERROR:
-                    callback.onException(new ConverterException(asReply(message)));
-                    break;
+                    return MockResult.forCancellation();
+                case CONVERTER_ERROR: {
+                    Exception exception = new ConverterAccessException(asReply(message));
+                    callback.onException(exception);
+                    return MockResult.indicating(exception);
+                }
+                case INPUT_ERROR: {
+                    Exception exception = new ConversionInputException(asReply(message));
+                    callback.onException(exception);
+                    return MockResult.indicating(exception);
+                }
+                case FORMAT_ERROR: {
+                    Exception exception = new ConversionFormatException(asReply(message));
+                    callback.onException(exception);
+                    return MockResult.indicating(exception);
+                }
+                case FILE_SYSTEM_ERROR: {
+                    Exception exception = new FileSystemInteractionException(asReply(message));
+                    callback.onException(exception);
+                    return MockResult.indicating(exception);
+                }
+                case GENERIC_ERROR: {
+                    Exception exception = new ConverterException(asReply(message));
+                    callback.onException(exception);
+                    return MockResult.indicating(exception);
+                }
                 case TIMEOUT:
                     // Emulate timeout: Do not invoke callback.
-                    break;
+                    return MockResult.forTimeout();
                 default:
                     throw new AssertionError(String.format("Unexpected conversion result: %s", this));
             }
@@ -132,8 +143,8 @@ public enum MockConversion {
             return message;
         }
 
-        public void applyTo(IInputStreamConsumer callback) {
-            MockConversion.this.handle(message, callback);
+        public Future<Boolean> applyTo(IInputStreamConsumer callback) {
+            return MockConversion.this.handle(message, callback);
         }
 
         public RichMessage overrideWith(MockConversion mockConversion) {

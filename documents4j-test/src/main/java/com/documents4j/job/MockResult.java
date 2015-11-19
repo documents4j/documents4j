@@ -1,10 +1,10 @@
-package com.documents4j.conversion;
+package com.documents4j.job;
 
 import com.google.common.base.MoreObjects;
 
 import java.util.concurrent.*;
 
-abstract class MockProcessResult implements Future<Boolean> {
+public abstract class MockResult implements Future<Boolean> {
 
     public static Future<Boolean> indicating(boolean value) {
         return new BooleanResult(value);
@@ -42,7 +42,7 @@ abstract class MockProcessResult implements Future<Boolean> {
         return true;
     }
 
-    private static class BooleanResult extends MockProcessResult {
+    private static class BooleanResult extends MockResult {
 
         private final boolean value;
 
@@ -61,7 +61,7 @@ abstract class MockProcessResult implements Future<Boolean> {
         }
     }
 
-    private static class CancelledResult extends MockProcessResult {
+    private static class CancelledResult extends MockResult {
 
         @Override
         public Boolean get() throws InterruptedException, ExecutionException {
@@ -79,7 +79,7 @@ abstract class MockProcessResult implements Future<Boolean> {
         }
     }
 
-    private static class ExceptionalResult extends MockProcessResult {
+    private static class ExceptionalResult extends MockResult {
 
         private final Exception e;
 

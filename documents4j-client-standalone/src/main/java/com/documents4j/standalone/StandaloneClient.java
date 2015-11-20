@@ -172,6 +172,8 @@ public class StandaloneClient {
 
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
 
+        OptionSpec<?> sslSpec = makeSslSpec(optionParser);
+
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -208,10 +210,13 @@ public class StandaloneClient {
         RemoteConverter.Builder builder = RemoteConverter.builder()
                 .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS)
                 .baseUri(baseUri);
-        try {
-            builder = builder.sslContext(SSLContext.getDefault());
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Could not initialize default SSL context: " + e.getMessage());
+        if (optionSet.has(sslSpec)) {
+            try {
+                builder = builder.sslContext(SSLContext.getDefault());
+            } catch (NoSuchAlgorithmException e) {
+                System.out.println("Could not access default SSL context: " + e.getMessage());
+                System.exit(-1);
+            }
         }
         return builder.build();
     }
@@ -303,6 +308,15 @@ public class StandaloneClient {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_TO_FILE)
                 .ofType(File.class);
         // defaults to null such that all log information is written to the console
+    }
+
+    private static OptionSpec<?> makeSslSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                        CommandDescription.ARGUMENT_LONG_SSL,
+                        CommandDescription.ARGUMENT_SHORT_SSL),
+                        CommandDescription.DESCRIPTION_CONTEXT_SSL
+                );
     }
 
     private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {

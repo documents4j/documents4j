@@ -54,11 +54,15 @@ public class CommandDescription {
             "of a conversion process. A too low value will result in requesting entities to be denied file conversion if the server " +
             "is currently very busy.";
 
-    public static final String ARGUMENT_LONG_LOG_TO_FILE = "log";
-    public static final String ARGUMENT_SHORT_LOG_TO_FILE = "L";
-    public static final String DESCRIPTION_ARGUMENT_LOG_TO_FILE = "A file to which all log information will be written. If " +
-            "not set, all log information will be written to the console.";
-    public static final String DESCRIPTION_CONTEXT_LOG_TO_FILE = "This file will contain all log information instead of writing " +
+    public static final String ARGUMENT_LONG_LOG_TO_FILE = "ssl";
+    public static final String ARGUMENT_SHORT_LOG_TO_FILE = "E";
+    public static final String DESCRIPTION_ARGUMENT_LOG_TO_FILE = "Registers the JVM's default SSL context for encryption of conversions.";
+    public static final String DESCRIPTION_CONTEXT_LOG_TO_FILE = "When setting this property, a connection is established in the context of " +
+            "the executing JVM's default SSL context. This way, a conversion of a document can be secured when using an insecure channel.";
+
+    public static final String ARGUMENT_LONG_SSL = "log";
+    public static final String ARGUMENT_SHORT_SSL = "L";
+    public static final String DESCRIPTION_CONTEXT_SSL = "This file will contain all log information instead of writing " +
             "the log output to the console. Make sure that this file can be written to and that no other application holds locks to it.";
 
     public static final String ARGUMENT_LONG_LOG_LEVEL = "level";

@@ -122,7 +122,7 @@ Again, the `-?` option can be supplied for obtaining a list of options.
 #### Encryption ####
 If a document conversion is realized via an insecure connection, it is possible to specify a `SSLContext` to secure the connection between conversion server and client. 
 
-The standalone implementations of server and client converters always attempt to use the `SSLContext.getDefault()` instance and notify on the console if this default instance is not available. The default trust store and key store configuration can be adjusted by setting `javax.net.ssl.*` system properties when running a standalone application from the console. The allowed encryption algorithms can be adjusted by setting `https.protocols` property.
+The standalone implementations of server and client converters can use the `SSLContext.getDefault()` instance for establishing a connection by setting the `-ssl` parameter on startup. The default trust store and key store configuration can be adjusted by setting `javax.net.ssl.*` system properties when running a standalone application from the console. The allowed encryption algorithms can be adjusted by setting `https.protocols` property.
 
 Aggregating converter
 ----------------

@@ -87,6 +87,8 @@ public class StandaloneServer {
         ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterEnabledSpec = makeConverterEnabledSpec(optionParser);
         ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> converterDisabledSpec = makeConverterDisabledSpec(optionParser);
 
+        OptionSpec<?> sslSpec = makeSslSpec(optionParser);
+
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
@@ -141,10 +143,13 @@ public class StandaloneServer {
         for (Class<? extends IExternalConverter> externalConverter : converterEnabledSpec.values(optionSet)) {
             builder = builder.enable(externalConverter);
         }
-        try {
-            builder = builder.sslContext(SSLContext.getDefault());
-        } catch (NoSuchAlgorithmException e) {
-            System.out.println("Could not initialize default SSL context: " + e.getMessage());
+        if (optionSet.has(sslSpec)) {
+            try {
+                builder = builder.sslContext(SSLContext.getDefault());
+            } catch (NoSuchAlgorithmException e) {
+                System.out.println("Could not access default SSL context: " + e.getMessage());
+                System.exit(-1);
+            }
         }
         return builder;
     }
@@ -284,6 +289,15 @@ public class StandaloneServer {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT)
                 .ofType(Long.class)
                 .defaultsTo(IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT);
+    }
+
+    private static OptionSpec<?> makeSslSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                        CommandDescription.ARGUMENT_LONG_SSL,
+                        CommandDescription.ARGUMENT_SHORT_SSL),
+                        CommandDescription.DESCRIPTION_CONTEXT_SSL
+                );
     }
 
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {

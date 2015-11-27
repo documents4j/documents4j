@@ -1,6 +1,10 @@
 documents4j release notes
 -------------------------
 
+### 27. November 2015: Version 1.0.0
+
+Added an aggregating converter API and SSL support for remote conversion.
+
 ### 4. February 2015: Version 0.2.1
 
 Fixed a racing condition where a future is released as done before its registered callbacks are executed.

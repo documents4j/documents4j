@@ -174,7 +174,7 @@ All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can the
 - *warn*: On this level, non-fatal errors are logged such as the timeout of a HTTP conversion due to high traffic. Normally, such log events are accompanied by an exception being thrown.
 - *error*: On this level, all user errors are logged. For example, the attempt of converting a non-existent file would cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
 
-Efficiency considerations
+Performance considerations
 -------------------------
 
 #### Input and target description ####
@@ -184,6 +184,9 @@ In the end, a user should however always try to hand the available data to the `
 
 #### Configuring an executing JVM ####
 MS Office components are (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of a significant amount of memory to the JVM should be considered as a cause. 
+
+#### Configuring MS Office ####
+When running a MS Office-based converter, it it important to appropriately configure MS Word before running documents4j. For example, it is crucial to disable all kinds of start-up wizards which can abort the convertion process if the MS Word API returns unexpected status codes. Furthermore, it can improve performance significantly when bookkeeping features such as the *recent documents* are disabled.
 
 Running as Windows service
 --------------------------

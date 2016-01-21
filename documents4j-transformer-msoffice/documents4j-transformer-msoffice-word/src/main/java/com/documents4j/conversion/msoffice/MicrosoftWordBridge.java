@@ -15,7 +15,6 @@ import static com.documents4j.api.DocumentType.Value.*;
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + WORD_ANY,
                 APPLICATION + "/" + RTF,
-                TEXT + "/" + RTF,
                 APPLICATION + "/" + XML,
                 APPLICATION + "/" + MHTML},
         to = {APPLICATION + "/" + PDF,
@@ -23,9 +22,9 @@ import static com.documents4j.api.DocumentType.Value.*;
                 APPLICATION + "/" + DOC,
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + RTF,
-                TEXT + "/" + RTF,
                 APPLICATION + "/" + XML,
-                APPLICATION + "/" + MHTML})
+                APPLICATION + "/" + MHTML,
+                TEXT + "/" + PLAIN})
 public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);

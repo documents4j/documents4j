@@ -280,6 +280,7 @@
                     <useReleaseProfile>false</useReleaseProfile>
                     <releaseProfiles>extras</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagNameFormat>documents4j-@{project.version}</tagNameFormat>
                 </configuration>
             </plugin>
 

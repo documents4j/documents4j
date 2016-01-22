@@ -31,11 +31,13 @@ public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversi
                 {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.XML, "xml", true},
                 {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.RTF, "rtf", true},
                 {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.MHTML, "mhtml", true},
+                {DOCX_VALID, DOCX_CORRUPT, DOCX_INEXISTENT, DocumentType.MS_WORD, DocumentType.TEXT, "txt", true},
                 {RTF_VALID, RTF_CORRUPT, RTF_INEXISTENT, DocumentType.RTF, DocumentType.PDF, "pdf", true},
                 {XML_VALID, XML_CORRUPT, XML_INEXISTENT, DocumentType.XML, DocumentType.PDF, "pdf", true},
                 {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf", false},
                 {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.DOCX, "docx", false},
-                {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf", true}
+                {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf", true},
+                {TEXT_VALID, null, TEXT_INEXISTENT, DocumentType.TEXT, DocumentType.PDF, "pdf", true}
         });
     }
 

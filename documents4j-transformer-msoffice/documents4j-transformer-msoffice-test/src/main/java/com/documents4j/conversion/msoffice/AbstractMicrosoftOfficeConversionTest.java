@@ -111,6 +111,10 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionCorrupt() throws Exception {
+        if (!fileCanBeCorrupted()) {
+            LOGGER.info("Skipping test for file corruption, file format does not support a checksum");
+            return;
+        }
         File target = makeTarget(false);
         StartedProcess conversion = getOfficeBridge()
                 .doStartConversion(corruptSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType());

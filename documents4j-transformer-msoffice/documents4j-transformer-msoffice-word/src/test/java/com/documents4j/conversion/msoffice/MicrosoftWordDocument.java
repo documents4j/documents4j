@@ -26,7 +26,10 @@ public enum MicrosoftWordDocument implements Document {
 
     MHTML_VALID("/valid.mhtml"),
     MHTML_CORRUPT("/corrupt.mhtml"),
-    MHTML_INEXISTENT("/inexistent.mhtml");
+    MHTML_INEXISTENT("/inexistent.mhtml"),
+
+    TEXT_VALID("/valid.txt"),
+    TEXT_INEXISTENT("/inexistent.text");
 
     private final String path;
 

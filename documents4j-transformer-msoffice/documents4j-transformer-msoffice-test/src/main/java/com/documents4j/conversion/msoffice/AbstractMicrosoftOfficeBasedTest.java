@@ -85,6 +85,10 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
         return makeCopy(documentTypeProvider.getCorrupt(), delete);
     }
 
+    protected boolean fileCanBeCorrupted() {
+        return documentTypeProvider.getCorrupt() != null;
+    }
+
     public File inexistentSourceFile() throws IOException {
         return documentTypeProvider.getInexistent().absoluteTo(files);
     }

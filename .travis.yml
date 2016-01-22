@@ -4,6 +4,3 @@ sudo: false
 
 jdk:
   - openjdk6
-
-after_success:
-  - mvn clean cobertura:cobertura coveralls:cobertura

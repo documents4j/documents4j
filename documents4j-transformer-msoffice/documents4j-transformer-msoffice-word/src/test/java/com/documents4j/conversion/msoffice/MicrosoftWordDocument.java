@@ -29,7 +29,15 @@ public enum MicrosoftWordDocument implements Document {
     MHTML_INEXISTENT("/inexistent.mhtml"),
 
     TEXT_VALID("/valid.txt"),
-    TEXT_INEXISTENT("/inexistent.text");
+    TEXT_INEXISTENT("/inexistent.txt"),
+
+    PDF_VALID("/valid.pdf"),
+    PDF_CORRUPT("/corrupt.pdf"),
+    PDF_INEXISTENT("/inexistent.pdf"),
+
+    PDFA_VALID("/valid.pdfa"),
+    PDFA_CORRUPT("/corrupt.pdfa"),
+    PDFA_INEXISTENT("/inexistent.pdfa");
 
     private final String path;
 

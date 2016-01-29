@@ -30,7 +30,13 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Attempt to open the source document.
     On Error Resume Next
-    Set wordDocument = wordApplication.Documents.Open(inputFile, False, True)
+
+    ' Open: See https://msdn.microsoft.com/en-us/library/office/ff835182.aspx
+    Set wordDocument = wordApplication.Documents.Open(inputFile, _
+                                                      False, _
+                                                      True, _
+                                                      False)
+
     If Err <> 0 Then
         WScript.Quit -2
     End If

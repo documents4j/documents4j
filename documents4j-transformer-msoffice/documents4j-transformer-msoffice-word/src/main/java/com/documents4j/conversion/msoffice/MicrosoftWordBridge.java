@@ -11,12 +11,15 @@ import java.util.concurrent.TimeUnit;
 import static com.documents4j.api.DocumentType.Value.*;
 
 @ViableConversion(
-        from = {APPLICATION + "/" + DOC,
+        from = {APPLICATION + "/" + PDF,
+                APPLICATION + "/" + PDFA,
+                APPLICATION + "/" + DOC,
                 APPLICATION + "/" + DOCX,
                 APPLICATION + "/" + WORD_ANY,
                 APPLICATION + "/" + RTF,
                 APPLICATION + "/" + XML,
-                APPLICATION + "/" + MHTML},
+                APPLICATION + "/" + MHTML,
+                TEXT + "/" + PLAIN},
         to = {APPLICATION + "/" + PDF,
                 APPLICATION + "/" + PDFA,
                 APPLICATION + "/" + DOC,

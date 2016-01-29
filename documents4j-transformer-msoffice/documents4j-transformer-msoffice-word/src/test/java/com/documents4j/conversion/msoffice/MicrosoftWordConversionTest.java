@@ -37,7 +37,9 @@ public class MicrosoftWordConversionTest extends AbstractMicrosoftOfficeConversi
                 {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf", false},
                 {DOC_VALID, DOC_CORRUPT, DOC_INEXISTENT, DocumentType.DOC, DocumentType.DOCX, "docx", false},
                 {MHTML_VALID, MHTML_CORRUPT, MHTML_INEXISTENT, DocumentType.MHTML, DocumentType.PDF, "pdf", true},
-                {TEXT_VALID, null, TEXT_INEXISTENT, DocumentType.TEXT, DocumentType.PDF, "pdf", true}
+                {TEXT_VALID, null, TEXT_INEXISTENT, DocumentType.TEXT, DocumentType.PDF, "pdf", true},
+                {PDF_VALID, PDF_CORRUPT, PDF_INEXISTENT, DocumentType.PDF, DocumentType.DOCX, "docx", true},
+                {PDFA_VALID, PDFA_CORRUPT, PDFA_INEXISTENT, DocumentType.PDFA, DocumentType.DOCX, "docx", true}
         });
     }
 

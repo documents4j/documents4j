@@ -14,6 +14,7 @@
     <modules>
         <module>documents4j-transformer-msoffice-word</module>
         <module>documents4j-transformer-msoffice-excel</module>
+        <module>documents4j-transformer-msoffice-powerpoint</module>
         <module>documents4j-transformer-msoffice-base</module>
         <module>documents4j-transformer-msoffice-test</module>
     </modules>

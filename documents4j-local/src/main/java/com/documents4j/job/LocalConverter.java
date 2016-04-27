@@ -35,6 +35,7 @@ public class LocalConverter extends ConverterAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
     private final IConversionManager conversionManager;
     private final ExecutorService executorService;
+    private final long processTimeout;
 
     protected LocalConverter(File baseFolder,
                              int corePoolSize,
@@ -46,6 +47,7 @@ public class LocalConverter extends ConverterAdapter {
         super(baseFolder);
         this.conversionManager = makeConversionManager(baseFolder, processTimeout, processTimeoutUnit, converterConfiguration);
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
         LOGGER.info("The documents4j local converter has started successfully");
     }
 
@@ -92,8 +94,14 @@ public class LocalConverter extends ConverterAdapter {
     @Override
     public void shutDown() {
         try {
-            conversionManager.shutDown();
-            executorService.shutdownNow();
+            executorService.shutdown();
+            try {
+                executorService.awaitTermination(processTimeout, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.info("The documents4j local converter could not await termination", e);
+            } finally {
+                conversionManager.shutDown();
+            }
         } finally {
             super.shutDown();
         }

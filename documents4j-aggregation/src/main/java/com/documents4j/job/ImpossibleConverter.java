@@ -56,6 +56,10 @@ class ImpossibleConverter implements IConverter {
     public void shutDown() {
     }
 
+    @Override
+    public void kill() {
+    }
+
     private static class ImpossibleConversionJobWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
 
         @Override

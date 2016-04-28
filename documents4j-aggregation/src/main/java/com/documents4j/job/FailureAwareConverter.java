@@ -60,6 +60,11 @@ class FailureAwareConverter implements IConverter {
         converter.shutDown();
     }
 
+    @Override
+    public void kill() {
+        converter.kill();
+    }
+
     private void reportException(Exception e) {
         if (e instanceof ConverterAccessException) {
             failureCallback.onFailure(converter);

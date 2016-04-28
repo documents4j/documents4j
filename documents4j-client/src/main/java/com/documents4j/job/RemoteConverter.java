@@ -39,9 +39,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RemoteConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteConverter.class);
+
     private final Client client;
+
     private final URI baseUri;
+
     private final ExecutorService executorService;
+
+    private final long requestTimeout;
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime,
@@ -50,6 +55,7 @@ public class RemoteConverter extends ConverterAdapter {
         this.client = makeClient(requestTimeout, maximumPoolSize, sslContext);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
+        this.requestTimeout = requestTimeout;
         LOGGER.info("The documents4j remote converter has started successfully (URI: {})", baseUri);
     }
 
@@ -158,12 +164,29 @@ public class RemoteConverter extends ConverterAdapter {
     public void shutDown() {
         try {
             try {
-                client.close();
-            } finally {
                 executorService.shutdown();
+                executorService.awaitTermination(requestTimeout, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.info("The documents4j remote converter could not await termination", e);
+            } finally {
+                client.close();
             }
         } finally {
             super.shutDown();
+        }
+        LOGGER.info("The documents4j remote converter has shut down successfully (URI: {})", baseUri);
+    }
+
+    @Override
+    public void kill() {
+        try {
+            try {
+                executorService.shutdownNow();
+            } finally {
+                client.close();
+            }
+        } finally {
+            super.kill();
         }
         LOGGER.info("The documents4j remote converter has shut down successfully (URI: {})", baseUri);
     }
@@ -181,6 +204,7 @@ public class RemoteConverter extends ConverterAdapter {
         public static final long DEFAULT_REQUEST_TIMEOUT = TimeUnit.MINUTES.toMillis(5L);
 
         private URI baseUri;
+
         private long requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
         private SSLContext sslContext;
@@ -325,9 +349,13 @@ public class RemoteConverter extends ConverterAdapter {
     private class RemoteConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
 
         private final IInputStreamSource source;
+
         private final DocumentType sourceFormat;
+
         private final IInputStreamConsumer callback;
+
         private final DocumentType targetFormat;
+
         private final int priority;
 
         private RemoteConversionJob(IInputStreamSource source, DocumentType sourceFormat, IInputStreamConsumer callback, DocumentType targetFormat, int priority) {

@@ -48,6 +48,12 @@ public class PseudoConverter extends ConverterAdapter {
     }
 
     @Override
+    public void kill() {
+        super.kill();
+        assertTrue(getTempFileFolder().getParentFile().delete());
+    }
+
+    @Override
     protected void registerShutdownHook() {
         /* do nothing */
     }

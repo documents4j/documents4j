@@ -40,6 +40,12 @@ class CopyConverter extends ConverterAdapter {
         super.shutDown();
     }
 
+    @Override
+    public void kill() {
+        operational = false;
+        super.kill();
+    }
+
     private class CopyConversionJobWithSourceUnspecified implements IConversionJobWithSourceUnspecified {
 
         private final IInputStreamSource source;

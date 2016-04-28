@@ -192,6 +192,30 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
     }
 
     @Override
+    public void kill() {
+        if (selfCheck != null) {
+            selfCheck.cancel(true);
+        }
+        try {
+            if (propagateShutDown) {
+                List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+                for (IConverter converter : converters) {
+                    try {
+                        converter.kill();
+                    } catch (RuntimeException e) {
+                        exceptions.add(e);
+                    }
+                }
+                if (!exceptions.isEmpty()) {
+                    throw new ConverterAccessException("Shutting down aggregated converters caused at least one exception", exceptions.get(0));
+                }
+            }
+        } finally {
+            converters.clear();
+        }
+    }
+
+    @Override
     public void onFailure(IConverter converter) {
         if (converters.remove(converter)) {
             try {

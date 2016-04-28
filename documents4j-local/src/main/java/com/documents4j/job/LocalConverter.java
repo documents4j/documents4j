@@ -33,8 +33,11 @@ import java.util.concurrent.TimeUnit;
 public class LocalConverter extends ConverterAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalConverter.class);
+
     private final IConversionManager conversionManager;
+
     private final ExecutorService executorService;
+
     private final long processTimeout;
 
     protected LocalConverter(File baseFolder,
@@ -108,6 +111,17 @@ public class LocalConverter extends ConverterAdapter {
         LOGGER.info("The documents4j local converter has shut down successfully");
     }
 
+    @Override
+    public void kill() {
+        try {
+            executorService.shutdownNow();
+            conversionManager.shutDown();
+        } finally {
+            super.kill();
+        }
+        LOGGER.info("The documents4j local converter has shut down successfully");
+    }
+
     /**
      * A builder for constructing a {@link LocalConverter}.
      * <p>&nbsp;</p>
@@ -119,7 +133,9 @@ public class LocalConverter extends ConverterAdapter {
          * The default time out for external processes.
          */
         public static final long DEFAULT_PROCESS_TIME_OUT = TimeUnit.MINUTES.toMillis(5L);
+
         private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
+
         private long processTimeout = DEFAULT_PROCESS_TIME_OUT;
 
         private Builder() {
@@ -258,10 +274,15 @@ public class LocalConverter extends ConverterAdapter {
     private class LocalConversionJob extends ConversionJobAdapter implements IConversionJobWithPriorityUnspecified {
 
         private final IFileSource source;
+
         private final DocumentType sourceFormat;
+
         private final File target;
+
         private final IFileConsumer callback;
+
         private final DocumentType targetFormat;
+
         private final int priority;
 
         private LocalConversionJob(IFileSource source, DocumentType sourceFormat, File target, IFileConsumer callback, DocumentType targetFormat, int priority) {

@@ -95,6 +95,15 @@ public abstract class ConverterAdapter implements IConverter {
 
     @Override
     public void shutDown() {
+        cleanUp();
+    }
+
+    @Override
+    public void kill() {
+        cleanUp();
+    }
+
+    private void cleanUp() {
         deregisterShutdownHook();
         deleteOrLog(tempFileFolder);
     }

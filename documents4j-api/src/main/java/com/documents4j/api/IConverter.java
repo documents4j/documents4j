@@ -88,8 +88,13 @@ public interface IConverter {
     boolean isOperational();
 
     /**
-     * Shuts down this converter. Converters that were shut down can never be used again and must be replaced
-     * by a fresh instance.
+     * Shuts down this converter gracefully. The converter does no longer accept new conversion requests but awaits running conversions to complete
+     * for a given period of time.
      */
     void shutDown();
+
+    /**
+     * Shuts down this converter immediately. All running conversions are aborted.
+     */
+    void kill();
 }

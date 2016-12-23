@@ -18,6 +18,7 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType CSV = new DocumentType(Value.TEXT, Value.CSV);
     public static final DocumentType XML = new DocumentType(Value.APPLICATION, Value.XML);
     public static final DocumentType MHTML = new DocumentType(Value.APPLICATION, Value.MHTML);
+    public static final DocumentType HTML = new DocumentType(Value.TEXT, Value.HTML);
     public static final DocumentType PDF = new DocumentType(Value.APPLICATION, Value.PDF);
     public static final DocumentType PDFA = new DocumentType(Value.APPLICATION, Value.PDFA);
     public static final DocumentType TEXT = new DocumentType(Value.TEXT, Value.PLAIN);
@@ -110,6 +111,7 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
 
         public static final String XML = "xml";
         public static final String MHTML = "x-mimearchive";
+        public static final String HTML = "html";
 
         public static final String CSV = "csv";
         public static final String PLAIN = "plain";

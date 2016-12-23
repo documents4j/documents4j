@@ -2,6 +2,8 @@
 Const WdDoNotSaveChanges = 0
 Const WdExportFormatPDF = 17
 Const MagicFormatPDFA = 999
+Const MagicFormatFilteredHTML = 10
+Const msoEncodingUTF8 = 65001
 
 Dim arguments
 Set arguments = WScript.Arguments
@@ -41,6 +43,10 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
         WScript.Quit -2
     End If
     On Error GoTo 0
+
+    if formatEnumeration = MagicFormatFilteredHTML Then
+      wordDocument.WebOptions.Encoding = msoEncodingUTF8
+    End If
 
     ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
     On Error Resume Next

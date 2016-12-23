@@ -65,8 +65,8 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
             return makePresetProcessExecutor()
-                    .command("cmd", "/C",
-                            quote(conversionScript.getAbsolutePath(),
+                    .command("cmd", "/C", "/S",
+                            doubleQuote(conversionScript.getAbsolutePath(),
                                     source.getAbsolutePath(),
                                     target.getAbsolutePath(),
                                     microsoftOfficeFormat.getValue()))

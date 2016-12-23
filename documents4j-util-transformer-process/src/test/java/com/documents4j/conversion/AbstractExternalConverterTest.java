@@ -1,9 +1,11 @@
 package com.documents4j.conversion;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
+@Ignore
 public class AbstractExternalConverterTest {
 
     @Test

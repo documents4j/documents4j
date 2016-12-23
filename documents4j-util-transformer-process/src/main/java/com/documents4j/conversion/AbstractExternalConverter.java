@@ -34,7 +34,6 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
                 stringBuilder.append(' ');
             }
             stringBuilder.append('"').append(arg.replace("\"", "\"\"")).append('"');
-            stringBuilder.append(arg);
         }
         return stringBuilder.toString();
     }
@@ -69,7 +68,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             // should never be killed during JVM shut down. In order to avoid an incomplete start up
             // procedure, start up processes will never be killed either.
             return makePresetProcessExecutor()
-                    .command("cmd", "/C", "/S", doubleQuote(script.getAbsolutePath()))
+                    .command("cmd", "/S", "/C", doubleQuote(script.getAbsolutePath()))
                     .execute().getExitValue();
         } catch (IOException e) {
             String message = String.format("Unable to run script: %s", script);

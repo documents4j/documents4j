@@ -1,6 +1,18 @@
 documents4j release notes
 -------------------------
 
+### 23. December 2016: Version 1.0.3
+
+Fixed escaping when using the converter in folders with spaces and fixed a command line bug caused by SSL inclusion.
+
+### 29. January 2016: Version 1.0.2
+
+Added additional formats.
+
+### 22. January 2016: Version 1.0.1
+
+Added additional formats.
+
 ### 27. November 2015: Version 1.0.0
 
 Added an aggregating converter API and SSL support for remote conversion.

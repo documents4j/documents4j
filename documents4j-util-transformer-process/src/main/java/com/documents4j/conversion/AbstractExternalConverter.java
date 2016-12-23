@@ -1,7 +1,6 @@
 package com.documents4j.conversion;
 
 import com.documents4j.throwables.ConverterAccessException;
-import com.google.common.base.Joiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -14,8 +13,6 @@ import java.util.concurrent.TimeoutException;
 
 public abstract class AbstractExternalConverter implements IExternalConverter {
 
-    private static final Joiner ARGUMENT_JOINER = Joiner.on(' ');
-
     private final Logger logger;
 
     private final long processTimeout;
@@ -27,8 +24,22 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
     }
 
+    public static void main(String[] args) {
+        System.out.println(quote("foo bar", "qux \" baz"));
+    }
+
     protected static String quote(String... args) {
-        return String.format("\"%s\"", ARGUMENT_JOINER.join(args));
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean first = true;
+        for (String arg : args) {
+            if (first) {
+                first = false;
+            } else {
+                stringBuilder.append(' ');
+            }
+            stringBuilder.append('"').append(arg.replace("\"", "\"\"")).append('"');
+        }
+        return stringBuilder.toString();
     }
 
     protected File getBaseFolder() {

@@ -23,7 +23,12 @@
             <groupId>org.zeroturnaround</groupId>
             <artifactId>zt-exec</artifactId>
         </dependency>
+
+        <!-- Testing dependencies -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
-
 </project>

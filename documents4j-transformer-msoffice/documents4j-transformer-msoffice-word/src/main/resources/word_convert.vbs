@@ -74,4 +74,4 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 End Function
 
 ' Execute the script.
-Call ConvertFile( arguments.Unnamed.Item(0), arguments.Unnamed.Item(1), CInt(arguments.Unnamed.Item(2)) )
+Call ConvertFile( WScript.Arguments.Unnamed.Item(0), WScript.Arguments.Unnamed.Item(1), CInt(WScript.Arguments.Unnamed.Item(2)) )

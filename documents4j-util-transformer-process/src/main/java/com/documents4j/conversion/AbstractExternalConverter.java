@@ -24,10 +24,6 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         this.processTimeout = processTimeoutUnit.toMillis(processTimeout);
     }
 
-    public static void main(String[] args) {
-        System.out.println(quote("foo bar", "qux \" baz"));
-    }
-
     protected static String quote(String... args) {
         StringBuilder stringBuilder = new StringBuilder();
         boolean first = true;
@@ -37,7 +33,8 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             } else {
                 stringBuilder.append(' ');
             }
-            stringBuilder.append('"').append(arg.replace("\"", "\"\"")).append('"');
+            //stringBuilder.append('"').append(arg.replace("\"", "\"\"")).append('"');
+            stringBuilder.append(arg);
         }
         return stringBuilder.toString();
     }

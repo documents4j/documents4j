@@ -20,7 +20,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
 
     private static File externalConverterDirectory;
     private static AbstractMicrosoftOfficeBridge externalConverter;
-    private final DocumentTypeProvider documentTypeProvider;
+    protected final DocumentTypeProvider documentTypeProvider;
     private AtomicInteger nameGenerator;
     private File files;
     private Set<File> fileCopies;
@@ -78,11 +78,15 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
     }
 
     public File validSourceFile(boolean delete) throws IOException {
-        return makeCopy(documentTypeProvider.getValid(), delete);
+        return validSourceFile(delete, false);
+    }
+
+    public File validSourceFile(boolean delete, boolean space) throws IOException {
+        return makeCopy(documentTypeProvider.getValid(), delete, space);
     }
 
     public File corruptSourceFile(boolean delete) throws IOException {
-        return makeCopy(documentTypeProvider.getCorrupt(), delete);
+        return makeCopy(documentTypeProvider.getCorrupt(), delete, false);
     }
 
     protected boolean fileCanBeCorrupted() {
@@ -109,7 +113,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
         return files;
     }
 
-    private File makeCopy(Document document, boolean delete) throws IOException {
+    private File makeCopy(Document document, boolean delete, boolean space) throws IOException {
         /*
          * When MS Word is asked to convert a file that is already opened by another program or by itself,
          * it will queue the conversion process until the file is released by the other process. This will cause
@@ -119,7 +123,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
          * they should create a defensive copy before the conversion. In order to keep the tests stable, all tests
          * will use such a defensive copy.
          */
-        File copy = document.materializeIn(files, String.format("%s.%d", document.getName(), nameGenerator.getAndIncrement()));
+        File copy = document.materializeIn(files, String.format("source%s%s.%d", space ? " " : "", document.getName(), nameGenerator.getAndIncrement()));
         assertTrue(copy.isFile());
         if (delete) {
             fileCopies.add(copy);

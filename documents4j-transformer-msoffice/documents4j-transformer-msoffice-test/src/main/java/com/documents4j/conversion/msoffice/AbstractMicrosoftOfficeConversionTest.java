@@ -70,6 +70,11 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
+    public void testConversionValidTargetContainsSpace() throws Exception {
+        testConversionValid(validSourceFile(true, true), makeTarget("target space." + documentTypeProvider.getTargetFileNameSuffix(), true));
+    }
+
+    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidSourceNoFileExtension() throws Exception {
         File source = new File(getFileFolder(), "source");
         assertFalse(source.exists());

@@ -22,6 +22,7 @@ import static com.documents4j.api.DocumentType.Value.*;
         to = {APPLICATION + "/" + PDF,
                 APPLICATION + "/" + XLS,
                 APPLICATION + "/" + XLSX,
+                APPLICATION + "/" + HTMLE,
                 APPLICATION + "/" + ODS,
                 TEXT + "/" + CSV,
                 TEXT + "/" + PLAIN,

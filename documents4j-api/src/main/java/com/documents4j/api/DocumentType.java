@@ -22,6 +22,8 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType PDF = new DocumentType(Value.APPLICATION, Value.PDF);
     public static final DocumentType PDFA = new DocumentType(Value.APPLICATION, Value.PDFA);
     public static final DocumentType TEXT = new DocumentType(Value.TEXT, Value.PLAIN);
+    public static final DocumentType HTMLE = new DocumentType(Value.APPLICATION, Value.HTMLE);
+    public static final DocumentType HTMLW = new DocumentType(Value.APPLICATION, Value.HTMLW);
 
     private final String type;
 
@@ -115,6 +117,9 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
 
         public static final String CSV = "csv";
         public static final String PLAIN = "plain";
+        
+        public static final String HTMLE = "vnd.com.documents4j.excelhtm-a";
+        public static final String HTMLW = "vnd.com.documents4j.wrodhtm-a";
 
         private Value() {
             throw new UnsupportedOperationException();

@@ -195,6 +195,21 @@ documents4j might malfunction when run as a Windows service together with MS Off
 1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*. On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*. [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).
 2. You can manipulate MS Window's registry such that MS Office applications are run with another account than the local service account. [This approach is documented on MSDN](http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy). Note that this breaks MS Window's sandbox model and imposes additional security threats to the machine that runs MS Office.
 
+Windows service - troubleshooting
+--------------------------
+
+1. For those that are experiencing requests jammed by a MS Office window reporting that some previous conversion failed, you can use MS bat script to looking for those windows and close them by script over Windows' Task Scheduler. First create a .bat file with these commands and add it to new task to run every minute (yes, every minute):
+```
+taskkill /F /FI "WindowTitle eq Microsoft Word*"
+taskkill /F /FI "WindowTitle eq Microsoft Office*"
+```
+2. For those that are experiencing multiples instances of msword and wsscript on task manager, all of them as zombies, you can use MS bat script to kill them by script over Windows' Task Scheduler. First create a .bat file with these commands, then, add it to new task to run every day at 6AM (for instance). Attention! Current conversions will fail when this script been triggered, so, choose an idle time for your application:
+
+```
+taskkill /f /t /im wscript.exe
+taskkill /f /t /im winword.exe
+```
+
 Building the project
 --------------------
 This project is set up to allow running as many tests as possible without requiring MS Office or even MS Windows installed. For this purpose, the project includes several rich stubs that step in place of the MS Office bridges. When you are building this project on a machine with MS Windows and MS Office installed, you should build the project with the `ms-office` profile which triggers tests that rely on an actual MS Office instance. You can then build the project using Maven:

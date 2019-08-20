@@ -101,7 +101,7 @@
         <version.maven.gpg-plugin>1.6</version.maven.gpg-plugin>
         <version.maven.war-plugin>2.3</version.maven.war-plugin>
         <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
-        <version.maven.cobertura-plugin>2.6</version.maven.cobertura-plugin>
+        <version.maven.cobertura-plugin>2.7</version.maven.cobertura-plugin>
         <version.maven.checkstyle-plugin>2.15</version.maven.checkstyle-plugin>
         <version.maven.resources-plugin>2.6</version.maven.resources-plugin>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>

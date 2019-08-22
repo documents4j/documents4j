@@ -84,14 +84,14 @@
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
         <!-- Note: Later versions of Jersey than 2.6 require Java 7 -->
-        <version.jersey>2.6</version.jersey>
+        <version.jersey>2.29</version.jersey>
         <version.guava>18.0</version.guava>
         <version.zt-exec>1.8</version.zt-exec>
         <version.jopt-simple>4.9</version.jopt-simple>
         <version.slf4j>1.7.13</version.slf4j>
         <version.logback>1.1.3</version.logback>
         <version.junit>4.12</version.junit>
-        <version.mockito>1.10.19</version.mockito>
+        <version.mockito>3.0.0</version.mockito>
         <version.thread-weaver>0.2</version.thread-weaver>
         <version.jetty>8.1.13.v20130916</version.jetty>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
@@ -251,7 +251,7 @@
 
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${version.mockito}</version>
             </dependency>
 

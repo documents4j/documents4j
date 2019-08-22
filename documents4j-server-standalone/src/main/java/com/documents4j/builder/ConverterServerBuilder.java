@@ -143,6 +143,8 @@ public class ConverterServerBuilder {
     /**
      * Returns the specified process time out in milliseconds.
      *
+     * @param processTimeout process timeout
+     * @param timeUnit time unit
      * @return The process time out in milliseconds.
      */
     public ConverterServerBuilder processTimeout(long processTimeout, TimeUnit timeUnit) {

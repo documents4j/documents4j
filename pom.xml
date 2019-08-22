@@ -39,8 +39,10 @@
 
      Profile summary:
       (1) ms-office: Runs tests that require MS Word and MS Excel installed on MS Windows.
-      (2) extras: Build a shaded jar for the standalone conversion server as well as javadoc and source artifacts.
-      (3) checks: Perform additional source code checks (activated by default).
+      (2) shaded-jar: Build a shaded jar for the standalone conversion server and standalone client
+      (3) javadoc: build javadoc
+      (4) source: build source jar
+      (5) checks: Perform additional source code checks (activated by default).
 
      Note that MS Office components do not officially support their execution in a service context. When run as a
      service, MS Office components are always started with MS Window's local service account which does not configure
@@ -83,7 +85,6 @@
         <version.javax.rs>2.0.1</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
-        <!-- Note: Later versions of Jersey than 2.6 require Java 7 -->
         <version.jersey>2.29</version.jersey>
         <version.guava>18.0</version.guava>
         <version.zt-exec>1.8</version.zt-exec>
@@ -108,7 +109,7 @@
         <version.maven.release-plugin>2.5.1</version.maven.release-plugin>
         <version.maven.install-plugin>2.5.1</version.maven.install-plugin>
         <version.maven.jxr-plugin>2.3</version.maven.jxr-plugin>
-        <version.java>1.6</version.java>
+        <version.java>11</version.java>
         <distribution.bintray>https://api.bintray.com/maven/raphw/maven/documents4j</distribution.bintray>
     </properties>
 
@@ -198,6 +199,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.glassfish.jersey.inject</groupId>
+                <artifactId>jersey-hk2</artifactId>
+                <version>${version.jersey}</version>
+            </dependency>
 
             <!-- Java extensions -->
             <dependency>
@@ -278,7 +284,7 @@
                 <version>${version.maven.release-plugin}</version>
                 <configuration>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>extras</releaseProfiles>
+                    <releaseProfiles>shaded-jar</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagNameFormat>documents4j-@{project.version}</tagNameFormat>
                 </configuration>
@@ -329,7 +335,7 @@
                     <version>${version.maven.release-plugin}</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
-                        <releaseProfiles>extras</releaseProfiles>
+                        <releaseProfiles>shaded-jar</releaseProfiles>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
@@ -339,7 +345,7 @@
 
     <profiles>
         <profile>
-            <id>extras</id>
+            <id>source</id>
             <build>
                 <plugins>
                     <!-- Create source artifacts -->
@@ -356,7 +362,14 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
 
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
                     <!-- Create javadoc artifacts -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

@@ -8,14 +8,6 @@
         <version>1.0.4-SNAPSHOT</version>
     </parent>
 
-    <!--
-     Jersey Client suffers a (temporary) thread leak. A patch was submitted to the Jersey project.
-     Version 0.1 contained a probably malfunctioning patch to this problem. Do not use this version!
-     For further information, see:
-     - https://java.net/jira/browse/JERSEY-2205
-     - https://github.com/jersey/jersey/pull/38
-    -->
-
     <artifactId>documents4j-client</artifactId>
     <packaging>jar</packaging>
 
@@ -43,6 +35,16 @@
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-jaxb</artifactId>
         </dependency>
 
         <dependency>

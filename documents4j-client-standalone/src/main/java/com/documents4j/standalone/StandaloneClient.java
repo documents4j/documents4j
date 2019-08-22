@@ -73,7 +73,7 @@ public class StandaloneClient {
                 System.out.println("This application can only be used from the command line.");
                 System.exit(-1);
             }
-            IConverter converter = asConverter(args);
+            IConverter converter = asConverter(getOptionsFromArgs(args));
             try {
                 Logger logger = LoggerFactory.getLogger(StandaloneClient.class);
                 sayHello(converter, logger, console);
@@ -162,16 +162,12 @@ public class StandaloneClient {
         }
     }
 
-    private static IConverter asConverter(String[] args) throws IOException {
-
+    static StandaloneClientOptions getOptionsFromArgs(String[] args) throws IOException {
+        StandaloneClientOptions options = new StandaloneClientOptions();
         OptionParser optionParser = new OptionParser();
-
         OptionSpec<?> helpSpec = makeHelpSpec(optionParser);
-
         NonOptionArgumentSpec<URI> baseUriSpec = makeBaseUriSpec(optionParser);
-
         ArgumentAcceptingOptionSpec<Long> requestTimeoutSpec = makeRequestTimeoutSpec(optionParser);
-
         OptionSpec<?> sslSpec = makeSslSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
@@ -192,25 +188,29 @@ public class StandaloneClient {
             System.exit(0);
         }
 
-        URI baseUri = baseUriSpec.value(optionSet);
-        if (baseUri == null) {
+        options.baseUri = baseUriSpec.value(optionSet);
+        if (options.baseUri == null) {
             System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
             System.exit(-1);
         }
 
-        long requestTimeout = requestTimeoutSpec.value(optionSet);
-        checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
+        options.requestTimeout = requestTimeoutSpec.value(optionSet);
+        checkArgument(options.requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
-        File logFile = logFileSpec.value(optionSet);
-        Level level = logLevelSpec.value(optionSet);
-        configureLogging(logFile, level);
+        options.logFile = logFileSpec.value(optionSet);
+        options.logLevel = logLevelSpec.value(optionSet);
 
-        System.out.println("Connecting to: " + baseUri);
+        options.hasSsl = optionSet.has(sslSpec);
+        return options;
+    }
 
+    static IConverter asConverter(StandaloneClientOptions options) throws IOException {
+        configureLogging(options.logFile, options.logLevel);
+        System.out.println("Connecting to: " + options.baseUri);
         RemoteConverter.Builder builder = RemoteConverter.builder()
-                .requestTimeout(requestTimeout, TimeUnit.MILLISECONDS)
-                .baseUri(baseUri);
-        if (optionSet.has(sslSpec)) {
+                .requestTimeout(options.requestTimeout, TimeUnit.MILLISECONDS)
+                .baseUri(options.baseUri);
+        if (options.hasSsl) {
             try {
                 builder = builder.sslContext(SSLContext.getDefault());
             } catch (NoSuchAlgorithmException e) {

@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -52,13 +54,22 @@ public class StandaloneServer {
             Logger logger = LoggerFactory.getLogger(StandaloneServer.class);
             try {
                 sayHello(builder, logger);
-                System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
-                if (System.in.read() == -1) {
-                    logger.warn("Console read terminated without receiving user input");
-                }
-                sayGoodbye(builder, logger);
+                System.out.println("The documents4j server is up and running. Hit Ctrl+C to stop.");
+
+                final CyclicBarrier cyclicBarrier = new CyclicBarrier(2);
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        cyclicBarrier.await();
+                    } catch (InterruptedException | BrokenBarrierException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
+                cyclicBarrier.await();
             } finally {
+                sayGoodbye(builder, logger);
+                System.out.println("Shutting down...");
                 httpServer.shutdownNow();
+                System.out.println("Successful.");
             }
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {

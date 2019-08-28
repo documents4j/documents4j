@@ -60,7 +60,7 @@ public class CommandDescription {
 
     public static final String ARGUMENT_LONG_AUTH = "auth";
     public static final String ARGUMENT_SHORT_AUTH = "A";
-    public static final String DESCRIPTION_CONTEXT_AUTH = "Protects the API with basic authentication given as 'user:pass'.";
+    public static final String DESCRIPTION_CONTEXT_AUTH = "Basic authentication credentials given as 'user:pass'.";
 
     public static final String ARGUMENT_LONG_LOG_TO_FILE = "log";
     public static final String ARGUMENT_SHORT_LOG_TO_FILE = "L";

@@ -124,6 +124,10 @@ If a document conversion is realized via an insecure connection, it is possible 
 
 The standalone implementations of server and client converters can use the `SSLContext.getDefault()` instance for establishing a connection by setting the `-ssl` parameter on startup. The [default trust store and key store configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html#InstallationAndCustomization) can be adjusted by setting `javax.net.ssl.*` system properties when running a standalone application from the console. The allowed encryption algorithms can be adjusted by setting `https.protocols` property.
 
+#### Authentication ####
+
+The server can be started with basic authentication support with `-auth user:pass`.
+
 Aggregating converter
 ----------------
 Additionally to the `LocalConverter` and the `RemoteConverter`, documents4j extends the `IConverter` API by `IAggregatingConverter` which allows to delegate conversions to a collection of underlying converters. This interface is implemented by the `AggregationConverter` class.

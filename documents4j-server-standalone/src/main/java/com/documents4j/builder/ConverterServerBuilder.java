@@ -2,6 +2,7 @@ package com.documents4j.builder;
 
 import com.documents4j.conversion.IExternalConverter;
 import com.documents4j.job.LocalConverter;
+import com.documents4j.server.auth.AuthFilter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
 import com.documents4j.ws.application.WebConverterApplication;
@@ -37,6 +38,7 @@ public class ConverterServerBuilder {
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
+    private String userPass;
 
     private ConverterServerBuilder() {
         converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();
@@ -92,6 +94,18 @@ public class ConverterServerBuilder {
     public ConverterServerBuilder baseUri(String baseUri) {
         checkNotNull(baseUri);
         this.baseUri = URI.create(baseUri);
+        return this;
+    }
+
+    /**
+     * Specifies the user and password used for basic auth.
+     *
+     * @param userPass User and password in the format `user:pass'.
+     * @return This builder instance.
+     */
+    public ConverterServerBuilder userPass(String userPass) {
+        checkNotNull(userPass);
+        this.userPass = userPass;
         return this;
     }
 
@@ -202,6 +216,9 @@ public class ConverterServerBuilder {
         ResourceConfig resourceConfig = ResourceConfig
                 .forApplication(new WebConverterApplication(configuration))
                 .register(configuration);
+        if (userPass != null) {
+            resourceConfig.register(new AuthFilter(userPass));
+        }
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
         } else {

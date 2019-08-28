@@ -58,6 +58,10 @@ public class CommandDescription {
     public static final String ARGUMENT_SHORT_SSL = "E";
     public static final String DESCRIPTION_CONTEXT_SSL = "Registers the JVM's default SSL context for encryption of conversions.";
 
+    public static final String ARGUMENT_LONG_AUTH = "auth";
+    public static final String ARGUMENT_SHORT_AUTH = "A";
+    public static final String DESCRIPTION_CONTEXT_AUTH = "Protects the API with basic authentication given as 'user:pass'.";
+
     public static final String ARGUMENT_LONG_LOG_TO_FILE = "log";
     public static final String ARGUMENT_SHORT_LOG_TO_FILE = "L";
     public static final String DESCRIPTION_ARGUMENT_LOG_TO_FILE = "A file to which all log information will be written. If " +

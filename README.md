@@ -103,7 +103,7 @@ Similarly to the `LocalConverter`, the `RemoteConverter` requires a folder for w
 documents4j offers a standalone conversion server which implements the required REST API by using a `LocalConverter` under the covers. This conversion server is contained in the *com.documents4j/documents4j-server-standalone* module. The Maven build creates a shaded artifact for this module which contains all dependencies. This way, the conversion server can be started from the command line, simply by:
 
 ```shell
-java -jar documents4j-server-standalone-shaded.jar http://localhost:9998
+java -jar documents4j-server-standalone-<VERSION>-shaded.jar http://localhost:9998
 ```
 
 The above command starts the conversion server to listen for a HTTP connection on port 9998 which is now accessible to the `RemoteConverter`. The standalone server comes with a rich set of option which are passed via command line. For a comprehensive description, you can print a summary of these options by supplying the `-?` option on the command line. 
@@ -114,7 +114,7 @@ A conversion server can also be started programmatically using a `ConversionServ
 Similarly to the conversion server, documents4j ships with a small console client which is mainly intended for debugging purposes. Using the client it is possible to connect to a conversion server in order to validate that a connection is possible and not prevented by for example active fire walls. The client is contained in the *com.documents4j/documents4j-client-standalone* module. You can connect to a server by:
 
 ```shell
-java -jar documents4j-client-standalone-shaded.jar http://localhost:9998
+java -jar documents4j-client-standalone-<VERSION>-shaded.jar http://localhost:9998
 ```
 
 Again, the `-?` option can be supplied for obtaining a list of options.
@@ -123,6 +123,17 @@ Again, the `-?` option can be supplied for obtaining a list of options.
 If a document conversion is realized via an insecure connection, it is possible to specify a `SSLContext` to secure the connection between conversion server and client. 
 
 The standalone implementations of server and client converters can use the `SSLContext.getDefault()` instance for establishing a connection by setting the `-ssl` parameter on startup. The [default trust store and key store configuration](http://docs.oracle.com/javase/8/docs/technotes/guides/security/jsse/JSSERefGuide.html#InstallationAndCustomization) can be adjusted by setting `javax.net.ssl.*` system properties when running a standalone application from the console. The allowed encryption algorithms can be adjusted by setting `https.protocols` property.
+
+To run the standalone server with SSL support:
+
+1. Import your certificate into a keystore
+   ```
+   keytool -import -noprompt -alias serverCert -storepass yourPassword -file /path/to/your/server.cert -keystore /path/to/your/keystore
+   ```
+2. Run the server with the given key store
+   ```
+   java -jar documents4j-client-standalone-<VERSION>-shaded.jar https://0.0.0.0:8443 -ssl -Djavax.net.ssl.keyStore=/path/to/your/keystore -Djavax.net.ssl.keyStorePassword=yourPassword
+   ```
 
 Aggregating converter
 ----------------

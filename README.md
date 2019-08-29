@@ -126,14 +126,17 @@ The standalone implementations of server and client converters can use the `SSLC
 
 To run the standalone server with SSL support:
 
-1. Import your certificate into a keystore
+1. Import your certificate into a keystore. `keytool` does not support importing certificates directly, you have to bundle them before with `openssl`.
    ```
-   keytool -import -noprompt -alias serverCert -storepass yourPassword -file /path/to/your/server.cert -keystore /path/to/your/keystore
+   openssl pkcs12 -export -in /path/to/your/cert.crt -inkey /path/to/your/cert.key -name serverCert -out /tmp/keystore-PKCS-12.p12 -password pass:yourPassword
+   keytool -importkeystore -noprompt -deststorepass yourPassword -srcstorepass yourPassword -destkeystore /path/to/your/keystore -srckeystore /tmp/keystore-PKCS-12.p12
    ```
 2. Run the server with the given key store
    ```
    java -jar documents4j-client-standalone-<VERSION>-shaded.jar https://0.0.0.0:8443 -ssl -Djavax.net.ssl.keyStore=/path/to/your/keystore -Djavax.net.ssl.keyStorePassword=yourPassword
    ```
+
+While `yourPassword` can be any chosen password, but is required.
 
 Aggregating converter
 ----------------

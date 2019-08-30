@@ -99,7 +99,7 @@ public class RemoteConverter extends ConverterAdapter {
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
         clientConfig.connectorProvider(new ApacheConnectorProvider());
-        if (usernamePasswordCredentials != null && usernamePasswordCredentials.getUserName() != null && !usernamePasswordCredentials.getUserName().isBlank()) {
+        if (usernamePasswordCredentials != null && usernamePasswordCredentials.getUserName() != null && !usernamePasswordCredentials.getUserName().isEmpty()) {
             clientConfig.register(HttpAuthenticationFeature.basicBuilder()
                     .credentials(usernamePasswordCredentials.getUserName(), usernamePasswordCredentials.getPassword())
                     .build());

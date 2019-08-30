@@ -109,7 +109,7 @@
         <version.maven.release-plugin>2.5.1</version.maven.release-plugin>
         <version.maven.install-plugin>2.5.1</version.maven.install-plugin>
         <version.maven.jxr-plugin>2.3</version.maven.jxr-plugin>
-        <version.java>11</version.java>
+        <version.java>8</version.java>
         <distribution.bintray>https://api.bintray.com/maven/raphw/maven/documents4j</distribution.bintray>
     </properties>
 

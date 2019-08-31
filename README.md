@@ -138,6 +138,10 @@ To run the standalone server with SSL support:
 
 While `yourPassword` can be any chosen password, but is required.
 
+#### Authentication ####
+
+The server can be started with basic authentication support with `-auth user:pass`.
+
 Aggregating converter
 ----------------
 Additionally to the `LocalConverter` and the `RemoteConverter`, documents4j extends the `IConverter` API by `IAggregatingConverter` which allows to delegate conversions to a collection of underlying converters. This interface is implemented by the `AggregationConverter` class.

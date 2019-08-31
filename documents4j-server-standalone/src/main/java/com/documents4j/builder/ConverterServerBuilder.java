@@ -205,7 +205,8 @@ public class ConverterServerBuilder {
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
         } else {
-            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig, true, new SSLEngineConfigurator(sslContext));
+            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig, true,
+                    new SSLEngineConfigurator(sslContext).setClientMode(false));
         }
     }
 

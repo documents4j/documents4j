@@ -10,6 +10,7 @@ import ch.qos.logback.core.OutputStreamAppender;
 import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
+import ch.qos.logback.core.util.FileSize;
 import com.documents4j.api.DocumentType;
 import com.documents4j.api.IConverter;
 import com.documents4j.api.IFileConsumer;
@@ -276,7 +277,7 @@ public class StandaloneClient {
         fixedWindowRollingPolicy.setContext(loggerContext);
         fixedWindowRollingPolicy.setParent(rollingFileAppender);
         SizeBasedTriggeringPolicy<ILoggingEvent> sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-        sizeBasedTriggeringPolicy.setMaxFileSize(LogDescription.MAXIMUM_LOG_FILE_SIZE);
+        sizeBasedTriggeringPolicy.setMaxFileSize(FileSize.valueOf(LogDescription.MAXIMUM_LOG_FILE_SIZE));
         sizeBasedTriggeringPolicy.setContext(loggerContext);
         rollingFileAppender.setRollingPolicy(fixedWindowRollingPolicy);
         rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);

@@ -2,7 +2,6 @@ package com.documents4j.demo;
 
 import org.apache.wicket.markup.html.link.DownloadLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 
 import java.io.File;
@@ -14,7 +13,7 @@ class LinkPanel extends Panel {
         add(new DownloadLink("file", file, name).setBody(new FileNameAndFormatAndSizeModel(file, type, name)));
     }
 
-    private static class FileNameAndFormatAndSizeModel extends AbstractReadOnlyModel<String> {
+    private static class FileNameAndFormatAndSizeModel implements IModel<String> {
 
         private final IModel<File> fileModel;
         private final IModel<String> typeModel;

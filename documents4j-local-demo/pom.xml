@@ -12,8 +12,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <wicket.version>6.10.0</wicket.version>
-        <jetty.version>7.6.3.v20120416</jetty.version>
+        <wicket.version>8.5.0</wicket.version>
     </properties>
 
     <dependencies>
@@ -71,10 +70,10 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
+            <artifactId>javax.servlet-api</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -99,9 +98,9 @@
 
         <plugins>
             <plugin>
-                <groupId>org.mortbay.jetty</groupId>
+                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${jetty.version}</version>
+                <version>${version.jetty}</version>
                 <configuration>
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">

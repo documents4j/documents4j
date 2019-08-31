@@ -3,7 +3,6 @@ package com.documents4j.demo;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.markup.repeater.Item;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 
 import java.io.File;
@@ -27,7 +26,7 @@ class LinkColumn extends AbstractColumn<FileRow, Void> {
         TARGET
     }
 
-    private class AlternateFileNameModel extends AbstractReadOnlyModel<String> {
+    private class AlternateFileNameModel implements IModel<String> {
 
         private final IModel<FileRow> rowModel;
 
@@ -41,7 +40,7 @@ class LinkColumn extends AbstractColumn<FileRow, Void> {
         }
     }
 
-    private class AlternateFileFormatModel extends AbstractReadOnlyModel<String> {
+    private class AlternateFileFormatModel implements IModel<String> {
 
         private final IModel<FileRow> rowModel;
 
@@ -55,7 +54,7 @@ class LinkColumn extends AbstractColumn<FileRow, Void> {
         }
     }
 
-    private class AlternateFileModel extends AbstractReadOnlyModel<File> {
+    private class AlternateFileModel implements IModel<File> {
 
         private final IModel<FileRow> rowModel;
 

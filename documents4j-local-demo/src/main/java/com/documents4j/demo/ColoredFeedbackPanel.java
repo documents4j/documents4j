@@ -5,7 +5,7 @@ import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 
 import java.io.Serializable;
 
@@ -13,7 +13,7 @@ class ColoredFeedbackPanel extends FeedbackPanel {
 
     public ColoredFeedbackPanel(String id) {
         super(id);
-        add(new AttributeAppender("class", new AbstractReadOnlyModel<String>() {
+        add(new AttributeAppender("class", new IModel<Object>() {
             @Override
             public String getObject() {
                 return findClass();

@@ -16,7 +16,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.util.ListModel;
@@ -50,7 +49,7 @@ public class DemoPage extends WebPage {
         List<DocumentType> documentTypes = new ArrayList<DocumentType>(conversions.keySet());
         Collections.sort(documentTypes);
         sourceFormat = makeDropDownChoice("sourceFormat", new ListModel<DocumentType>(documentTypes));
-        targetFormat = makeDropDownChoice("targetFormat", new AbstractReadOnlyModel<List<DocumentType>>() {
+        targetFormat = makeDropDownChoice("targetFormat", new IModel<List<DocumentType>>() {
             @Override
             public List<DocumentType> getObject() {
                 if (sourceFormat.getModelObject() == null) {

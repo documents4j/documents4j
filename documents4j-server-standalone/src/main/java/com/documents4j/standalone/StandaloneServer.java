@@ -54,7 +54,7 @@ public class StandaloneServer {
             try {
                 sayHello(builder, logger);
                 if (builder.isServiceMode()) {
-                    System.out.println("The documents4j server is up and running in server mode and will not terminate until interruption.");
+                    System.out.println("The documents4j server is up and running in service mode and will not terminate until process interruption.");
                     try {
                         Thread.currentThread().join();
                     } catch (InterruptedException ignored) {

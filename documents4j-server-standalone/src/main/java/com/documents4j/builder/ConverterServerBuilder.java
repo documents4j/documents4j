@@ -29,13 +29,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ConverterServerBuilder {
 
     private final Map<Class<? extends IExternalConverter>, Boolean> converterConfiguration;
+
     private URI baseUri;
+
     private File baseFolder = null;
+
     private SSLContext sslContext;
+
     private int corePoolSize = LocalConverter.Builder.DEFAULT_CORE_POOL_SIZE;
+
     private int maximumPoolSize = LocalConverter.Builder.DEFAULT_MAXIMUM_POOL_SIZE;
+
     private long keepAliveTime = LocalConverter.Builder.DEFAULT_KEEP_ALIVE_TIME;
+
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
+
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
 
     private ConverterServerBuilder() {
@@ -144,7 +152,7 @@ public class ConverterServerBuilder {
      * Returns the specified process time out in milliseconds.
      *
      * @param processTimeout process timeout
-     * @param timeUnit time unit
+     * @param timeUnit       time unit
      * @return The process time out in milliseconds.
      */
     public ConverterServerBuilder processTimeout(long processTimeout, TimeUnit timeUnit) {
@@ -205,8 +213,8 @@ public class ConverterServerBuilder {
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
         } else {
-            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig, true,
-                    new SSLEngineConfigurator(sslContext).setClientMode(false));
+            return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig,
+                    true, new SSLEngineConfigurator(sslContext).setClientMode(false));
         }
     }
 

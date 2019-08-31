@@ -1,7 +1,7 @@
 package com.documents4j.ws.application;
 
 import com.documents4j.ws.endpoint.ConverterResource;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 
@@ -18,6 +18,7 @@ import java.util.Set;
 public class WebConverterApplication extends Application {
 
     private final Set<Class<?>> classes;
+
     private final Set<Object> singletons;
 
     public WebConverterApplication(IWebConverterConfiguration webConverterConfiguration) {

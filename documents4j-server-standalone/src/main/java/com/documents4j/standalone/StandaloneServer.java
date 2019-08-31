@@ -58,7 +58,7 @@ public class StandaloneServer {
                     try {
                         Thread.currentThread().join();
                     } catch (InterruptedException ignored) {
-                        /* do nothing */
+                        System.out.println("Received interruption signal which indicates server termination.");
                     }
                 } else {
                     System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
@@ -84,11 +84,11 @@ public class StandaloneServer {
         OptionParser optionParser = new OptionParser();
 
         OptionSpec<?> helpSpec = makeHelpSpec(optionParser);
-        
+
         NonOptionArgumentSpec<URI> baseUriSpec = makeBaseUriSpec(optionParser);
 
         OptionSpec<?> serviceModeSpec = makeServiceModeSpec(optionParser);
-        
+
         ArgumentAcceptingOptionSpec<File> baseFolderSpec = makeBaseFolderSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> corePoolSizeSpec = makeCorePoolSizeSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> fallbackPoolSizeSpc = makeFallbackPoolSizeSpec(optionParser);
@@ -125,7 +125,7 @@ public class StandaloneServer {
             System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
             System.exit(-1);
         }
-        
+
         boolean serviceMode = optionSet.has(serviceModeSpec);
 
         File baseFolder = baseFolderSpec.value(optionSet);

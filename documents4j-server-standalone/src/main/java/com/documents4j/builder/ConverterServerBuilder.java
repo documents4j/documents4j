@@ -48,7 +48,7 @@ public class ConverterServerBuilder {
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
 
     private String userPass;
-    
+
     private boolean serviceMode;
 
     private ConverterServerBuilder() {
@@ -216,7 +216,7 @@ public class ConverterServerBuilder {
 
     /**
      * Enables or disables service mode where {@link System#in} is not used.
-     * 
+     *
      * @param serviceMode {@code true} if service mode is enabled.
      * @return This builder.
      */
@@ -323,7 +323,7 @@ public class ConverterServerBuilder {
 
     /**
      * Returns {@code true} if the conversion server is run in service mode.
-     * 
+     *
      * @return {@code true} if the conversion server is run in service mode.
      */
     public boolean isServiceMode() {

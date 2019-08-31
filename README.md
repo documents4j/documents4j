@@ -232,6 +232,8 @@ documents4j might malfunction when run as a Windows service together with MS Off
 1. On a 32-bit system, create the folder *C:\Windows\System32\config\systemprofile\Desktop*. On a 64-bit system, create the folder *C:\Windows\SysWOW64\config\systemprofile\Desktop*. [Further information can be found on MSDN](http://social.msdn.microsoft.com/Forums/en-US/b81a3c4e-62db-488b-af06-44421818ef91/excel-2007-automation-on-top-of-a-windows-server-2008-x64?forum=innovateonoffice).
 2. You can manipulate MS Window's registry such that MS Office applications are run with another account than the local service account. [This approach is documented on MSDN](http://social.technet.microsoft.com/Forums/en-US/334c9f30-4e27-4904-9e71-abfc65975e23/problem-running-windows-service-with-excel-object-on-windows-server-2008-64-bit?forum=officesetupdeploylegacy). Note that this breaks MS Window's sandbox model and imposes additional security threats to the machine that runs MS Office.
 
+When running the standalone server, you should also start it in service mode by the `-M` flag to avoid using system input.
+
 Windows service - troubleshooting
 --------------------------
 

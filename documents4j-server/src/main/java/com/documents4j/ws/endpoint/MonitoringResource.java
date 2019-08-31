@@ -20,9 +20,9 @@ public class MonitoringResource {
     @GET
     public Response serverInformation() {
         if (webConverterConfiguration.getConverter().isOperational()) {
-            return Response.status(Response.Status.OK).build();
+            return Response.ok().build();
         } else {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.serverError().build();
         }
     }
 }

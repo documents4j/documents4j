@@ -83,12 +83,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shaded.classifier>shaded</shaded.classifier>
         <version.javax.rs>2.0.1</version.javax.rs>
+        <version.javax.servlet>2.5</version.javax.servlet>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
         <version.javax.activation>1.1.1</version.javax.activation>
         <version.javax.jaxb>2.3.0</version.javax.jaxb>
         <version.jersey>2.29</version.jersey>
-        <version.guava>18.0</version.guava>
+        <version.guava>28.1-jre</version.guava>
         <version.zt-exec>1.8</version.zt-exec>
         <version.jopt-simple>4.9</version.jopt-simple>
         <version.slf4j>1.7.13</version.slf4j>
@@ -96,7 +97,7 @@
         <version.junit>4.12</version.junit>
         <version.mockito>3.0.0</version.mockito>
         <version.thread-weaver>0.2</version.thread-weaver>
-        <version.jetty>8.1.13.v20130916</version.jetty>
+        <version.jetty>9.4.20.v20190813</version.jetty>
         <version.maven.compiler-plugin>3.1</version.maven.compiler-plugin>
         <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
         <version.maven.source-plugin>2.2.1</version.maven.source-plugin>
@@ -213,6 +214,12 @@
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>${version.javax.rs}</version>
             </dependency>
+            
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${version.javax.servlet}</version>
+            </dependency>
 
             <dependency>
                 <groupId>javax.inject</groupId>
@@ -291,12 +298,6 @@
                 <groupId>com.googlecode.thread-weaver</groupId>
                 <artifactId>threadweaver</artifactId>
                 <version>${version.thread-weaver}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.eclipse.jetty.aggregate</groupId>
-                <artifactId>jetty-all-server</artifactId>
-                <version>${version.jetty}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

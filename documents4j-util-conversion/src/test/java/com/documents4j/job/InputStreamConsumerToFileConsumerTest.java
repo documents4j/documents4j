@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 public class InputStreamConsumerToFileConsumerTest extends AbstractAdapterTest {

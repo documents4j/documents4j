@@ -1,6 +1,5 @@
 package com.documents4j.job;
 
-import com.documents4j.job.OutputStreamToInputStreamConsumer;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.OngoingStubbing;
@@ -9,8 +8,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.*;
 
 public class OutputStreamToInputStreamConsumerTest {

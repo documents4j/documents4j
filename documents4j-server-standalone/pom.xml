@@ -74,6 +74,13 @@
             <artifactId>jul-to-slf4j</artifactId>
         </dependency>
 
+        <!-- Add dependency removed in Java 11 -->
+        <dependency>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
         <!-- Testing dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -84,7 +91,7 @@
 
     <profiles>
         <profile>
-            <id>extras</id>
+            <id>shaded-jar</id>
             <build>
                 <plugins>
                     <!-- Shade plugin: Allow all dependencies to be packed into a single jar file -->

@@ -8,14 +8,6 @@
         <version>1.0.4-SNAPSHOT</version>
     </parent>
 
-    <!--
-     Jersey Client suffers a (temporary) thread leak. A patch was submitted to the Jersey project.
-     Version 0.1 contained a probably malfunctioning patch to this problem. Do not use this version!
-     For further information, see:
-     - https://java.net/jira/browse/JERSEY-2205
-     - https://github.com/jersey/jersey/pull/38
-    -->
-
     <artifactId>documents4j-client</artifactId>
     <packaging>jar</packaging>
 
@@ -46,6 +38,16 @@
         </dependency>
 
         <dependency>
+            <groupId>org.glassfish.jersey.inject</groupId>
+            <artifactId>jersey-hk2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-jaxb</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>
             <artifactId>jersey-apache-connector</artifactId>
         </dependency>
@@ -71,7 +73,7 @@
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
 

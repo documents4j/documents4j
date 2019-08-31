@@ -46,7 +46,10 @@ public class ConverterServerBuilder {
     private long processTimeout = LocalConverter.Builder.DEFAULT_PROCESS_TIME_OUT;
 
     private long requestTimeout = IWebConverterConfiguration.DEFAULT_REQUEST_TIMEOUT;
+
     private String userPass;
+    
+    private boolean serviceMode;
 
     private ConverterServerBuilder() {
         converterConfiguration = new HashMap<Class<? extends IExternalConverter>, Boolean>();
@@ -212,6 +215,18 @@ public class ConverterServerBuilder {
     }
 
     /**
+     * Enables or disables service mode where {@link System#in} is not used.
+     * 
+     * @param serviceMode {@code true} if service mode is enabled.
+     * @return This builder.
+     */
+    public ConverterServerBuilder serviceMode(boolean serviceMode) {
+        checkNotNull(sslContext);
+        this.serviceMode = serviceMode;
+        return this;
+    }
+
+    /**
      * Creates the conversion server that is specified by this builder.
      *
      * @return The conversion server that is specified by this builder.
@@ -304,6 +319,15 @@ public class ConverterServerBuilder {
      */
     public long getRequestTimeout() {
         return requestTimeout;
+    }
+
+    /**
+     * Returns {@code true} if the conversion server is run in service mode.
+     * 
+     * @return {@code true} if the conversion server is run in service mode.
+     */
+    public boolean isServiceMode() {
+        return serviceMode;
     }
 
     private static void assertNumericArgument(long number, boolean zeroAllowed) {

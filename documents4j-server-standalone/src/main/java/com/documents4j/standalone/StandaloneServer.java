@@ -53,9 +53,18 @@ public class StandaloneServer {
             Logger logger = LoggerFactory.getLogger(StandaloneServer.class);
             try {
                 sayHello(builder, logger);
-                System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
-                if (System.in.read() == -1) {
-                    logger.warn("Console read terminated without receiving user input");
+                if (builder.isServiceMode()) {
+                    System.out.println("The documents4j server is up and running in server mode and will not terminate until interruption.");
+                    try {
+                        Thread.currentThread().join();
+                    } catch (InterruptedException ignored) {
+                        /* do nothing */
+                    }
+                } else {
+                    System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
+                    if (System.in.read() == -1) {
+                        logger.warn("Console read terminated without receiving user input");
+                    }
                 }
                 sayGoodbye(builder, logger);
             } finally {
@@ -75,9 +84,11 @@ public class StandaloneServer {
         OptionParser optionParser = new OptionParser();
 
         OptionSpec<?> helpSpec = makeHelpSpec(optionParser);
-
+        
         NonOptionArgumentSpec<URI> baseUriSpec = makeBaseUriSpec(optionParser);
 
+        OptionSpec<?> serviceModeSpec = makeServiceModeSpec(optionParser);
+        
         ArgumentAcceptingOptionSpec<File> baseFolderSpec = makeBaseFolderSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> corePoolSizeSpec = makeCorePoolSizeSpec(optionParser);
         ArgumentAcceptingOptionSpec<Integer> fallbackPoolSizeSpc = makeFallbackPoolSizeSpec(optionParser);
@@ -114,6 +125,8 @@ public class StandaloneServer {
             System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
             System.exit(-1);
         }
+        
+        boolean serviceMode = optionSet.has(serviceModeSpec);
 
         File baseFolder = baseFolderSpec.value(optionSet);
         checkArgument(baseFolder == null || baseFolder.exists(), "The specified base folder cannot be located on the file system");
@@ -156,7 +169,7 @@ public class StandaloneServer {
         if (optionSet.hasArgument(authSpec)) {
             builder.userPass(authSpec.value(optionSet));
         }
-        return builder;
+        return builder.serviceMode(serviceMode);
     }
 
     private static void configureLogging(File logFile, Level level) {
@@ -377,6 +390,15 @@ public class StandaloneServer {
                         CommandDescription.DESCRIPTION_CONTEXT_HELP
                 )
                 .forHelp();
+    }
+
+    private static OptionSpec<Void> makeServiceModeSpec(OptionParser optionParser) {
+        return optionParser
+                .acceptsAll(Arrays.asList(
+                        CommandDescription.ARGUMENT_LONG_SERVICE_MODE,
+                        CommandDescription.ARGUMENT_SHORT_SERVICE_MODE),
+                        CommandDescription.DESCRIPTION_CONTEXT_SERVICE_MODE
+                );
     }
 
     private static void sayHello(ConverterServerBuilder builder, Logger logger) {

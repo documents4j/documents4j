@@ -95,6 +95,10 @@ public class CommandDescription {
     public static final String ARGUMENT_SHORT_HELP = "?";
     public static final String DESCRIPTION_CONTEXT_HELP = "Displays information about this application.";
 
+    public static final String ARGUMENT_LONG_SERVICE_MODE = "service";
+    public static final String ARGUMENT_SHORT_SERVICE_MODE = "M";
+    public static final String DESCRIPTION_CONTEXT_SERVICE_MODE = "Avoids the usage of system in if used as a service.";
+
     public static final String DESCRIPTION_BASE_URI = "The base URI of the conversion server. (e.g. http://localhost:8080)";
 
 

@@ -63,7 +63,7 @@ public class StandaloneServer {
                 } else {
                     System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
                     if (System.in.read() == -1) {
-                        logger.warn("Console read terminated without receiving user input");
+                        System.out.println("Console read terminated without receiving user input");
                     }
                 }
                 sayGoodbye(builder, logger);

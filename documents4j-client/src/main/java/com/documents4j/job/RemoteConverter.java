@@ -4,12 +4,14 @@ import com.documents4j.api.*;
 import com.documents4j.ws.ConverterNetworkProtocol;
 import com.documents4j.ws.ConverterServerInformation;
 import com.google.common.primitives.Ints;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.glassfish.jersey.apache.connector.ApacheClientProperties;
 import org.glassfish.jersey.apache.connector.ApacheConnectorProvider;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.client.filter.EncodingFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.slf4j.Logger;
@@ -50,9 +52,9 @@ public class RemoteConverter extends ConverterAdapter {
 
     protected RemoteConverter(URI baseUri, File baseFolder, long requestTimeout,
                               int corePoolSize, int maximumPoolSize, long keepAliveTime,
-                              SSLContext sslContext) {
+                              SSLContext sslContext, UsernamePasswordCredentials usernamePasswordCredentials) {
         super(baseFolder);
-        this.client = makeClient(requestTimeout, maximumPoolSize, sslContext);
+        this.client = makeClient(requestTimeout, maximumPoolSize, sslContext, usernamePasswordCredentials);
         this.baseUri = baseUri;
         this.executorService = makeExecutorService(corePoolSize, maximumPoolSize, keepAliveTime);
         this.requestTimeout = requestTimeout;
@@ -88,7 +90,7 @@ public class RemoteConverter extends ConverterAdapter {
         return builder().baseUri(baseUri).build();
     }
 
-    private static Client makeClient(long requestTimeout, int maxConnections, SSLContext sslContext) {
+    private static Client makeClient(long requestTimeout, int maxConnections, SSLContext sslContext, UsernamePasswordCredentials usernamePasswordCredentials) {
         ClientConfig clientConfig = new ClientConfig();
         int castRequestTimeout = Ints.checkedCast(requestTimeout);
         clientConfig.register(makeGZipFeature());
@@ -97,6 +99,11 @@ public class RemoteConverter extends ConverterAdapter {
         clientConfig.property(ClientProperties.READ_TIMEOUT, castRequestTimeout);
         clientConfig.property(ApacheClientProperties.CONNECTION_MANAGER, makeConnectionManager(maxConnections));
         clientConfig.connectorProvider(new ApacheConnectorProvider());
+        if (usernamePasswordCredentials != null && usernamePasswordCredentials.getUserName() != null && !usernamePasswordCredentials.getUserName().isEmpty()) {
+            clientConfig.register(HttpAuthenticationFeature.basicBuilder()
+                    .credentials(usernamePasswordCredentials.getUserName(), usernamePasswordCredentials.getPassword())
+                    .build());
+        }
         if (sslContext != null) {
             return ClientBuilder.newBuilder().sslContext(sslContext).withConfig(clientConfig).build();
         } else {
@@ -208,6 +215,8 @@ public class RemoteConverter extends ConverterAdapter {
         private long requestTimeout = DEFAULT_REQUEST_TIMEOUT;
 
         private SSLContext sslContext;
+        private String userName;
+        private String password;
 
         private Builder() {
             /* empty */
@@ -262,12 +271,25 @@ public class RemoteConverter extends ConverterAdapter {
             return this;
         }
 
+        /**
+         * Configures the credentials used for basic authentication against the documents4j server.
+         *
+         * @param userName user name
+         * @param password password
+         * @return This builder instance.
+         */
+        public Builder basicAuthenticationCredentials(String userName, String password) {
+            this.userName = userName;
+            this.password = password;
+            return this;
+        }
+
         @Override
         public IConverter build() {
             checkNotNull(baseUri, "The base URI was not set");
             return new RemoteConverter(baseUri, normalizedBaseFolder(), requestTimeout,
                     corePoolSize, maximumPoolSize, keepAliveTime,
-                    sslContext);
+                    sslContext, userName != null ? new UsernamePasswordCredentials(userName, password) : null);
         }
 
         /**

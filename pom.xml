@@ -85,6 +85,8 @@
         <version.javax.rs>2.0.1</version.javax.rs>
         <version.javax.inject>1</version.javax.inject>
         <version.javax.annotation>1.2</version.javax.annotation>
+        <version.javax.activation>1.1.1</version.javax.activation>
+        <version.javax.jaxb>2.3.0</version.javax.jaxb>
         <version.jersey>2.29</version.jersey>
         <version.guava>18.0</version.guava>
         <version.zt-exec>1.8</version.zt-exec>
@@ -222,6 +224,30 @@
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${version.javax.annotation}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>javax.activation</groupId>
+                <artifactId>activation</artifactId>
+                <version>${version.javax.activation}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>${version.javax.jaxb}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-core</artifactId>
+                <version>${version.javax.jaxb}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>com.sun.xml.bind</groupId>
+                <artifactId>jaxb-impl</artifactId>
+                <version>${version.javax.jaxb}</version>
             </dependency>
 
             <!-- Testing / Logging -->

@@ -192,6 +192,25 @@ All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can the
 - *warn*: On this level, non-fatal errors are logged such as the timeout of a HTTP conversion due to high traffic. Normally, such log events are accompanied by an exception being thrown.
 - *error*: On this level, all user errors are logged. For example, the attempt of converting a non-existent file would cause a logging event on this level. Normally, such events are accompanied by an exception being thrown.
 
+Monitoring
+----------
+
+There is a monitoring endpoint `/health` returning `200 OK` if the converter server is operational and `500 Internal Server Error` otherwise.
+
+This allows load balancers only able to check simple health requests and HTTP status codes (e.g. AWS Load balancer) to decide if this server is healthy or not.
+
+Troubleshooting
+---------------
+
+* Don't open and close MS Office on the same machine as the server is running. After closing it again, the server won't be operational any more. The client will fail with 
+    ````
+    com.documents4j.throwables.ConverterAccessException: The converter could not process the request
+    ````
+    and `<operational>false</operational>` will appear at the top of the status xml page returned by `GET /`.
+    Of course, there may be more reasons causing MS Office to stop working. A restart of the server will fix this.
+
+* If the server is run by command line in an Windows Command Line window be sure not to leave the window in "Select mode" by clicking on it or marking text. This will cause the server not to respond any more and the clients will run into timeouts.
+
 Performance considerations
 -------------------------
 
@@ -204,7 +223,7 @@ In the end, a user should however always try to hand the available data to the `
 MS Office components are (of course) not run within the Java virtual machine's process. Therefore, an allocation of a significant amount of the operating system's memory to the JVM can cause an opposite effect to performance than intended. Since the JVM already reserved most of the operating system's memory, the MS Word processes that were started by the JVM will run short for memory. At the same time, the JVM that created these processes remains idle waiting for a result. It is difficult to tell what amount of memory should optimally be reserved for the JVM since this is highly dependant of the number of concurrent conversion. However, if one observes conversion to be critically unperformant, the allocation of a significant amount of memory to the JVM should be considered as a cause. 
 
 #### Configuring MS Office ####
-When running a MS Office-based converter, it it important to appropriately configure MS Office before running documents4j. For example, it is crucial to disable all kinds of start-up wizards which can abort the convertion process if the MS Office API returns unexpected status codes. Furthermore, it can improve performance significantly when bookkeeping features such as the *recent documents* listing are disabled.
+When running a MS Office-based converter, it it important to appropriately configure MS Office before running documents4j. For example, it is crucial to disable all kinds of start-up wizards which can abort the conversion process if the MS Office API returns unexpected status codes. Furthermore, it can improve performance significantly when bookkeeping features such as the *recent documents* listing are disabled.
 
 Running as Windows service
 --------------------------

@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
  * be used by load balancers (e.g. in AWS) as health check.
  */
 @Path("/health")
-public class MonitoringResource {
+public class MonitoringHealthResource {
 
     @Inject
     private IWebConverterConfiguration webConverterConfiguration;

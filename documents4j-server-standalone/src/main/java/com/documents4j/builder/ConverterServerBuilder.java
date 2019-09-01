@@ -6,6 +6,7 @@ import com.documents4j.server.auth.AuthFilter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
 import com.documents4j.ws.application.WebConverterApplication;
+import com.documents4j.ws.endpoint.MonitoringHealthResource;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -238,9 +239,10 @@ public class ConverterServerBuilder {
         // and directly in order to trigger life cycle methods on the deployment container.
         ResourceConfig resourceConfig = ResourceConfig
                 .forApplication(new WebConverterApplication(configuration))
-                .register(configuration);
+                .register(configuration)
+                .register(MonitoringHealthResource.class);
         if (userPass != null) {
-            resourceConfig.register(new AuthFilter(userPass));
+            resourceConfig.register(new AuthFilter(userPass, "/health"));
         }
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);

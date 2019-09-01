@@ -17,7 +17,8 @@ public class AuthFilter implements ContainerRequestFilter {
      * means that the credentials has to be sent by the client already with the first request (causing it not to work with browsers).
      *
      * @param userPass        User and password expected for basic auth in format user:pass
-     * @param excludePatterns Regular expressions of URL patterns which should not be protected (e.g. /health or /running)
+     * @param excludePatterns Regular expressions of URL patterns which should not be protected (e.g. /health or /running).
+     *                          The leading slash is not part of the path. To exclude /health, this regular expression works: <code>^health$</code>.
      */
     public AuthFilter(final String userPass, final String... excludePatterns) {
         this.userPass = userPass;
@@ -26,7 +27,7 @@ public class AuthFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(final ContainerRequestContext requestContext) {
-        if(!requestPathExcludedFromAuth(requestContext.getUriInfo().getPath())) {
+        if (!requestPathExcludedFromAuth(requestContext.getUriInfo().getPath())) {
             String auth = requestContext.getHeaderString("authorization");
             if (auth == null || !decodeBasicAuth(auth).equals(userPass)) {
                 requestContext.abortWith(Response.status(Response.Status.FORBIDDEN).build());

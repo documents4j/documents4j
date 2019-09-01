@@ -11,8 +11,10 @@ import javax.ws.rs.core.Response;
  * Provides an endpoint that returns it's health in form of HTTP status codes so that it can
  * be used by load balancers (e.g. in AWS) as health check.
  */
-@Path("/health")
+@Path(MonitoringHealthResource.PATH)
 public class MonitoringHealthResource {
+
+    public static final String PATH = "health";
 
     @Inject
     private IWebConverterConfiguration webConverterConfiguration;

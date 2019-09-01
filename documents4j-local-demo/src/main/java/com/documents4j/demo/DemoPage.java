@@ -38,7 +38,7 @@ public class DemoPage extends WebPage {
     private final FileUploadField fileUploadField;
     private final DropDownChoice<DocumentType> sourceFormat, targetFormat;
 
-    public DemoPage(final PageParameters parameters) {
+    public DemoPage(PageParameters parameters) {
         super(parameters);
 
         add(new ColoredFeedbackPanel("feedback"));

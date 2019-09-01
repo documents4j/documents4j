@@ -16,10 +16,11 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -245,7 +246,9 @@ public class ConverterServerBuilder {
                 .register(MonitoringHealthResource.class)
                 .register(MonitoringRunningResource.class);
         if (userPass != null) {
-            resourceConfig.register(new AuthFilter(userPass, makePatternsFromPaths(MonitoringHealthResource.PATH, MonitoringRunningResource.PATH)));
+            resourceConfig.register(new AuthFilter(userPass, Stream.of(MonitoringHealthResource.PATH, MonitoringRunningResource.PATH)
+                    .map(pattern -> "^" + pattern + "$")
+                    .collect(Collectors.toSet())));
         }
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
@@ -253,10 +256,6 @@ public class ConverterServerBuilder {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig,
                     true, new SSLEngineConfigurator(sslContext).setClientMode(false));
         }
-    }
-
-    private String[] makePatternsFromPaths(final String... paths) {
-        return Arrays.stream(paths).map(s -> "^" + s + "$").toArray(String[]::new);
     }
 
     private StandaloneWebConverterConfiguration makeConfiguration() {

@@ -17,15 +17,19 @@ import static org.mockito.Mockito.when;
 public class AuthFilterTest {
 
     private ContainerRequestContext containerRequestContext;
+    private UriInfo uriInfo;
 
     @Before
     public void setUp() {
         containerRequestContext = mock(ContainerRequestContext.class);
+        uriInfo = mock(UriInfo.class);
     }
 
     @Test
     public void assureStatus403_withBasicAuth_noAuthGivenInRequest() {
         final AuthFilter authFilter = new AuthFilter("user:pass");
+        when(uriInfo.getPath()).thenReturn("/");
+        when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
 
         authFilter.filter(containerRequestContext);
 
@@ -38,6 +42,8 @@ public class AuthFilterTest {
         when(containerRequestContext.getHeaderString("authorization")).thenReturn(
                 "Basic " + new String(Base64.getEncoder().encode("user:incorrectpass".getBytes()))
         );
+        when(uriInfo.getPath()).thenReturn("/");
+        when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
 
         authFilter.filter(containerRequestContext);
 
@@ -50,6 +56,8 @@ public class AuthFilterTest {
         when(containerRequestContext.getHeaderString("authorization")).thenReturn(
                 "Basic " + new String(Base64.getEncoder().encode("user:pass".getBytes()))
         );
+        when(uriInfo.getPath()).thenReturn("/");
+        when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
 
         authFilter.filter(containerRequestContext);
 
@@ -58,9 +66,8 @@ public class AuthFilterTest {
 
     @Test
     public void assureStatusOk_withBasicAuth_exludedEndpointCalled_withExcludePatterns_noAuthGiven() {
-        final AuthFilter authFilter = new AuthFilter("user:pass", "/hea[lth]{3}.*");
-        final UriInfo uriInfo = mock(UriInfo.class);
-        when(uriInfo.getPath()).thenReturn("/health");
+        final AuthFilter authFilter = new AuthFilter("user:pass", "^health$");
+        when(uriInfo.getPath()).thenReturn("health");
         when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
 
         authFilter.filter(containerRequestContext);
@@ -70,8 +77,7 @@ public class AuthFilterTest {
 
     @Test
     public void assureStatus403_withBasicAuth_protectedEndpointCalled_withExcludePatterns_noAuthGiven() {
-        final AuthFilter authFilter = new AuthFilter("user:pass", "/hea[lth]{3}.*");
-        final UriInfo uriInfo = mock(UriInfo.class);
+        final AuthFilter authFilter = new AuthFilter("user:pass", "^health$");
         when(uriInfo.getPath()).thenReturn("/");
         when(containerRequestContext.getUriInfo()).thenReturn(uriInfo);
 

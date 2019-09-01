@@ -6,6 +6,8 @@ import com.documents4j.server.auth.AuthFilter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
 import com.documents4j.ws.application.WebConverterApplication;
+import com.documents4j.ws.endpoint.MonitoringHealthResource;
+import com.documents4j.ws.endpoint.MonitoringRunningResource;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
@@ -14,6 +16,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -238,9 +241,11 @@ public class ConverterServerBuilder {
         // and directly in order to trigger life cycle methods on the deployment container.
         ResourceConfig resourceConfig = ResourceConfig
                 .forApplication(new WebConverterApplication(configuration))
-                .register(configuration);
+                .register(configuration)
+                .register(MonitoringHealthResource.class)
+                .register(MonitoringRunningResource.class);
         if (userPass != null) {
-            resourceConfig.register(new AuthFilter(userPass));
+            resourceConfig.register(new AuthFilter(userPass, makePatternsFromPaths(MonitoringHealthResource.PATH, MonitoringRunningResource.PATH)));
         }
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);
@@ -248,6 +253,10 @@ public class ConverterServerBuilder {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig,
                     true, new SSLEngineConfigurator(sslContext).setClientMode(false));
         }
+    }
+
+    private String[] makePatternsFromPaths(final String... paths) {
+        return Arrays.stream(paths).map(s -> "^" + s + "$").toArray(String[]::new);
     }
 
     private StandaloneWebConverterConfiguration makeConfiguration() {

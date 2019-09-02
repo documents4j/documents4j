@@ -200,7 +200,7 @@ The standalone server comes with two monitoring endpoints:
 * Health endpoint under `/health` returning `200 OK` if the converter server is operational and `500 Internal Server Error` otherwise
 * Running endpoint under `/running` returning always `200 OK`
 
-Both endpoints are always unprotected, even if the documents4j runs with basic authentication.
+Both endpoints are always unprotected, even if the standalone documents4j server runs with basic authentication.
 
 Troubleshooting
 ---------------

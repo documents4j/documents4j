@@ -140,7 +140,7 @@ While `yourPassword` can be any chosen password, but is required.
 
 #### Authentication ####
 
-The server can be started with basic authentication support with `-auth user:pass`.
+The standalone server can be started with basic authentication support with `-auth user:pass`.
 
 Aggregating converter
 ----------------
@@ -195,9 +195,12 @@ All logging is delegated to the [SLF4J](http://www.slf4j.org) facade and can the
 Monitoring
 ----------
 
-There is a monitoring endpoint `/health` returning `200 OK` if the converter server is operational and `500 Internal Server Error` otherwise.
+The standalone server comes with two monitoring endpoints:
 
-This allows load balancers only able to check simple health requests and HTTP status codes (e.g. AWS Load balancer) to decide if this server is healthy or not.
+* Health endpoint under `/health` returning `200 OK` if the converter server is operational and `500 Internal Server Error` otherwise
+* Running endpoint under `/running` returning always `200 OK`
+
+Both endpoints are always unprotected, even if the documents4j runs with basic authentication.
 
 Troubleshooting
 ---------------
@@ -238,16 +241,15 @@ Windows service - troubleshooting
 --------------------------
 
 1. For those that are experiencing requests jammed by a MS Office window reporting that some previous conversion failed, you can use MS bat script to looking for those windows and close them by script over Windows' Task Scheduler. First create a .bat file with these commands and add it to new task to run every minute (yes, every minute):
-```
-taskkill /F /FI "WindowTitle eq Microsoft Word*"
-taskkill /F /FI "WindowTitle eq Microsoft Office*"
-```
+    ```
+    taskkill /F /FI "WindowTitle eq Microsoft Word*"
+    taskkill /F /FI "WindowTitle eq Microsoft Office*"
+    ```
 2. For those that are experiencing multiples instances of msword and wsscript on task manager, all of them as zombies, you can use MS bat script to kill them by script over Windows' Task Scheduler. First create a .bat file with these commands, then, add it to new task to run every day at 6AM (for instance). Attention! Current conversions will fail when this script been triggered, so, choose an idle time for your application:
-
-```
-taskkill /f /t /im wscript.exe
-taskkill /f /t /im winword.exe
-```
+    ```
+    taskkill /f /t /im wscript.exe
+    taskkill /f /t /im winword.exe
+    ```
 
 Building the project
 --------------------

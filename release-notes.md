@@ -1,6 +1,14 @@
 documents4j release notes
 -------------------------
 
+### 2. September 2019: Version 1.1.0
+
+- Add monitoring endpoints.
+- Make Java 11 compatible and increase to Java 11.
+- Update dependencies.
+- Allow for SSL and basic auth.
+- Allow running standalone server without using system in.
+
 ### 23. December 2016: Version 1.0.3
 
 Fixed escaping when using the converter in folders with spaces and fixed a command line bug caused by SSL inclusion.

@@ -225,7 +225,6 @@ public class ConverterServerBuilder {
      * @return This builder.
      */
     public ConverterServerBuilder serviceMode(boolean serviceMode) {
-        checkNotNull(sslContext);
         this.serviceMode = serviceMode;
         return this;
     }

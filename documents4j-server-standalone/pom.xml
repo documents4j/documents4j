@@ -96,7 +96,7 @@
 
     <profiles>
         <profile>
-            <id>extras</id>
+            <id>shaded-jar</id>
             <build>
                 <plugins>
                     <!-- Shade plugin: Allow all dependencies to be packed into a single jar file -->

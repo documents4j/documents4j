@@ -262,7 +262,7 @@ mvn package -Pms-office
  
 When you are testing native converters such as the `MicrosoftWordBridge` or the `MicrosoftExcelBridge`, do not forget to keep an eye on your task manager. Consider an alternative to the default task manager such as [Process Explorer](http://technet.microsoft.com/en-us/sysinternals/bb896653.aspx) for debugging purposes. For monitoring network connections, I recommend [TCPView](http://technet.microsoft.com/de-de/sysinternals/bb897437.aspx). 
 
-Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar for the standalone server are only executed when the corresponding profile `extras` is active.
+Several time consuming operations such as building source code and javadoc artifacts as well as building the shaded jar for the standalone server are only executed when the corresponding Maven profiles `shaded-jar`, `source` or `javadoc` are active.
 
 [![Build Status](https://travis-ci.org/documents4j/documents4j.svg)](https://travis-ci.org/documents4j/documents4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j)

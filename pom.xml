@@ -39,7 +39,7 @@
 
      Profile summary:
       (1) ms-office: Runs tests that require MS Word and MS Excel installed on MS Windows.
-      (2) extras: Creates additional artifacts, including a shaded jar for the standalone conversion server and standalone client
+      (2) shaded-jar: Build a shaded jar for the standalone conversion server and standalone client
       (3) javadoc: build javadoc
       (4) source: build source jar
       (5) checks: Perform additional source code checks (activated by default).
@@ -311,7 +311,7 @@
                 <version>${version.maven.release-plugin}</version>
                 <configuration>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>extras</releaseProfiles>
+                    <releaseProfiles>shaded-jar,javadoc,source</releaseProfiles>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <tagNameFormat>documents4j-@{project.version}</tagNameFormat>
                 </configuration>
@@ -362,7 +362,7 @@
                     <version>${version.maven.release-plugin}</version>
                     <configuration>
                         <useReleaseProfile>false</useReleaseProfile>
-                        <releaseProfiles>extras</releaseProfiles>
+                        <releaseProfiles>shaded-jar,javadoc,source</releaseProfiles>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                     </configuration>
                 </plugin>
@@ -372,7 +372,7 @@
 
     <profiles>
         <profile>
-            <id>extras</id>
+            <id>source</id>
             <build>
                 <plugins>
                     <!-- Create source artifacts -->
@@ -389,7 +389,14 @@
                             </execution>
                         </executions>
                     </plugin>
-                    
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>javadoc</id>
+            <build>
+                <plugins>
                     <!-- Create javadoc artifacts -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

@@ -1,6 +1,10 @@
 documents4j release notes
 -------------------------
 
+### 4. September 2019: Version 1.1.1
+
+- Fixes an invalid input validation.
+
 ### 2. September 2019: Version 1.1.0
 
 - Add monitoring endpoints.

@@ -28,6 +28,7 @@ import static com.documents4j.api.DocumentType.Value.*;
                 APPLICATION + "/" + RTF,
                 APPLICATION + "/" + XML,
                 APPLICATION + "/" + MHTML,
+                APPLICATION + "/" + HTMLW,
                 TEXT + "/" + HTML,
                 TEXT + "/" + PLAIN})
 public class MicrosoftWordBridge extends AbstractMicrosoftOfficeBridge {

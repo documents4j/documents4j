@@ -14,6 +14,7 @@ enum MicrosoftExcelFormat implements MicrosoftOfficeFormat {
     ODS("60", "ods", DocumentType.ODS),
     CSV("6", "csv", DocumentType.CSV),
     XML("46", "xml", DocumentType.XML),
+    HTMLE("44", "htm", DocumentType.HTMLE),
     TEXT("42", "txt", DocumentType.TEXT);
 
     private final String value;

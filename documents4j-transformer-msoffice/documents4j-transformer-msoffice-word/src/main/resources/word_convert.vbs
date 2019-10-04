@@ -4,9 +4,59 @@ Const WdExportFormatPDF = 17
 Const MagicFormatPDFA = 999
 Const MagicFormatFilteredHTML = 10
 Const msoEncodingUTF8 = 65001
+Const HtmFormat = 8
 
 Dim arguments
 Set arguments = WScript.Arguments
+
+Function Zip(Outfile)
+  'This script is provided under the Creative Commons license located
+  'at http://creativecommons.org/licenses/by-nc/2.5/ . It may not
+  'be used for commercial purposes with out the expressed written consent
+  'of NateRice.com
+	Dim outputfilename
+	Dim outputfoldername
+	Dim outputzipfile
+  Set oFSO = WScript.CreateObject("Scripting.FileSystemObject")
+  Set oShell = WScript.CreateObject("Wscript.Shell")
+
+  '--------Find Working Directory--------
+  aScriptFilename = Split(Wscript.ScriptFullName, "\")
+  sScriptFilename = aScriptFileName(Ubound(aScriptFilename))
+  sWorkingDirectory = Replace(Wscript.ScriptFullName, sScriptFilename, "")
+  '--------------------------------------
+
+  '-------Ensure we can find 7z.exe------
+  If oFSO.FileExists(sWorkingDirectory & "\" & "7z.exe") Then
+    s7zLocation = ""
+  ElseIf oFSO.FileExists("C:\Program Files\7-Zip\7z.exe") Then
+    s7zLocation = "C:\Program Files\7-Zip\"
+  Else
+    Zip = "Error: Couldn't find 7z.exe"
+    Exit Function
+  End If
+  '--------------------------------------
+  outputfilename =   """" & Outfile &".htm" & """"
+  outputfoldername = """" & Outfile & ".files" & """"
+  outputzipfile = """" &Outfile &".zip" & """"
+  oShell.Run """" & s7zLocation & "7z.exe"" a  " & outputzipfile &" " _
+  &outputfoldername&" "& outputfilename, 0, True
+
+  
+  If oFSO.FileExists(Outfile &".htm") Then
+  	oFSO.DeleteFile (Outfile &".htm")
+  End IF
+  If oFSO.FolderExists(Outfile & ".files") Then 
+		oFSO.DeleteFolder(Outfile & ".files")
+	END IF
+	oFSO.MoveFile Outfile &".zip",Outfile &".htm"
+	
+  If oFSO.FileExists(Outfile) Then
+    Zip = 1
+  Else
+    Zip = "Error: Archive Creation Failed."
+  End If
+End Function
 
 ' Transforms a file using MS Word into the given format.
 Function ConvertFile( inputFile, outputFile, formatEnumeration )
@@ -56,12 +106,18 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
                                        False, _
                                        , , , , , , , , , , _
                                        True
+		wordDocument.Close WdDoNotSaveChanges                                       
+	ElseIf 	formatEnumeration = HtmFormat Then    
+		wordDocument.SaveAs outputFile, formatEnumeration
+		wordDocument.Close WdDoNotSaveChanges
+	  	Call Zip(outputFile) 
     Else
       wordDocument.SaveAs outputFile, formatEnumeration
+      wordDocument.Close WdDoNotSaveChanges
     End If
 
     ' Close the source document.
-    wordDocument.Close WdDoNotSaveChanges
+    
     If Err <> 0 Then
         WScript.Quit -3
     End If

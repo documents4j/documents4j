@@ -13,6 +13,7 @@ enum MicrosoftWordFormat implements MicrosoftOfficeFormat {
     DOC("0", "doc", DocumentType.DOC),
     RTF("6", "rtf", DocumentType.RTF),
     MHTML("9", "mht", DocumentType.MHTML),
+    HTMLW("8", "htm", DocumentType.HTMLW),
     FilteredHTML("10", "htm", DocumentType.HTML),
     XML("11", "xml", DocumentType.XML),
     TEXT("7", "txt", DocumentType.TEXT);

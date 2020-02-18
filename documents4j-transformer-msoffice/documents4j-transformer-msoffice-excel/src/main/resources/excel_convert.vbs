@@ -24,7 +24,6 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
   inputFile = fileSystemObject.GetAbsolutePathName(inputFile)
 
-  
   ' Convert the source file only if it exists.
   If fileSystemObject.FileExists(inputFile) Then
 

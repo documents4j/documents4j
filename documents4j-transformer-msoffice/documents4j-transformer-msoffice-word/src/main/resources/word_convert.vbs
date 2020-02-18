@@ -37,14 +37,16 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     Set wordDocument = wordApplication.Documents.Open(inputFile, _
                                                       False, _
                                                       True, _
-                                                      False)
+                                                      False, _
+                                                      "")
 
-    If Err <> 0 Then
-        WScript.Quit -2
+    ' We provided a password when opening to avoid any dialog. If the document cannot be opened due to it, its handle is empty.
+    If wordDocument = "" OR Err <> 0 Then
+      WScript.Quit -2
     End If
     On Error GoTo 0
 
-    if formatEnumeration = MagicFormatFilteredHTML Then
+    If formatEnumeration = MagicFormatFilteredHTML Then
       wordDocument.WebOptions.Encoding = msoEncodingUTF8
     End If
 
@@ -63,7 +65,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     ' Close the source document.
     wordDocument.Close WdDoNotSaveChanges
     If Err <> 0 Then
-        WScript.Quit -3
+      WScript.Quit -3
     End If
     On Error GoTo 0
 

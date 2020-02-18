@@ -28,11 +28,11 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   ' Convert the source file only if it exists.
   If fileSystemObject.FileExists(inputFile) Then
 
-    ' Attempt to open the source document.
+    ' Attempt to open the source document. We are using an empty password to suppress any dialog.
     On Error Resume Next
-    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, , , , , , , , , , , , 2)
-    If Err <> 0 Then
-        WScript.Quit -2
+    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, "", , , , , , , , , , , 2)
+    If excelDocument = "" OR Err <> 0 Then
+      WScript.Quit -2
     End If
     On Error GoTo 0
 
@@ -47,7 +47,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     ' Close the source document.
     excelDocument.Close False
     If Err <> 0 Then
-        WScript.Quit -3
+      WScript.Quit -3
     End If
     On Error GoTo 0
 

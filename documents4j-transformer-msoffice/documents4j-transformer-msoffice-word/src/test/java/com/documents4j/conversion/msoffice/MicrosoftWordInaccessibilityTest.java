@@ -1,6 +1,9 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.api.DocumentType;
+
+import java.io.File;
+
 import org.junit.BeforeClass;
 
 public class MicrosoftWordInaccessibilityTest extends AbstractMicrosoftOfficeInaccessibilityTest {
@@ -21,4 +24,10 @@ public class MicrosoftWordInaccessibilityTest extends AbstractMicrosoftOfficeIna
                 MicrosoftWordScript.ASSERTION,
                 MicrosoftWordScript.SHUTDOWN);
     }
+
+	@Override
+	public File getUserScript() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

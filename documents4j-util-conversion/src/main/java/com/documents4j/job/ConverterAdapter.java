@@ -56,30 +56,60 @@ public abstract class ConverterAdapter implements IConverter {
     }
 
     @Override
+    public IConversionJobWithSourceUnspecified convert(File source, File script) {
+        return convert(new FileSourceFromFile(source), new FileSourceFromFile(script));
+    }
+
+    @Override
+    public IConversionJobWithSourceUnspecified convert(InputStream source, InputStream script) {
+        return convert(source, script, DEFAULT_CLOSE_STREAM);
+    }
+
+    @Override
+    public IConversionJobWithSourceUnspecified convert(InputStream source, InputStream script, boolean close) {
+    	// TODO close applies to both inputstreams.  Control independently?
+        return convert(new InputStreamSourceFromInputStream(source, close), 
+        		new InputStreamSourceFromInputStream(script, close));
+    }
+
+    @Override
+    public IConversionJobWithSourceUnspecified convert(IFileSource source, IFileSource script) {
+        return convert(new InputStreamSourceFromFileSource(source), new InputStreamSourceFromFileSource(script));
+    }
+
+    @Override
+    public IConversionJobWithSourceUnspecified convert(IInputStreamSource source, IInputStreamSource script) {
+        return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()),
+        		new FileSourceFromInputStreamSource(script, makeTemporaryFile()));
+    }
+
+    @Override
     public IConversionJobWithSourceUnspecified convert(File source) {
-        return convert(new FileSourceFromFile(source));
+        return convert(new FileSourceFromFile(source), null);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(InputStream source) {
-        return convert(source, DEFAULT_CLOSE_STREAM);
+        return convert(source, null, DEFAULT_CLOSE_STREAM);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(InputStream source, boolean close) {
-        return convert(new InputStreamSourceFromInputStream(source, close));
+        return convert(new InputStreamSourceFromInputStream(source, close), 
+        		null);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(IFileSource source) {
-        return convert(new InputStreamSourceFromFileSource(source));
+        return convert(new InputStreamSourceFromFileSource(source), null);
     }
 
     @Override
     public IConversionJobWithSourceUnspecified convert(IInputStreamSource source) {
-        return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()));
+        return convert(new FileSourceFromInputStreamSource(source, makeTemporaryFile()),
+        		null);
     }
-
+    
     protected File makeTemporaryFile() {
         return makeTemporaryFile(NO_EXTENSION);
     }
@@ -134,4 +164,5 @@ public abstract class ConverterAdapter implements IConverter {
             shutDown();
         }
     }
+
 }

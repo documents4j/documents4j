@@ -60,7 +60,7 @@ public class ExternalConverterDiscoveryTest {
     public static class IllegalConverter implements IExternalConverter {
 
         @Override
-        public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetType) {
+        public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetType, File script) {
             throw new AssertionError();
         }
 

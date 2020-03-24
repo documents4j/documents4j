@@ -25,6 +25,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
                                       File target,
                                       IFileConsumer callback,
                                       DocumentType targetFormat,
+                                      IFileSource script,
                                       int priority) {
         super(priority);
         this.conversionManager = conversionManager;
@@ -33,6 +34,7 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
         this.target = target;
         this.callback = callback;
         this.targetFormat = targetFormat;
+        this.script = script;
     }
 
     @Override
@@ -45,9 +47,22 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
         source.onConsumed(fetchedSource);
     }
 
+    
+    private IFileSource script; 
+	@Override
+	protected File fetchScript() {
+		if (script==null) {
+			return null;
+		} else {
+			return script.getFile();
+		}
+	}
+    
     @Override
-    protected LocalConversionContext startConversion(File fetchedSource) {
-        return new LocalConversionContext(conversionManager.startConversion(fetchedSource, sourceFormat, target, targetFormat));
+    protected LocalConversionContext startConversion(File fetchedSource, File script) {
+    	
+        return new LocalConversionContext(
+        		conversionManager.startConversion(fetchedSource, sourceFormat, target, targetFormat, script));
     }
 
     @Override
@@ -75,4 +90,5 @@ class LocalFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityFu
                 .add("file-system-target", target)
                 .toString();
     }
+
 }

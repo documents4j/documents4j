@@ -1,5 +1,6 @@
 package com.documents4j.job;
 
+import java.io.File;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,11 +32,17 @@ class StubbedFutureWrappingPriorityFuture extends AbstractFutureWrappingPriority
         onSourceConsumed.incrementAndGet();
     }
 
-    @Override
-    protected IConversionContext startConversion(Void fetchedSource) {
+	@Override
+	protected IConversionContext startConversion(Void fetchedSource, File script) {
         startConversion.incrementAndGet();
         return conversionContext;
-    }
+	}
+
+//    @Override
+//    protected IConversionContext startConversion(Void fetchedSource) {
+//        startConversion.incrementAndGet();
+//        return conversionContext;
+//    }
 
     @Override
     protected void onConversionFinished(IConversionContext conversionContext) throws Exception {
@@ -92,4 +99,11 @@ class StubbedFutureWrappingPriorityFuture extends AbstractFutureWrappingPriority
             return future;
         }
     }
+
+	@Override
+	protected File fetchScript() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

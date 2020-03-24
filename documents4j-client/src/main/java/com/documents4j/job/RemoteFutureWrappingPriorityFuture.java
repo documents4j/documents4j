@@ -9,6 +9,8 @@ import com.google.common.base.MoreObjects;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+
+import java.io.File;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -52,13 +54,18 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
     }
 
     @Override
-    protected RemoteConversionContext startConversion(InputStream fetchedSource) {
+    protected RemoteConversionContext startConversion(InputStream fetchedSource, File script) {
+    	
+    	// TODO handle script
+    	
         return new RemoteConversionContext(webTarget
                 .path(ConverterNetworkProtocol.RESOURCE_PATH)
                 .request(targetFormat.toString())
                 .header(ConverterNetworkProtocol.HEADER_JOB_PRIORITY, getPriority().getValue())
                 .async()
-                .post(Entity.entity(new ConsumeOnCloseInputStream(this, fetchedSource), sourceFormat.toString())));
+                .post(Entity.entity(
+                		new ConsumeOnCloseInputStream(this, fetchedSource), 
+                		sourceFormat.toString())));
     }
 
     @Override
@@ -92,4 +99,11 @@ class RemoteFutureWrappingPriorityFuture extends AbstractFutureWrappingPriorityF
                 .add("web-target", webTarget.getUri())
                 .toString();
     }
+
+	@Override
+	protected File fetchScript() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

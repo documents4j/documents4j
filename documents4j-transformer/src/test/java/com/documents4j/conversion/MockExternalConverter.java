@@ -31,8 +31,8 @@ public class MockExternalConverter implements IExternalConverter {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
-        return delegate.startConversion(source, sourceFormat, target, targetFormat);
+    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat, File script) {
+        return delegate.startConversion(source, sourceFormat, target, targetFormat, script);
     }
 
     public IExternalConverter getDelegate() {

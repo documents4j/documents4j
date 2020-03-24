@@ -22,7 +22,7 @@ public abstract class AbstractMicrosoftOfficeInaccessibilityTest extends Abstrac
         getAssertionEngine().kill();
         assertTrue(otherFolder.delete());
         File target = makeTarget(false);
-        assertEquals(getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
+        assertEquals(getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType(), null)
                         .getFuture().get().getExitValue(),
                 ExternalConverterScriptResult.CONVERTER_INACCESSIBLE.getExitValue().intValue());
         assertFalse(target.exists());

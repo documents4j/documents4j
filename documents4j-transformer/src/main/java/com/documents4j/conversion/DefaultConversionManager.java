@@ -26,8 +26,10 @@ public class DefaultConversionManager implements IConversionManager {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
-        return converterRegistry.lookup(sourceFormat, targetFormat).startConversion(source, sourceFormat, target, targetFormat);
+    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat,
+    		File script) {
+    	IExternalConverter externalConverter = converterRegistry.lookup(sourceFormat, targetFormat);
+        return externalConverter.startConversion(source, sourceFormat, target, targetFormat, script);
     }
 
     @Override

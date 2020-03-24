@@ -5,6 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -40,4 +41,14 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
     public static void setUpConverter() throws Exception {
         AbstractMicrosoftOfficeConversionTest.setUp(MicrosoftExcelBridge.class, MicrosoftExcelScript.ASSERTION, MicrosoftExcelScript.SHUTDOWN);
     }
+    
+	@Override
+	public File getUserScript() {
+		
+		// Its OK to use the standard script here
+		MicrosoftOfficeScript script = MicrosoftExcelScript.CONVERSION;
+		return script.materializeIn(getFileFolder());
+		
+	}
+    
 }

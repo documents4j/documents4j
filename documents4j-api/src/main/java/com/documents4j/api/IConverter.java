@@ -71,6 +71,55 @@ public interface IConverter {
      * @return The current conversion specification.
      */
     IConversionJobWithSourceUnspecified convert(IFileSource source);
+        
+    /**
+     * Converts a source that is represented as a {@link InputStream}. The input stream will
+     * be closed after the conversion is complete.
+     *
+     * @param source The conversion input as an input stream.
+     * @param script The conversion script as an input stream.
+     * @return The current conversion specification.
+     */
+    IConversionJobWithSourceUnspecified convert(InputStream source, InputStream script);
+
+    /**
+     * Converts a source that is represented as a {@link InputStream}.
+     *
+     * @param source The conversion input as an input stream.
+     * @param script The conversion script as an input stream.
+     * @param close  Whether the {@link InputStream} is closed after the conversion terminates.
+     * @return The current conversion specification.
+     */
+    IConversionJobWithSourceUnspecified convert(InputStream source, InputStream script, boolean close);
+
+    /**
+     * Invokes a callback for the dynamic generation of a input stream source which is additionally
+     * informed about the consumption of this source.
+     *
+     * @param source The input stream source generator.
+     * @param script The conversion script as an input stream source generator.
+     * @return The current conversion specification.
+     */
+    IConversionJobWithSourceUnspecified convert(IInputStreamSource source, IInputStreamSource script);
+
+    /**
+     * Converts a source file that is stored on the local file system.
+     *
+     * @param source The conversion input as a file.
+     * @param script The conversion script as a file.
+     * @return The current conversion specification.
+     */
+    IConversionJobWithSourceUnspecified convert(File source, File script);
+
+    /**
+     * Invokes a callback for the dynamic generation of a file source which is additionally informed
+     * about the consumption of a source.
+     *
+     * @param source The file source generator.
+     * @param script The conversion script as a file source.
+     * @return The current conversion specification.
+     */
+    IConversionJobWithSourceUnspecified convert(IFileSource source, IFileSource script);
 
     /**
      * Returns a mapping of all conversions that are supported by the backing conversion engine.

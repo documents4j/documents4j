@@ -16,14 +16,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
 
-public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAssertingTest {
+public abstract class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAssertingTest {
 
     private static File externalConverterDirectory;
     private static AbstractMicrosoftOfficeBridge externalConverter;
     protected final DocumentTypeProvider documentTypeProvider;
     private AtomicInteger nameGenerator;
     private File files;
-    private Set<File> fileCopies;
+    protected Set<File> fileCopies;
 
     protected AbstractMicrosoftOfficeBasedTest(DocumentTypeProvider documentTypeProvider) {
         this.documentTypeProvider = documentTypeProvider;
@@ -143,4 +143,6 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
         }
         return target;
     }
+    
+    abstract public File getUserScript();
 }

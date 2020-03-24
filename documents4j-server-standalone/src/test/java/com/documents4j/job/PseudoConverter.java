@@ -19,7 +19,8 @@ public class PseudoConverter implements IExternalConverter {
     public Future<Boolean> startConversion(File source,
                                            DocumentType sourceFormat,
                                            File target,
-                                           DocumentType targetType) {
+                                           DocumentType targetType,
+                                           File script) {
         throw new AssertionError();
     }
 

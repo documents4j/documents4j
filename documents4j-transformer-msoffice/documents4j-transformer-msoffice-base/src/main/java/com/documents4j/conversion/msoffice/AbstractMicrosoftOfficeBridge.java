@@ -19,9 +19,10 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConverter {
 
-    private final File conversionScript;
+    private File conversionScript;
+    private File userScript;
 
-    protected AbstractMicrosoftOfficeBridge(File baseFolder,
+	protected AbstractMicrosoftOfficeBridge(File baseFolder,
                                             long processTimeout,
                                             TimeUnit processTimeoutUnit,
                                             MicrosoftOfficeScript conversionScript) {
@@ -42,6 +43,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                     .resolve();
         } finally {
             tryDelete(conversionScript);
+            if (userScript!=null) tryDelete(userScript);
         }
     }
 
@@ -55,18 +57,28 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
-        return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
+    public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType, File userScript) {
+    	//new Throwable().printStackTrace();
+    	if (userScript==null) {
+    		return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType, conversionScript));
+    	} else {
+    		this.userScript = userScript;
+    		return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType, userScript));    		
+    	}
     }
 
-    protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
+    protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType, File script) {
         getLogger().info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
+        
+        // For JUnit tests only, since entry point for these is not the startConversion method above
+        if (script==null) script = conversionScript;
+        
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
             return makePresetProcessExecutor()
                     .command("cmd", "/S", "/C",
-                            doubleQuote(conversionScript.getAbsolutePath(),
+                            doubleQuote(script.getAbsolutePath(),
                                     source.getAbsolutePath(),
                                     target.getAbsolutePath(),
                                     microsoftOfficeFormat.getValue()))
@@ -75,7 +87,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                     .start();
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' (%s) to '%s' (%s)",
-                    conversionScript, source, sourceType, target, targetType);
+                    script, source, sourceType, target, targetType);
             getLogger().error(message, e);
             throw new ConverterAccessException(message, e);
         }

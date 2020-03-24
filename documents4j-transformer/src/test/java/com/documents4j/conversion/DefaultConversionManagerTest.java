@@ -63,11 +63,12 @@ public class DefaultConversionManagerTest {
         conversionManager.startConversion(source,
                 SOURCE_FORMAT,
                 target,
-                TARGET_FORMAT);
+                TARGET_FORMAT,
+                null);
         conversionManager.shutDown();
 
         MockExternalConverter bridge = extractConverter(conversionManager);
-        verify(bridge.getDelegate()).startConversion(source, SOURCE_FORMAT, target, TARGET_FORMAT);
+        verify(bridge.getDelegate()).startConversion(source, SOURCE_FORMAT, target, TARGET_FORMAT, null);
         verify(bridge.getDelegate()).shutDown();
         verifyNoMoreInteractions(bridge.getDelegate());
     }

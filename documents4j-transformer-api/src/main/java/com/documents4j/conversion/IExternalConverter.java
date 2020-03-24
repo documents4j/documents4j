@@ -17,10 +17,11 @@ public interface IExternalConverter {
      * @param sourceFormat The file format of the source file.
      * @param target       The target file to which the converted file should be saved.
      * @param targetFormat The file format of the target file.
+     * @param script       A specific script to use for the conversion (can be null).
      * @return A future that represents a pending conversion where the enclosed {@code boolean} represents the
      * conversion's success.
      */
-    Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat);
+    Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat, File script);
 
     /**
      * Checks if this converter back-end is operational.

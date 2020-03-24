@@ -41,37 +41,44 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         getAssertionEngine().assertRunning();
     }
 
-    private void testConversionValid(File source, File target) throws Exception {
+    private void testConversionValid(File source, File target, File script) throws Exception {
         assertTrue(source.exists());
         assertFalse(target.exists());
-        StartedProcess conversion = getOfficeBridge().doStartConversion(source, getSourceDocumentType(), target, getTargetDocumentType());
+        if (script!=null) fileCopies.add(script); // so it can be deleted
+        StartedProcess conversion = getOfficeBridge().doStartConversion(source, getSourceDocumentType(), target, getTargetDocumentType(), script);
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
                 conversion.getFuture().get().getExitValue());
         assertTrue(target.exists());
     }
 
+    @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
+    public void testConversionValidScriptSpecified() throws Exception {
+        testConversionValid(validSourceFile(true), makeTarget("target", true), this.getUserScript());
+    }
+
+    
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT * CONVERSION_INVOCATIONS)
     public void testConversionValidRepeated() throws Exception {
         // Check if the script can be run several times.
         for (int i = 0; i < CONVERSION_INVOCATIONS; i++) {
-            testConversionValid(validSourceFile(true), makeTarget(true));
+            testConversionValid(validSourceFile(true), makeTarget(true), null);
         }
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidTargetOtherFileExtension() throws Exception {
-        testConversionValid(validSourceFile(true), makeTarget("target.file", true));
+        testConversionValid(validSourceFile(true), makeTarget("target.file", true), null);
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidTargetNoFileExtension() throws Exception {
-        testConversionValid(validSourceFile(true), makeTarget("target", true));
+        testConversionValid(validSourceFile(true), makeTarget("target", true), null);
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
     public void testConversionValidTargetContainsSpace() throws Exception {
-        testConversionValid(validSourceFile(true, true), makeTarget("target space." + documentTypeProvider.getTargetFileNameSuffix(), true));
+        testConversionValid(validSourceFile(true, true), makeTarget("target space." + documentTypeProvider.getTargetFileNameSuffix(), true), null);
     }
 
     @Test(timeout = DEFAULT_CONVERSION_TIMEOUT)
@@ -80,7 +87,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         assertFalse(source.exists());
         assertTrue(validSourceFile(false).renameTo(source));
         try {
-            testConversionValid(source, makeTarget(true));
+            testConversionValid(source, makeTarget(true), null);
         } finally {
             assertTrue(source.delete());
         }
@@ -92,7 +99,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         assertFalse(source.exists());
         assertTrue(validSourceFile(false).renameTo(source));
         try {
-            testConversionValid(source, makeTarget(true));
+            testConversionValid(source, makeTarget(true), null);
         } finally {
             assertTrue(source.delete());
         }
@@ -124,7 +131,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         }
         File target = makeTarget(false);
         StartedProcess conversion = getOfficeBridge()
-                .doStartConversion(corruptSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType());
+                .doStartConversion(corruptSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType(), null);
         assertEquals(
                 ExternalConverterScriptResult.ILLEGAL_INPUT.getExitValue().intValue(),
                 conversion.getFuture().get().getExitValue());
@@ -135,7 +142,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
     public void testConversionInexistent() throws Exception {
         File target = makeTarget(false);
         StartedProcess conversion = getOfficeBridge()
-                .doStartConversion(inexistentSourceFile(), getSourceDocumentType(), target, getTargetDocumentType());
+                .doStartConversion(inexistentSourceFile(), getSourceDocumentType(), target, getTargetDocumentType(), null);
         assertEquals(
                 ExternalConverterScriptResult.INPUT_NOT_FOUND.getExitValue().intValue(),
                 conversion.getFuture().get().getExitValue());
@@ -153,7 +160,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         fileOutputStream.close();
         assertEquals(
                 ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
+                getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType(), null)
                         .getFuture().get().getExitValue());
     }
 
@@ -168,7 +175,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         try {
             assertEquals(
                     ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue().intValue(),
-                    getOfficeBridge().doStartConversion(source, getSourceDocumentType(), makeTarget(true), getTargetDocumentType())
+                    getOfficeBridge().doStartConversion(source, getSourceDocumentType(), makeTarget(true), getTargetDocumentType(), null)
                             .getFuture().get().getExitValue());
         } finally {
             fileInputStream.close();
@@ -184,7 +191,7 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         try {
             assertEquals(
                     ExternalConverterScriptResult.TARGET_INACCESSIBLE.getExitValue().intValue(),
-                    getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType())
+                    getOfficeBridge().doStartConversion(validSourceFile(true), getSourceDocumentType(), target, getTargetDocumentType(), null)
                             .getFuture().get().getExitValue());
         } finally {
             fileOutputStream.close();
@@ -196,11 +203,13 @@ public abstract class AbstractMicrosoftOfficeConversionTest extends AbstractMicr
         @Override
         public void run() {
             try {
-                testConversionValid(validSourceFile(true), makeTarget(true));
+                testConversionValid(validSourceFile(true), makeTarget(true), null);
             } catch (Exception e) {
                 e.printStackTrace();
                 throw new AssertionError();
             }
         }
     }
+    
+    
 }

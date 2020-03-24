@@ -5,6 +5,7 @@ import com.documents4j.throwables.ConverterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.concurrent.*;
 
 abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionContext>
@@ -67,7 +68,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
                     if (underlyingFuture.isCancelled()) {
                         return;
                     }
-                    conversionContext = startConversion(source);
+                    conversionContext = startConversion(source, fetchScript());
                     logger.trace("Context fetched for source {}: {}", source, conversionContext);
                     underlyingFuture = conversionFuture = conversionContext.asFuture();
                     logger.trace("Underlying future created for source {}: {}", source, conversionFuture);
@@ -178,10 +179,15 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
     }
 
     protected abstract T fetchSource();
+    protected abstract File fetchScript();
 
     protected abstract void onSourceConsumed(T fetchedSource);
 
-    protected abstract S startConversion(T fetchedSource);
+    protected abstract S startConversion(T fetchedSource, File script);
+
+    protected S startConversion(T fetchedSource) {
+    	return startConversion(fetchedSource, null);
+    }
 
     protected abstract void onConversionFinished(S conversionContext) throws Exception;
 

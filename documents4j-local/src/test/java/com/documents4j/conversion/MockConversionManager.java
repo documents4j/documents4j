@@ -39,7 +39,7 @@ public abstract class MockConversionManager implements IConversionManager {
     }
 
     @Override
-    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat) {
+    public Future<Boolean> startConversion(File source, DocumentType sourceFormat, File target, DocumentType targetFormat, File script) {
         if (!sourceFormat.equals(AbstractConverterTest.MOCK_INPUT_TYPE) || !targetFormat.equals(AbstractConverterTest.MOCK_RESPONSE_TYPE)) {
             return MockResult.indicating(new ConversionFormatException("Unknown input/output format conversion"));
         }

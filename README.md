@@ -39,7 +39,7 @@ The `LocalConverter` implementation of `IConverter` performs conversions by conv
 
 ```java
 IConverter converter = LocalConverter.builder()
-                           .baseFolder(new File("C:\Users\documents4j\temp"));
+                           .baseFolder(new File("C:\Users\documents4j\temp"))
                            .workerPool(20, 25, 2, TimeUnit.SECONDS)
                            .processTimeout(5, TimeUnit.SECONDS)
                            .build();
@@ -90,10 +90,10 @@ A `RemoteConverter` is created fairly similar to a `LocalConverter` by using ano
 
 ```java
 IConverter converter = RemoteConverter.builder()
-                           .baseFolder(new File("C:\Users\documents4j\temp"));
+                           .baseFolder(new File("C:\Users\documents4j\temp"))
                            .workerPool(20, 25, 2, TimeUnit.SECONDS)
                            .requestTimeout(10, TimeUnit.SECONDS)
-                           .baseUri("http://localhost:9998");
+                           .baseUri("http://localhost:9998")
                            .build();
 ```
 

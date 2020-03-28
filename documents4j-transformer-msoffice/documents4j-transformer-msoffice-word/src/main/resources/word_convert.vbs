@@ -34,11 +34,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     On Error Resume Next
 
     ' Open: See https://msdn.microsoft.com/en-us/library/office/ff835182.aspx
-    Set wordDocument = wordApplication.Documents.Open(inputFile, _
-                                                      False, _
-                                                      True, _
-                                                      False, _
-                                                      "")
+    Set wordDocument = wordApplication.Documents.Open(inputFile, False, , False, "dummy-password-to-avoid-lock")
 
     ' We provided a password when opening to avoid any dialog. If the document cannot be opened due to it, its handle is empty.
     If wordDocument = "" OR Err <> 0 Then
@@ -53,11 +49,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
     On Error Resume Next
     If formatEnumeration = MagicFormatPDFA Then
-      wordDocument.ExportAsFixedFormat outputFile, _
-                                       WdExportFormatPDF, _
-                                       False, _
-                                       , , , , , , , , , , _
-                                       True
+      wordDocument.ExportAsFixedFormat outputFile, WdExportFormatPDF, False, , , , , , , , , , , True
     Else
       wordDocument.SaveAs outputFile, formatEnumeration
     End If

@@ -1,6 +1,10 @@
 documents4j release notes
 -------------------------
 
+### 28. Mars 2020: Version 1.1.2
+
+- Avoid freeze if Word or Excel document is password protected.
+
 ### 4. September 2019: Version 1.1.1
 
 - Fixes an invalid input validation.

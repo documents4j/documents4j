@@ -48,7 +48,12 @@ enum MicrosoftWordScript implements MicrosoftOfficeScript {
             if (!script.createNewFile()) {
                 throw new IOException(String.format("Could not create file %s", script));
             }
-            Resources.asByteSource(Resources.getResource(getClass(), path)).copyTo(Files.asByteSink(script));
+            String override = System.getProperty("com.documents4j.conversion.msoffice." + path.substring(1));
+            if (override == null) {
+                Resources.asByteSource(Resources.getResource(getClass(), path)).copyTo(Files.asByteSink(script));
+            } else {
+                Files.asByteSource(new File(override)).copyTo(Files.asByteSink(script));
+            }
         } catch (IOException e) {
             String message = String.format("Could not copy script resource '%s' to local file system at '%s'", path, folder);
             LOGGER.error(message, e);

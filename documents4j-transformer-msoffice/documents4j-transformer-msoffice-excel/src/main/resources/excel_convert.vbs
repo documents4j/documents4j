@@ -29,8 +29,8 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Attempt to open the source document. We are using an empty password to suppress any dialog.
     On Error Resume Next
-    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, "dummy-password-to-avoid-lock", , , , , , , , , , , 2)
-    If excelDocument = "" OR Err <> 0 Then
+    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, ,"dummy-password-to-avoid-lock", , , , , , , , , , 2)
+    If Err <> 0 Then
       WScript.Quit -2
     End If
     On Error GoTo 0

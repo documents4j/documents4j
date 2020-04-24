@@ -1,7 +1,12 @@
 documents4j release notes
 -------------------------
 
-### 28. Mars 2020: Version 1.1.2
+### 28. Mars 2020: Version 1.1.3
+
+- Adjust script for Excel conversion to provide the pseudo-password as the right argument.
+- Introduce possibility to override scripts by setting `com.documents4j.conversion.msoffice`-prefixed system properties.
+
+### 28. Mars 202: Version 1.1.2
 
 - Avoid freeze if Word or Excel document is password protected.
 

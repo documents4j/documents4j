@@ -7,6 +7,7 @@ Set excelApplication = GetObject(, "Excel.Application")
 If Err = 0 Then
   WScript.Quit 3
 End If
+Err.clear
 
 ' Start MS Excel.
 Set excelApplication = CreateObject("Excel.Application")

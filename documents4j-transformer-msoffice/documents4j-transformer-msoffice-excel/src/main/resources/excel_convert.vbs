@@ -27,9 +27,9 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
   ' Convert the source file only if it exists.
   If fileSystemObject.FileExists(inputFile) Then
 
-    ' Attempt to open the source document. We are using an empty password to suppress any dialog.
+    ' Attempt to open the source document.
     On Error Resume Next
-    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, ,"dummy-password-to-avoid-lock", , , , , , , , , , 2)
+    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, , , , , , , , , , , , 2)
     If Err <> 0 Then
       WScript.Quit -2
     End If

@@ -1,6 +1,11 @@
 documents4j release notes
 -------------------------
 
+### 10. August 2020: Version 1.1.4
+
+- Remove pseudo-password from scripts since it causes breakage with several versions of MS Word and Excel.
+- Clear Word error on start if restarted.
+
 ### 28. Mars 2020: Version 1.1.3
 
 - Adjust script for Excel conversion to provide the pseudo-password as the right argument.

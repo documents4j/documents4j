@@ -29,7 +29,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Attempt to open the source document.
     On Error Resume Next
-    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True, , , , , , , , , , , , 2)
+    Set excelDocument = excelApplication.Workbooks.Open(inputFile, , True)
     If Err <> 0 Then
       WScript.Quit -2
     End If

@@ -36,7 +36,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     ' Open: See https://msdn.microsoft.com/en-us/library/office/ff835182.aspx
     Set wordDocument = wordApplication.Documents.Open(inputFile, False, True, False)
 
-    ' We provided a password when opening to avoid any dialog. If the document cannot be opened due to it, its handle is empty.
+    ' If the document cannot be opened due to it, its handle is empty.
     If wordDocument = "" OR Err <> 0 Then
       WScript.Quit -2
     End If

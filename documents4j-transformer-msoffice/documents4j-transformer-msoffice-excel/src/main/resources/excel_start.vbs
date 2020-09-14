@@ -14,7 +14,7 @@ Set excelApplication = CreateObject("Excel.Application")
 excelApplication.DisplayAlerts = False
 ' Add a workbook to keep open, otherwise Excel is shut down implicitly.
 excelApplication.Workbooks.Add
-If Err = 0 Then
+If Err <> 0 Then
   WScript.Quit -6
 End If
 

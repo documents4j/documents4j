@@ -11,7 +11,7 @@ Err.clear
 
 ' Start MS Word.
 Set wordApplication = CreateObject("Word.Application")
-If Err = 0 Then
+If Err <> 0 Then
   WScript.Quit -6
 End If
 

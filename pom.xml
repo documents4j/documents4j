@@ -89,7 +89,7 @@
         <version.javax.activation>1.1.1</version.javax.activation>
         <version.javax.jaxb>2.3.0</version.javax.jaxb>
         <version.jersey>2.29</version.jersey>
-        <version.guava>28.1-jre</version.guava>
+        <version.guava>29.0-jre</version.guava>
         <version.zt-exec>1.11</version.zt-exec>
         <version.jopt-simple>5.0.4</version.jopt-simple>
         <version.slf4j>1.7.28</version.slf4j>

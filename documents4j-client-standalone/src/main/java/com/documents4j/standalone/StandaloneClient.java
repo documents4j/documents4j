@@ -55,6 +55,8 @@ public class StandaloneClient {
         FILE_NAME_EXTENSIONS.put(DocumentType.XML, "xml");
         FILE_NAME_EXTENSIONS.put(DocumentType.TEXT, "txt");
         FILE_NAME_EXTENSIONS.put(DocumentType.CSV, "csv");
+        FILE_NAME_EXTENSIONS.put(DocumentType.PPT, "ppt");
+        FILE_NAME_EXTENSIONS.put(DocumentType.PPTX, "pptx");
     }
 
     private StandaloneClient() {

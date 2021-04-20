@@ -24,8 +24,6 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType MS_POWERPOINT = new DocumentType(Value.APPLICATION, Value.POWERPOINT_ANY);
     public static final DocumentType PPTX = new DocumentType(Value.APPLICATION, Value.PPTX);
     public static final DocumentType PPT = new DocumentType(Value.APPLICATION, Value.PPT);
-    public static final DocumentType OTP = new DocumentType(Value.APPLICATION, Value.OTP);
-    public static final DocumentType POTX = new DocumentType(Value.APPLICATION, Value.POTX);;
 
     private final String type;
 
@@ -123,8 +121,6 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
         public static final String PPT = "vnd.ms-powerpoint";
         public static final String PPTX = "vnd.openxmlformats-officedocument.presentationml.presentation";
         public static final String POWERPOINT_ANY = "vnd.com.documents4j.any-mspowerpoint";
-        public static final String POTX = "vnd.openxmlformats-officedocument.presentationml.template";
-        public static final String OTP = "vnd.oasis.opendocument.presentation-template";
 
         private Value() {
             throw new UnsupportedOperationException();

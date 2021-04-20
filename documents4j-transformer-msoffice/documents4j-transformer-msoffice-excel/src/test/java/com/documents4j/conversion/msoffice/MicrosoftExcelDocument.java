@@ -20,6 +20,10 @@ public enum MicrosoftExcelDocument implements Document {
     ODS_CORRUPT("/corrupt.ods"),
     ODS_INEXISTENT("/inexistent.ods"),
 
+    OTS_VALID("/valid.ots"),
+    OTS_CORRUPT("/corrupt.ots"),
+    OTS_INEXISTENT("/inexistent.ots"),
+
     CSV_VALID("/valid.csv"),
     CSV_CORRUPT("/corrupt.csv"),
     CSV_INEXISTENT("/inexistent.csv"),

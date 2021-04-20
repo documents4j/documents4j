@@ -11,6 +11,7 @@ import org.zeroturnaround.exec.StartedProcess;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -70,7 +71,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                             target.getAbsolutePath(),
                             microsoftOfficeFormat.getValue())};
 
-            getLogger().trace("Running command for conversion " + command.toString());
+            getLogger().trace("Running command for conversion {},", Arrays.toString(command));
 
             return makePresetProcessExecutor()
                     .command(command)

@@ -8,6 +8,7 @@ import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -73,7 +74,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
                     .command(command)
                     .execute().getExitValue();
 
-            logger.trace("Got exitcode {} for command {}", exitCode, command);
+            logger.trace("Got exitcode {} for command {}", exitCode, Arrays.toString(command));
 
             return exitCode;
         } catch (IOException e) {

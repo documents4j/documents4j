@@ -24,10 +24,10 @@ public class MicrosoftPowerpointBridge extends AbstractMicrosoftOfficeBridge {
     private static final Object POWERPOINT_LOCK = new Object();
 
     /**
-     * Other than MS Word, MS Excel does not behave well under stress. Thus, MS
-     * Excel must not be asked to convert more than one document at a time.
+     * limit the number of parallel conversions. It seems to work with more than 1 presentation, so this could be
+     * an optimisation point. We will start with a defensive value of 3 parallel conversions.
      */
-    private static final Semaphore CONVERSION_LOCK = new Semaphore(1, true);
+    private static final Semaphore CONVERSION_LOCK = new Semaphore(3, true);
 
     public MicrosoftPowerpointBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
         super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftPowerpointScript.CONVERSION);

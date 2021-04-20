@@ -23,7 +23,7 @@ If Err <> 0 Then
 End If
 
 ' Disable execution of macros.
-' powerpointApplication.WordBasic.DisableAutoMacros
+powerpointApplication.WordBasic.DisableAutoMacros
 
 ' Exit and signal success.
 ' Wscript.Echo "Powerpoint is running now"

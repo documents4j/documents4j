@@ -64,15 +64,20 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
+            String[] command = {"cmd", "/S", "/C",
+                    doubleQuote(conversionScript.getAbsolutePath(),
+                            source.getAbsolutePath(),
+                            target.getAbsolutePath(),
+                            microsoftOfficeFormat.getValue())};
+
+            getLogger().trace("Running command for conversion " + command.toString());
+
             return makePresetProcessExecutor()
-                    .command("cmd", "/S", "/C",
-                            doubleQuote(conversionScript.getAbsolutePath(),
-                                    source.getAbsolutePath(),
-                                    target.getAbsolutePath(),
-                                    microsoftOfficeFormat.getValue()))
+                    .command(command)
                     .destroyOnExit()
                     .addListener(targetNameCorrector(target, microsoftOfficeFormat.getFileExtension()))
                     .start();
+
         } catch (IOException e) {
             String message = String.format("Could not start shell script ('%s') for conversion of '%s' (%s) to '%s' (%s)",
                     conversionScript, source, sourceType, target, targetType);

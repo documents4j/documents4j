@@ -7,13 +7,16 @@ Dim arguments
 Set arguments = WScript.Arguments
 
 ' Transforms a file using MS Powerpoint into the given format.
-Function ConvertFile2( inputFile, outputFile, formatEnumeration )
+Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
   Dim fileSystemObject
   Dim powerpointApplication
   Dim powerpointPresentation
 
-  ' Get the running instance of MS Word. If Word is not running, exit the conversion.
+  ' Get the running instance of MS Powerpoint. If Powerpoint is not running, exit the conversion.
+  ' Set powerpointApplication = CreateObject("PowerPoint.Application")
+
+  ' Get the running instance of MS Powerpoint. If PowerPoint is not running, exit the conversion.
   On Error Resume Next
   Set powerpointApplication = GetObject(, "PowerPoint.Application")
   If Err <> 0 Then
@@ -30,59 +33,17 @@ Function ConvertFile2( inputFile, outputFile, formatEnumeration )
 
     ' Attempt to open the source document.
     On Error Resume Next
+
+    ' https://docs.microsoft.com/en-us/office/vba/api/powerpoint.presentations.open
+    ' 1st argument - filename'
+    ' 2nd argument - ReadOnly'
+    ' 3rd argument - Untitled'
+    ' 4rd argument - WithWindow'
     Set powerpointPresentation = powerpointApplication.Presentations.Open(inputFile, , , FALSE)
+
     If Err <> 0 Then
-        WScript.Quit -2
-    End If
-    On Error GoTo 0
-
-    ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
-    On Error Resume Next
-    
-    powerpointPresentation.SaveAs outputFile, formatEnumeration, True
-
-    ' Close the source document.
-    powerpointPresentation.Close WdDoNotSaveChanges
-    If Err <> 0 Then
-        WScript.Quit -3
-    End If
-    On Error GoTo 0
-
-    ' Signal that the conversion was successful.
-    WScript.Quit 2
-
-  Else
-
-    ' Files does not exist, could not convert
-    WScript.Quit -4
-
-  End If
-
-End Function
-
-' Transforms a file using MS Powerpoint into the given format.
-Function ConvertFile( inputFile, outputFile, formatEnumeration )
-
-  Dim fileSystemObject
-  Dim powerpointApplication
-  Dim powerpointPresentation
-
-  ' Get the running instance of MS Word. If Word is not running, exit the conversion.
-  
-  Set powerpointApplication = CreateObject("PowerPoint.Application")
-
-  ' Find the source file on the file system.
-  Set fileSystemObject = CreateObject("Scripting.FileSystemObject")
-  inputFile = fileSystemObject.GetAbsolutePathName(inputFile)
-
-  ' Convert the source file only if it exists.
-  If fileSystemObject.FileExists(inputFile) Then
-
-    ' Attempt to open the source document.
-    On Error Resume Next
-    Set powerpointPresentation = powerpointApplication.Presentations.Open(inputFile, , , FALSE)
-    If Err <> 0 Then
-        WScript.Quit -2
+    ''  WScript.Echo Err
+      WScript.Quit -2
     End If
     On Error GoTo 0
 
@@ -93,6 +54,11 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
     ' Close the source document.
     powerpointPresentation.Close
+
+    If Err <> 0 Then
+      WScript.Quit -3
+    End If
+    On Error GoTo 0
 
     ' Signal that the conversion was successful.
     WScript.Quit 2

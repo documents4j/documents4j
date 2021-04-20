@@ -9,13 +9,13 @@ import com.documents4j.api.DocumentType;
  */
 enum MicrosoftPowerpointFormat implements MicrosoftOfficeFormat {
 
-    PDF("32", "pdf", DocumentType.PDF), PPTX("24", "xlsx", DocumentType.PPTX), PPT("1", "xls", DocumentType.PPT);
+    PDF("32", "pdf", DocumentType.PDF), PPTX("24", "pptx", DocumentType.PPTX), PPT("1", "ppt", DocumentType.PPT);
 
     private final String value;
     private final DocumentType documentType;
     private final String fileExtension;
 
-    private MicrosoftPowerpointFormat(String value, String fileExtension, DocumentType documentType) {
+    MicrosoftPowerpointFormat(String value, String fileExtension, DocumentType documentType) {
         this.value = value;
         this.fileExtension = fileExtension;
         this.documentType = documentType;

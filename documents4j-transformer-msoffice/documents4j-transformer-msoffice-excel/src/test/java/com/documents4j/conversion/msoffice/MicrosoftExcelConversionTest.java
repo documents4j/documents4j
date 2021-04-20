@@ -32,7 +32,8 @@ public class MicrosoftExcelConversionTest extends AbstractMicrosoftOfficeConvers
                 {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.ODS, "ods", true},
                 {XLSX_VALID, XLSX_CORRUPT, XLSX_INEXISTENT, DocumentType.MS_EXCEL, DocumentType.TEXT, "txt", true},
                 {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.DOC, DocumentType.PDF, "pdf", false},
-                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.XLS, DocumentType.XLSX, "xlsx", false}
+                {XLS_VALID, XLS_CORRUPT, XLS_INEXISTENT, DocumentType.XLS, DocumentType.XLSX, "xlsx", false},
+                {OTS_VALID, OTS_CORRUPT, OTS_INEXISTENT, DocumentType.OTS, DocumentType.XLTX, "xltx", false}
         });
     }
 

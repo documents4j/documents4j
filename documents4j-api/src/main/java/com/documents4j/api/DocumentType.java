@@ -13,8 +13,10 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType DOC = new DocumentType(Value.APPLICATION, Value.DOC);
     public static final DocumentType MS_EXCEL = new DocumentType(Value.APPLICATION, Value.EXCEL_ANY);
     public static final DocumentType XLSX = new DocumentType(Value.APPLICATION, Value.XLSX);
+    public static final DocumentType XLTX = new DocumentType(Value.APPLICATION, Value.XLTX);
     public static final DocumentType XLS = new DocumentType(Value.APPLICATION, Value.XLS);
     public static final DocumentType ODS = new DocumentType(Value.APPLICATION, Value.ODS);
+    public static final DocumentType OTS = new DocumentType(Value.APPLICATION, Value.OTS);
     public static final DocumentType CSV = new DocumentType(Value.TEXT, Value.CSV);
     public static final DocumentType XML = new DocumentType(Value.APPLICATION, Value.XML);
     public static final DocumentType MHTML = new DocumentType(Value.APPLICATION, Value.MHTML);
@@ -22,6 +24,7 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType PDF = new DocumentType(Value.APPLICATION, Value.PDF);
     public static final DocumentType PDFA = new DocumentType(Value.APPLICATION, Value.PDFA);
     public static final DocumentType TEXT = new DocumentType(Value.TEXT, Value.PLAIN);
+
 
     private final String type;
 
@@ -101,8 +104,10 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
 
         public static final String XLS = "vnd.ms-excel";
         public static final String XLSX = "vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        public static final String XLTX = "vnd.openxmlformats-officedocument.spreadsheetml.template";
         public static final String EXCEL_ANY = "vnd.com.documents4j.any-msexcel";
         public static final String ODS = "vnd.oasis.opendocument.spreadsheet";
+        public static final String OTS = "vnd.oasis.opendocument.spreadsheet-template";
 
         public static final String PDF = "pdf";
         public static final String PDFA = "vnd.com.documents4j.pdf-a";

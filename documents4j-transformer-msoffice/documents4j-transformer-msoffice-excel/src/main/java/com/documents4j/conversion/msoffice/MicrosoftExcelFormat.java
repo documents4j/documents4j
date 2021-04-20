@@ -10,6 +10,7 @@ enum MicrosoftExcelFormat implements MicrosoftOfficeFormat {
 
     PDF("999", "pdf", DocumentType.PDF),
     XLSX("51", "xlsx", DocumentType.XLSX),
+    XLST("54", "xltx", DocumentType.XLTX),
     XLS("43", "xls", DocumentType.XLS),
     ODS("60", "ods", DocumentType.ODS),
     CSV("6", "csv", DocumentType.CSV),

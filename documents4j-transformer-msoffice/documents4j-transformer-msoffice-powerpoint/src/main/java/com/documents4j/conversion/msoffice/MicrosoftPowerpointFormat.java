@@ -4,8 +4,8 @@ import com.documents4j.api.DocumentType;
 
 /**
  * An enumeration of <a href=
- * "http://msdn.microsoft.com/en-us/library/bb241279%28v=office.12%29.aspx">MS
- * Excel file format encodings</a>.
+ * "https://docs.microsoft.com/en-us/office/vba/api/powerpoint.ppsaveasfiletype">MS
+ * Powerpoint file format encodings</a>.
  */
 enum MicrosoftPowerpointFormat implements MicrosoftOfficeFormat {
 

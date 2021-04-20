@@ -49,7 +49,7 @@ public class ProcessFutureWrapper implements Future<Boolean> {
                     .from(exitValue)
                     .resolve();
         } catch (ConverterException e) {
-            throw new ExecutionException("The conversion finished unsuccessful with exitCode "+exitValue, e);
+            throw new ExecutionException("The conversion finished unsuccessful with exitCode " + exitValue, e);
         }
     }
 }

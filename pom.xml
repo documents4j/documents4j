@@ -113,7 +113,6 @@
         <version.maven.install-plugin>2.5.1</version.maven.install-plugin>
         <version.maven.jxr-plugin>2.3</version.maven.jxr-plugin>
         <version.java>8</version.java>
-        <distribution.bintray>https://api.bintray.com/maven/raphw/maven/documents4j</distribution.bintray>
     </properties>
 
     <developers>
@@ -167,9 +166,13 @@
     </reporting>
 
     <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
         <repository>
-            <id>bintray</id>
-            <url>${distribution.bintray}</url>
+            <id>central</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
     </distributionManagement>
 
@@ -329,6 +332,19 @@
                         <format>xml</format>
                     </formats>
                     <check />
+                </configuration>
+            </plugin>
+
+            <!-- Setup plugin for deployment to Maven Central. -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>central</serverId>
+                    <nexusUrl>https://oss.sonatype.org</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
         </plugins>

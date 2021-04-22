@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 
 public abstract class AbstractMicrosoftOfficeStartStopTest extends AbstractMicrosoftOfficeAssertingTest {
 
-    private static final long START_SHUTDOWN_TIMEOUT = 10000L;
+    private static final long START_SHUTDOWN_TIMEOUT = 20000L;
     private static final int START_SHUTDOWN_INVOCATIONS = 3;
 
     private final Class<? extends IExternalConverter> externalConverter;

@@ -33,7 +33,9 @@ public class ProcessFutureWrapper implements Future<Boolean> {
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        return evaluateExitValue(startedProcess.getFuture().get().getExitValue());
+        int exitValue = startedProcess.getFuture().get().getExitValue();
+
+        return evaluateExitValue(exitValue);
     }
 
     @Override
@@ -47,7 +49,7 @@ public class ProcessFutureWrapper implements Future<Boolean> {
                     .from(exitValue)
                     .resolve();
         } catch (ConverterException e) {
-            throw new ExecutionException("The conversion finished unsuccessful", e);
+            throw new ExecutionException("The conversion finished unsuccessful with exitCode " + exitValue, e);
         }
     }
 }

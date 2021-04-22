@@ -6,7 +6,6 @@ import java.io.Serializable;
  * Represents an immutable document <a href="http://en.wikipedia.org/wiki/Internet_media_type">MIME</a> type.
  */
 public class DocumentType implements Serializable, Comparable<DocumentType> {
-
     public static final DocumentType MS_WORD = new DocumentType(Value.APPLICATION, Value.WORD_ANY);
     public static final DocumentType RTF = new DocumentType(Value.APPLICATION, Value.RTF);
     public static final DocumentType DOCX = new DocumentType(Value.APPLICATION, Value.DOCX);
@@ -24,6 +23,9 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     public static final DocumentType PDF = new DocumentType(Value.APPLICATION, Value.PDF);
     public static final DocumentType PDFA = new DocumentType(Value.APPLICATION, Value.PDFA);
     public static final DocumentType TEXT = new DocumentType(Value.TEXT, Value.PLAIN);
+    public static final DocumentType MS_POWERPOINT = new DocumentType(Value.APPLICATION, Value.POWERPOINT_ANY);
+    public static final DocumentType PPTX = new DocumentType(Value.APPLICATION, Value.PPTX);
+    public static final DocumentType PPT = new DocumentType(Value.APPLICATION, Value.PPT);
 
 
     private final String type;
@@ -33,7 +35,7 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
     /**
      * Creates a new document type.
      *
-     * @param type    The MIME type's type name.
+     * @param type The MIME type's type name.
      * @param subtype The MIME type's subtype name.
      */
     public DocumentType(String type, String subtype) {
@@ -120,6 +122,10 @@ public class DocumentType implements Serializable, Comparable<DocumentType> {
 
         public static final String CSV = "csv";
         public static final String PLAIN = "plain";
+
+        public static final String PPT = "vnd.ms-powerpoint";
+        public static final String PPTX = "vnd.openxmlformats-officedocument.presentationml.presentation";
+        public static final String POWERPOINT_ANY = "vnd.com.documents4j.any-mspowerpoint";
 
         private Value() {
             throw new UnsupportedOperationException();

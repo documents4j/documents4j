@@ -8,6 +8,7 @@ import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -67,9 +68,15 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             // would typically be triggered from a shut down hook. Therefore, the shut down process
             // should never be killed during JVM shut down. In order to avoid an incomplete start up
             // procedure, start up processes will never be killed either.
-            return makePresetProcessExecutor()
-                    .command("cmd", "/S", "/C", doubleQuote(script.getAbsolutePath()))
+            String[] command = {"cmd", "/S", "/C", doubleQuote(script.getAbsolutePath())};
+
+            int exitCode = makePresetProcessExecutor()
+                    .command(command)
                     .execute().getExitValue();
+
+            logger.trace("Got exitcode {} for command {}", exitCode, Arrays.toString(command));
+
+            return exitCode;
         } catch (IOException e) {
             String message = String.format("Unable to run script: %s", script);
             logger.error(message, e);

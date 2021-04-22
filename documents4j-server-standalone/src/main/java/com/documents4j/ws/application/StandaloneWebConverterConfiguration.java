@@ -60,7 +60,7 @@ public class StandaloneWebConverterConfiguration implements IWebConverterConfigu
                 .processTimeout(processTimeout, TimeUnit.MILLISECONDS)
                 .workerPool(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS);
         for (Map.Entry<Class<? extends IExternalConverter>, Boolean> entry : converterConfiguration.entrySet()) {
-            LOGGER.info("{} converter: %s", entry.getValue() ? "ENABLED" : "DISABLED", entry.getKey());
+            LOGGER.info("{} converter: {}", entry.getValue() ? "ENABLED" : "DISABLED", entry.getKey());
             builder = entry.getValue() ? builder.enable(entry.getKey()) : builder.disable(entry.getKey());
         }
         this.converter = builder.build();

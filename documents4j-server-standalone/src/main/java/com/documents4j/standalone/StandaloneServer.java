@@ -73,7 +73,7 @@ public class StandaloneServer {
             System.out.println("Shut down successful. Goodbye!");
         } catch (Exception e) {
             LoggerFactory.getLogger(StandaloneServer.class).error("The documents4j server terminated with an unexpected error", e);
-            System.err.println(String.format("Error: %s", e.getMessage()));
+            System.err.printf("Error: %s%n", e.getMessage());
             System.err.println("Use option -? to display a list of legal commands.");
             System.exit(-1);
         }

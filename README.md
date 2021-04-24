@@ -69,6 +69,9 @@ The MS Excel converter is represented by a `MicrosoftExcelBridge` instance. All 
 
 **Important**: Note that you have to manually add a dependency to either the `MicrosoftWordBridge` or the `MicrosoftExcelBridge` when using the `LocalConverter`. The MS Word bridge is contained by the *com.documents4j/documents4j-transformer-msoffice-word* Maven module and the MS Excel bridge by the *com.documents4j/documents4j-transformer-msoffice-excel* module.
 
+#### Microsoft PowerPoint converter ####
+The MS PowerPoint converter is represented by a `MicrosoftPowerPointBridge` instance. Unlike the bridges for Word and Excel, the PowerPoint bridge needs explicit activation. This is due to PowerPoint's requirement to run in the foreground which opens PowerPoint on the executing machine which can cause problems in some environments.
+
 #### Give it a try ####
 documents4j was written after evaluating several solutions for converting *docx* files into *pdf* which unfortunately all produced files with layout distortions of different degrees. For these experiences, documents4j comes with an evaluation application which is run in the browser. For starting this application, simply run the following commands on a Windows machine with MS Word and MS Excel installed:   
 

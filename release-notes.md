@@ -1,6 +1,14 @@
 documents4j release notes
 -------------------------
 
+### 22. April 2021: Version 1.1.6
+
+- Add support for MS PowerPoint.
+
+### 14. September 2020: Version 1.1.5
+
+- Minor conversion script fixes.
+
 ### 10. August 2020: Version 1.1.4
 
 - Remove pseudo-password from scripts since it causes breakage with several versions of MS Word and Excel.

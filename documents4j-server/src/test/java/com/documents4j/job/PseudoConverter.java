@@ -152,6 +152,12 @@ public class PseudoConverter extends ConverterAdapter {
         }
 
         @Override
+        public boolean execute() {
+            schedule();
+            return true;
+        }
+
+        @Override
         public IConversionJob prioritizeWith(int priority) {
             return new PseudoConversionJob(source, sourceFormat, callback, targetFormat, priority);
         }

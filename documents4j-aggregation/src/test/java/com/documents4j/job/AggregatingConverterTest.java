@@ -1,13 +1,13 @@
 package com.documents4j.job;
 
 import com.documents4j.api.*;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -15,9 +15,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertFalse;
-import static junit.framework.TestCase.assertNotNull;
+import static junit.framework.TestCase.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -29,7 +27,7 @@ public class AggregatingConverterTest {
 
     @Before
     public void setUp() throws Exception {
-        folder = Files.createTempDir();
+        folder = Files.createTempDirectory("tmp").toFile();
     }
 
     @After

@@ -21,7 +21,7 @@ public abstract class AbstractAdapterTest {
 
     @Before
     public void setUp() throws Exception {
-        temporaryFolder = Files.createTempDir();
+        temporaryFolder = java.nio.file.Files.createTempDirectory("tmp").toFile();
         uniqueNameMaker = new AtomicInteger(1);
     }
 

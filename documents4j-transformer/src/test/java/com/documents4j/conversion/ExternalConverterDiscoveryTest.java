@@ -1,12 +1,12 @@
 package com.documents4j.conversion;
 
 import com.documents4j.api.DocumentType;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -23,7 +23,7 @@ public class ExternalConverterDiscoveryTest {
 
     @Before
     public void setUp() throws Exception {
-        baseFolder = Files.createTempDir();
+        baseFolder = Files.createTempDirectory("tmp").toFile();
     }
 
     @After

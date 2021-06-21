@@ -2,12 +2,14 @@ package com.documents4j.demo;
 
 import com.documents4j.api.IConverter;
 import com.documents4j.job.LocalConverter;
-import com.google.common.io.Files;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.slf4j.impl.SimpleLogger;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -33,8 +35,12 @@ public class DemoApplication extends WebApplication {
 
         System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "TRACE");
 
-        uploadFolder = Files.createTempDir();
-        baseFolder = Files.createTempDir();
+        try {
+            uploadFolder = Files.createTempDirectory("upload").toFile();
+            baseFolder = Files.createTempDirectory("base").toFile();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
 
         nameSequence = new AtomicInteger(1);
 

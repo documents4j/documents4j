@@ -1,6 +1,8 @@
 package com.documents4j.ws.endpoint;
 
 import com.documents4j.ws.application.IWebConverterConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -14,6 +16,8 @@ import javax.ws.rs.core.Response;
 @Path(MonitoringHealthResource.PATH)
 public class MonitoringHealthResource {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MonitoringHealthResource.class);
+
     public static final String PATH = "health";
 
     @Inject
@@ -22,8 +26,10 @@ public class MonitoringHealthResource {
     @GET
     public Response serverInformation() {
         if (webConverterConfiguration.getConverter().isOperational()) {
+            LOGGER.debug("{} is operational", webConverterConfiguration.getConverter());
             return Response.ok().build();
         } else {
+            LOGGER.error("{} is not operational.", webConverterConfiguration.getConverter());
             return Response.serverError().build();
         }
     }

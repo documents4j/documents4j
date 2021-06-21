@@ -1,13 +1,13 @@
 package com.documents4j.conversion;
 
 import com.documents4j.api.DocumentType;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +37,7 @@ public class DefaultConversionManagerTest {
 
     @Before
     public void setUp() throws Exception {
-        folder = Files.createTempDir();
+        folder = Files.createTempDirectory("tmp").toFile();
     }
 
     @After

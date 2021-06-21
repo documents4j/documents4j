@@ -6,6 +6,7 @@ import com.documents4j.server.auth.AuthFilter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import com.documents4j.ws.application.StandaloneWebConverterConfiguration;
 import com.documents4j.ws.application.WebConverterApplication;
+import com.documents4j.ws.endpoint.MonitoringHealthCreateDocumentResource;
 import com.documents4j.ws.endpoint.MonitoringHealthResource;
 import com.documents4j.ws.endpoint.MonitoringRunningResource;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -243,11 +244,14 @@ public class ConverterServerBuilder {
                 .forApplication(new WebConverterApplication(configuration))
                 .register(configuration)
                 .register(MonitoringHealthResource.class)
-                .register(MonitoringRunningResource.class);
+                .register(MonitoringRunningResource.class)
+                .register(MonitoringHealthCreateDocumentResource.class);
         if (userPass != null) {
-            resourceConfig.register(new AuthFilter(userPass, Stream.of(MonitoringHealthResource.PATH, MonitoringRunningResource.PATH)
-                    .map(pattern -> "^" + pattern + "$")
-                    .collect(Collectors.toSet())));
+            resourceConfig.register(new AuthFilter(userPass, Stream.of(
+                    MonitoringHealthResource.PATH,
+                    MonitoringRunningResource.PATH,
+                    MonitoringHealthCreateDocumentResource.PATH
+            ).map(pattern -> "^" + pattern + "$").collect(Collectors.toSet())));
         }
         if (sslContext == null) {
             return GrizzlyHttpServerFactory.createHttpServer(baseUri, resourceConfig);

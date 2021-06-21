@@ -1,9 +1,9 @@
 package com.documents4j.conversion.msoffice;
 
-import com.google.common.io.Files;
 import org.junit.AfterClass;
 
 import java.io.File;
+import java.nio.file.Files;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -21,7 +21,7 @@ public abstract class AbstractMicrosoftOfficeAssertingTest {
 
     // Must be called from a @BeforeClass method in the inheriting class.
     protected static void setUp(MicrosoftOfficeScript assertionScript, MicrosoftOfficeScript shutdownScript) throws Exception {
-        assertionEngineFolder = Files.createTempDir();
+        assertionEngineFolder = Files.createTempDirectory("tmp").toFile();
         msOfficeAssertionEngine = new MicrosoftOfficeAssertionEngine(assertionEngineFolder, assertionScript, shutdownScript);
         msOfficeAssertionEngine.assertNotRunning();
     }

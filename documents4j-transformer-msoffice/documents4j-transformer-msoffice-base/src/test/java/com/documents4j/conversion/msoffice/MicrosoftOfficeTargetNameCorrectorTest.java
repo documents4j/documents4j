@@ -25,7 +25,7 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
 
     @Before
     public void setUp() throws Exception {
-        temporaryFolder = Files.createTempDir();
+        temporaryFolder = java.nio.file.Files.createTempDirectory("tmp").toFile();
         nameGenerator = new AtomicInteger(1);
     }
 

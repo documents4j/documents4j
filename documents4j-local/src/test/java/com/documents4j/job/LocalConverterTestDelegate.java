@@ -4,9 +4,11 @@ import com.documents4j.api.IConverter;
 import com.documents4j.conversion.IConversionManager;
 import com.documents4j.conversion.IExternalConverter;
 import com.documents4j.conversion.MockConversionManager;
-import com.google.common.io.Files;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +26,11 @@ class LocalConverterTestDelegate implements IConverterTestDelegate {
     }
 
     public void setUp() {
-        temporaryFolder = Files.createTempDir();
+        try {
+            temporaryFolder = Files.createTempDirectory("tmp").toFile();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
         converter = new StubbedLocalConverter(temporaryFolder);
         assertEquals(operational, converter.isOperational());
     }

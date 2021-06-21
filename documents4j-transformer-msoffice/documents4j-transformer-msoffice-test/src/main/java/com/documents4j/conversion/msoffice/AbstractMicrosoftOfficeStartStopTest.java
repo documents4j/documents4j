@@ -1,10 +1,10 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.conversion.IExternalConverter;
-import com.google.common.io.Files;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -24,7 +24,7 @@ public abstract class AbstractMicrosoftOfficeStartStopTest extends AbstractMicro
     public void testStartup() throws Exception {
         // This test is run several times in order to test the stability of starting and shutting down MS Word.
         for (int i = 0; i < START_SHUTDOWN_INVOCATIONS; i++) {
-            File folder = Files.createTempDir();
+            File folder = Files.createTempDirectory("tmp").toFile();
             try {
                 getAssertionEngine().assertNotRunning();
                 startUpAndShutDown(folder);

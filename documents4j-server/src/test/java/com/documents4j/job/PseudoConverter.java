@@ -1,17 +1,19 @@
 package com.documents4j.job;
 
 import com.documents4j.api.*;
-import com.google.common.io.Files;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class PseudoConverter extends ConverterAdapter {
 
@@ -20,10 +22,18 @@ public class PseudoConverter extends ConverterAdapter {
     private final DocumentType legalSourceFormat, legalTargetFormat;
 
     public PseudoConverter(boolean operational, DocumentType legalSourceFormat, DocumentType legalTargetFormat) {
-        super(Files.createTempDir());
+        super(createTempDir());
         this.operational = operational;
         this.legalSourceFormat = legalSourceFormat;
         this.legalTargetFormat = legalTargetFormat;
+    }
+
+    private static File createTempDir() {
+        try {
+            return Files.createTempDirectory("tmp").toFile();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     @Override
@@ -148,13 +158,7 @@ public class PseudoConverter extends ConverterAdapter {
             } finally {
                 source.onConsumed(inputStream);
             }
-            return mock(Future.class);
-        }
-
-        @Override
-        public boolean execute() {
-            schedule();
-            return true;
+            return CompletableFuture.completedFuture(true);
         }
 
         @Override

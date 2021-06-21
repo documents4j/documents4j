@@ -4,13 +4,13 @@ import com.documents4j.api.DocumentType;
 import com.documents4j.api.IConverter;
 import com.documents4j.api.IFileConsumer;
 import com.documents4j.throwables.ConversionFormatException;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +36,7 @@ public abstract class AbstractConverterTest {
 
     @Before
     public void setUpFiles() throws Exception {
-        folder = Files.createTempDir();
+        folder = Files.createTempDirectory("tmp").toFile();
         files = new ConcurrentSkipListSet<File>();
         atomicInteger = new AtomicInteger(1);
     }

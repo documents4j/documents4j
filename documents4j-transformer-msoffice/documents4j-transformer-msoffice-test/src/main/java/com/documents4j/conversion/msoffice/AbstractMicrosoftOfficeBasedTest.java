@@ -1,13 +1,13 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.api.DocumentType;
-import com.google.common.io.Files;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +35,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
                                 MicrosoftOfficeScript assertionScript,
                                 MicrosoftOfficeScript shutdownScript) throws Exception {
         AbstractMicrosoftOfficeAssertingTest.setUp(assertionScript, shutdownScript);
-        externalConverterDirectory = Files.createTempDir();
+        externalConverterDirectory = Files.createTempDirectory("external").toFile();
         externalConverter = bridge.getDeclaredConstructor(File.class, long.class, TimeUnit.class)
                 .newInstance(externalConverterDirectory, DEFAULT_CONVERSION_TIMEOUT, TimeUnit.MILLISECONDS);
         getAssertionEngine().assertRunning();
@@ -65,7 +65,7 @@ public class AbstractMicrosoftOfficeBasedTest extends AbstractMicrosoftOfficeAss
     @Before
     public void setUpFiles() throws Exception {
         nameGenerator = new AtomicInteger(1);
-        files = Files.createTempDir();
+        files = Files.createTempDirectory("files").toFile();
         fileCopies = Collections.newSetFromMap(new ConcurrentHashMap<File, Boolean>());
     }
 

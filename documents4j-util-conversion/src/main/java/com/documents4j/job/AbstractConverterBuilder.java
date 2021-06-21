@@ -1,9 +1,11 @@
 package com.documents4j.job;
 
 import com.documents4j.api.IConverter;
-import com.google.common.io.Files;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -84,7 +86,11 @@ abstract class AbstractConverterBuilder<T extends AbstractConverterBuilder<T>> {
     }
 
     protected File normalizedBaseFolder() {
-        return baseFolder == null ? Files.createTempDir() : this.baseFolder;
+        try {
+            return baseFolder == null ? Files.createTempDirectory("tmp").toFile() : this.baseFolder;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     /**

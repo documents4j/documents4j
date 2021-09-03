@@ -174,7 +174,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         }
         try {
             if (propagateShutDown) {
-                List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+                List<RuntimeException> exceptions = new LinkedList<RuntimeException>();
                 for (IConverter converter : converters) {
                     try {
                         converter.shutDown();
@@ -198,7 +198,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         }
         try {
             if (propagateShutDown) {
-                List<RuntimeException> exceptions = new ArrayList<RuntimeException>();
+                List<RuntimeException> exceptions = new LinkedList<RuntimeException>();
                 for (IConverter converter : converters) {
                     try {
                         converter.kill();

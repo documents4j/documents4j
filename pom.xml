@@ -4,7 +4,7 @@
 
     <groupId>com.documents4j</groupId>
     <artifactId>documents4j-parent</artifactId>
-    <version>1.1.8-SNAPSHOT</version>
+    <version>1.1.8</version>
     <packaging>pom</packaging>
 
     <!--
@@ -138,7 +138,7 @@
         <connection>scm:git:git@github.com:documents4j/documents4j.git</connection>
         <developerConnection>scm:git:git@github.com:documents4j/documents4j.git</developerConnection>
         <url>git@github.com:documents4j/documents4j.git</url>
-        <tag>documents4j-parent-0.1.2</tag>
+        <tag>documents4j-1.1.8</tag>
     </scm>
 
     <issueManagement>

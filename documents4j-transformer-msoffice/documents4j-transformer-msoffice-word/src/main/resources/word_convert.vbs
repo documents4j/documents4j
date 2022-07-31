@@ -17,7 +17,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
 
   ' Get the running instance of MS Word. If Word is not running, exit the conversion.
   On Error Resume Next
-  Set wordApplication = GetObject("", "Word.Application")
+  Set wordApplication = GetObject(, "Word.Application")
   If Err <> 0 Then
     WScript.Quit -6
   End If

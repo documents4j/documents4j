@@ -3,7 +3,7 @@ Const WdDoNotSaveChanges = 0
 ' Try to get currently running instance of MS Word.
 On Error Resume Next
 Dim wordApplication
-Set wordApplication = GetObject("", "Word.Application")
+Set wordApplication = GetObject(, "Word.Application")
 
 ' If no such instance can be found, MS Word is already shut down.
 If Err <> 0 Then

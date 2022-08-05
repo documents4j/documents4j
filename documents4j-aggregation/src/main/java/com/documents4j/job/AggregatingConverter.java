@@ -79,11 +79,7 @@ public class AggregatingConverter implements IAggregatingConverter, IConverterFa
         Map<DocumentType, Set<DocumentType>> supportedConversions = new HashMap<DocumentType, Set<DocumentType>>();
         for (IConverter converter : converters) {
             for (Map.Entry<DocumentType, Set<DocumentType>> entry : converter.getSupportedConversions().entrySet()) {
-                Set<DocumentType> targetTypes = supportedConversions.get(entry.getKey());
-                if (targetTypes == null) {
-                    targetTypes = new HashSet<DocumentType>();
-                    supportedConversions.put(entry.getKey(), targetTypes);
-                }
+                Set<DocumentType> targetTypes = supportedConversions.computeIfAbsent(entry.getKey(), k -> new HashSet<DocumentType>());
                 targetTypes.addAll(entry.getValue());
             }
         }

@@ -62,7 +62,7 @@ class MicrosoftOfficeTargetNameCorrector extends ProcessListener {
         return !Files.getFileExtension(target.getName()).equals(fileExtension);
     }
 
-    private boolean conversionSuccessful(Process process) {
+    private static boolean conversionSuccessful(Process process) {
         return ExternalConverterScriptResult.from(process.exitValue()) == ExternalConverterScriptResult.CONVERSION_SUCCESSFUL;
     }
 }

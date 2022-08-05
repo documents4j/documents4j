@@ -26,11 +26,7 @@ class ConverterRegistry {
     private static Map<DocumentType, Set<DocumentType>> extractSupportedConversions(Set<ConversionPath> conversionPaths) {
         Map<DocumentType, Set<DocumentType>> supported = new HashMap<DocumentType, Set<DocumentType>>();
         for (ConversionPath conversionPath : conversionPaths) {
-            Set<DocumentType> targetFormat = supported.get(conversionPath.getSourceFormat());
-            if (targetFormat == null) {
-                targetFormat = new HashSet<DocumentType>();
-                supported.put(conversionPath.getSourceFormat(), targetFormat);
-            }
+            Set<DocumentType> targetFormat = supported.computeIfAbsent(conversionPath.getSourceFormat(), k -> new HashSet<DocumentType>());
             targetFormat.add(conversionPath.getTargetFormat());
         }
         return supported;

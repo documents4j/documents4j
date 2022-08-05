@@ -13,12 +13,7 @@ class ColoredFeedbackPanel extends FeedbackPanel {
 
     public ColoredFeedbackPanel(String id) {
         super(id);
-        add(new AttributeAppender("class", new IModel<Object>() {
-            @Override
-            public String getObject() {
-                return findClass();
-            }
-        }));
+        add(new AttributeAppender("class", (IModel<Object>) () -> findClass()));
     }
 
     @Override

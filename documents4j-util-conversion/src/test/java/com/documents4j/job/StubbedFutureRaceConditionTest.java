@@ -5,7 +5,7 @@ import com.google.testing.threadtester.*;
 import org.junit.Ignore;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +73,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.beforeCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertTrue(future.isCancelled());
         assertTrue(future.isDone());
@@ -103,7 +103,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.afterCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertTrue(future.isCancelled());
         assertTrue(future.isDone());
@@ -133,7 +133,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.beforeCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -163,7 +163,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.afterCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -193,7 +193,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.beforeCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -223,7 +223,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.afterCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -253,7 +253,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.beforeCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -282,7 +282,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.afterCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertFalse(future.isCancelled());
         assertTrue(future.isDone());
@@ -310,7 +310,7 @@ public class StubbedFutureRaceConditionTest {
                 .getClassInstrumentation(AbstractFutureWrappingPriorityFuture.class);
         CodePosition position = instrumentation.beforeCall(runMethod, breakPointMethod);
 
-        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Arrays.asList(position)).throwExceptionsIfAny();
+        InterleavedRunner.interleave(mainRunnable, secondaryRunnable, Collections.singletonList(position)).throwExceptionsIfAny();
 
         assertTrue(future.isCancelled());
         assertTrue(future.isDone());

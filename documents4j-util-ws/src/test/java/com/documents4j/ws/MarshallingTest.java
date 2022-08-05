@@ -26,8 +26,7 @@ public class MarshallingTest {
         converterServerInformation.setProtocolVersion(PROTOCOL_VERSION);
         converterServerInformation.setTimeout(TIMEOUT);
         Map<DocumentType, Set<DocumentType>> supported = new HashMap<DocumentType, Set<DocumentType>>();
-        Set<DocumentType> first = new HashSet<DocumentType>();
-        first.addAll(Arrays.asList(FIRST_SAMPLE_TYPE, SECOND_SAMPLE_TYPE));
+        Set<DocumentType> first = new HashSet<DocumentType>(Arrays.asList(FIRST_SAMPLE_TYPE, SECOND_SAMPLE_TYPE));
         supported.put(FIRST_SAMPLE_TYPE, first);
         Set<DocumentType> second = new HashSet<DocumentType>();
         second.add(FIRST_SAMPLE_TYPE);

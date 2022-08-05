@@ -81,12 +81,9 @@ public class FileRow implements Serializable {
             return null;
         }
         try {
-            InputStream inputStream = new FileInputStream(file);
-            try {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 properties.load(inputStream);
                 return properties;
-            } finally {
-                inputStream.close();
             }
         } catch (IOException e) {
             return null;
@@ -106,7 +103,7 @@ public class FileRow implements Serializable {
     }
 
     public String getDuration() {
-        long milliseconds = Long.valueOf(properties.getProperty(CONVERSION_DURATION_PROPERTY_KEY, "-1"));
+        long milliseconds = Long.parseLong(properties.getProperty(CONVERSION_DURATION_PROPERTY_KEY, "-1"));
         if (milliseconds < 1000L) {
             return String.format("%d ms", milliseconds);
         } else {

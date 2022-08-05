@@ -43,7 +43,7 @@ public class ProcessFutureWrapper implements Future<Boolean> {
         return evaluateExitValue(startedProcess.getFuture().get(timeout, unit).getExitValue());
     }
 
-    private boolean evaluateExitValue(int exitValue) throws ExecutionException {
+    private static boolean evaluateExitValue(int exitValue) throws ExecutionException {
         try {
             return ExternalConverterScriptResult
                     .from(exitValue)

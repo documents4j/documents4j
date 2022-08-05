@@ -49,20 +49,17 @@ public class DemoPage extends WebPage {
         List<DocumentType> documentTypes = new ArrayList<DocumentType>(conversions.keySet());
         Collections.sort(documentTypes);
         sourceFormat = makeDropDownChoice("sourceFormat", new ListModel<DocumentType>(documentTypes));
-        targetFormat = makeDropDownChoice("targetFormat", new IModel<List<DocumentType>>() {
-            @Override
-            public List<DocumentType> getObject() {
-                if (sourceFormat.getModelObject() == null) {
-                    return Collections.emptyList();
-                }
-                Set<DocumentType> sourceTypes = conversions.get(sourceFormat.getModelObject());
-                if (sourceTypes == null) {
-                    return Collections.emptyList();
-                }
-                List<DocumentType> documentTypes = new ArrayList<DocumentType>(sourceTypes);
-                Collections.sort(documentTypes);
-                return documentTypes;
+        targetFormat = makeDropDownChoice("targetFormat", (IModel<List<DocumentType>>) () -> {
+            if (sourceFormat.getModelObject() == null) {
+                return Collections.emptyList();
             }
+            Set<DocumentType> sourceTypes = conversions.get(sourceFormat.getModelObject());
+            if (sourceTypes == null) {
+                return Collections.emptyList();
+            }
+            List<DocumentType> documentTypes1 = new ArrayList<DocumentType>(sourceTypes);
+            Collections.sort(documentTypes1);
+            return documentTypes1;
         });
         sourceFormat.add(new AjaxFormComponentUpdatingBehavior("onchange") {
             @Override
@@ -120,7 +117,7 @@ public class DemoPage extends WebPage {
 
                 File transactionFolder = new File(DemoApplication.get().getUploadFolder(), DemoApplication.get().nextFolderName());
                 if (!transactionFolder.mkdirs()) {
-                    LOGGER.warn("Could not create directory", transactionFolder);
+                    LOGGER.warn("Could not create directory {}", transactionFolder);
                 }
                 File newFile = new File(transactionFolder, FileRow.SOURCE_FILE_NAME);
 
@@ -171,34 +168,31 @@ public class DemoPage extends WebPage {
         };
     }
 
-    private void writeProperties(Properties properties, File transactionFolder) throws IOException {
+    private static void writeProperties(Properties properties, File transactionFolder) throws IOException {
         File file = new File(transactionFolder, FileRow.PROPERTIES_FILE_NAME);
         if (!file.createNewFile()) {
             throw new IOException(String.format("Could not create properties file %s", file));
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        try {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
             properties.store(fileOutputStream, FileRow.PROPERTY_COMMENT);
-        } finally {
-            fileOutputStream.close();
         }
     }
 
-    private FileUploadField makeUploadField(String identifier) {
+    private static FileUploadField makeUploadField(String identifier) {
         return new FileUploadField(identifier);
     }
 
-    private DropDownChoice<DocumentType> makeDropDownChoice(String identifier, IModel<List<DocumentType>> types) {
+    private static DropDownChoice<DocumentType> makeDropDownChoice(String identifier, IModel<List<DocumentType>> types) {
         DropDownChoice<DocumentType> dropDownChoice = new DropDownChoice<DocumentType>(identifier, new Model<DocumentType>(), types);
         dropDownChoice.setOutputMarkupId(true);
         return dropDownChoice;
     }
 
-    private Component makeSubmitButton(String identifier) {
+    private static Component makeSubmitButton(String identifier) {
         return new Button(identifier);
     }
 
-    private Component makeResultView(String identifier) {
+    private static Component makeResultView(String identifier) {
         return new FileTable(identifier);
     }
 

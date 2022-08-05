@@ -139,11 +139,11 @@ public abstract class AbstractConverterTest {
         return makeFile(delete, TARGET_SUFFIX);
     }
 
-    protected DocumentType validInputType() {
+    protected static DocumentType validInputType() {
         return MOCK_INPUT_TYPE;
     }
 
-    protected DocumentType validTargetType() {
+    protected static DocumentType validTargetType() {
         return MOCK_RESPONSE_TYPE;
     }
 

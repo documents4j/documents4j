@@ -14,7 +14,7 @@ public class OutputStreamToInputStreamConsumerTest {
 
     private static final Integer[] PSEUDO_VALUES = {7, 16, 9, 64, 14, 9, 8};
 
-    private OutputStream testDelegation(boolean closeAfterWrite) throws Exception {
+    private static OutputStream testDelegation(boolean closeAfterWrite) throws Exception {
         InputStream inputStream = mock(InputStream.class);
         OngoingStubbing<Integer> inputStreamStubbing = when(inputStream.read());
         for (int value : PSEUDO_VALUES) {

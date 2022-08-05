@@ -43,7 +43,7 @@ class WebserviceRequestFutureWrapper implements Future<Boolean> {
         return handle(futureResponse.get(timeout, unit));
     }
 
-    private boolean handle(Response response) throws ExecutionException {
+    private static boolean handle(Response response) throws ExecutionException {
         try {
             return ConverterNetworkProtocol.Status.from(response.getStatus()).resolve();
         } catch (ConverterException e) {

@@ -1,6 +1,8 @@
 package com.documents4j.conversion;
 
 import com.documents4j.throwables.ConverterAccessException;
+import com.documents4j.util.OsUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -68,8 +70,13 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             // would typically be triggered from a shut down hook. Therefore, the shut down process
             // should never be killed during JVM shut down. In order to avoid an incomplete start up
             // procedure, start up processes will never be killed either.
-            String[] command = {"cmd", "/S", "/C", doubleQuote(script.getAbsolutePath())};
+            String[] command = null;
 
+            if (OsUtils.isWindows()) {
+                command = new String[]{"cmd", "/S", "/C", doubleQuote(script.getAbsolutePath())};
+            } else if (OsUtils.isMac()) {
+                command = new String[]{"osascript", doubleQuote(script.getAbsolutePath())};
+            }
             int exitCode = makePresetProcessExecutor()
                     .command(command)
                     .execute().getExitValue();

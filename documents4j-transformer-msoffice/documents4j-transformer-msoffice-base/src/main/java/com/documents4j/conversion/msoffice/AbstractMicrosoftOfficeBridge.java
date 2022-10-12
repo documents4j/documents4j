@@ -5,6 +5,7 @@ import com.documents4j.conversion.AbstractExternalConverter;
 import com.documents4j.conversion.ExternalConverterScriptResult;
 import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
+import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
 import org.slf4j.Logger;
 import org.zeroturnaround.exec.StartedProcess;
@@ -65,12 +66,20 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
-            String[] command = {"cmd", "/S", "/C",
-                    doubleQuote(conversionScript.getAbsolutePath(),
-                            source.getAbsolutePath(),
-                            target.getAbsolutePath(),
-                            microsoftOfficeFormat.getValue())};
-
+            String[] command = null;
+            if (OsUtils.isWindows()) {
+                command = new String[]{"cmd", "/S", "/C",
+                        doubleQuote(conversionScript.getAbsolutePath(),
+                                source.getAbsolutePath(),
+                                target.getAbsolutePath(),
+                                microsoftOfficeFormat.getValue())};
+            } else if (OsUtils.isMac()) {
+                command = new String[]{"osascript",
+                        doubleQuote(conversionScript.getAbsolutePath(),
+                                source.getAbsolutePath(),
+                                target.getAbsolutePath(),
+                                microsoftOfficeFormat.getValue())};
+            }
             getLogger().trace("Running command for conversion {},", Arrays.toString(command));
 
             return makePresetProcessExecutor()

@@ -75,7 +75,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             if (OsUtils.isWindows()) {
                 command = new String[]{"cmd", "/S", "/C", doubleQuote(script.getAbsolutePath())};
             } else if (OsUtils.isMac()) {
-                command = new String[]{"osascript", doubleQuote(script.getAbsolutePath())};
+                command = new String[]{"/usr/bin/osascript", script.getAbsolutePath()};
             }
             int exitCode = makePresetProcessExecutor()
                     .command(command)

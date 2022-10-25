@@ -75,37 +75,13 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                                 target.getAbsolutePath(),
                                 microsoftOfficeFormat.getValue())};
             } else if (OsUtils.isMac()) {
-                command = new String[]{"zsh", "-c", "\"osascript " +
-                                       conversionScript.getAbsolutePath() + " " +
-                                       source.getAbsolutePath() + " " +
-                                       target.getAbsolutePath() + " " + 
-                                       microsoftOfficeFormat.getValue() + "\""};
+                command = new String[]{"/usr/bin/osascript",                                  
+                					   conversionScript.getAbsolutePath(),
+                                       source.getAbsolutePath(),
+                                       target.getAbsolutePath(),
+                                       microsoftOfficeFormat.getValue()};
             }
             getLogger().info("Running command for conversion '{}'", Arrays.toString(command));
-            
-//            ProcessBuilder processBuilder = new ProcessBuilder();
-//            processBuilder.command(command);
-//            try {
-//
-//                Process process = processBuilder.start();
-//
-//                BufferedReader reader = new BufferedReader(
-//                        new InputStreamReader(process.getErrorStream()));
-//
-//                     String line;
-//                     while ((line = reader.readLine()) != null) {
-//                        System.out.println("E: " + line);
-//                    }
-//
-//
-//                int success = process.waitFor();
-//                
-//                System.out.println("succ: " + success);
-                // check the status
-//            } catch (IOException | InterruptedException e) {
-//                // do some logging
-//            }
-            
             
             return makePresetProcessExecutor()
                     .command(command)

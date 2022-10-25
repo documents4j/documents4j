@@ -1,5 +1,6 @@
 package com.documents4j.conversion;
 
+import com.documents4j.util.OsUtils;
 import com.documents4j.util.Reaction;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -13,7 +14,7 @@ public enum ExternalConverterScriptResult {
     /**
      * Represents a successful conversion of a file.
      */
-    CONVERSION_SUCCESSFUL(2, Reaction.with(true)),
+    CONVERSION_SUCCESSFUL(OsUtils.isWindows() ? 2 : 0, Reaction.with(true)),
 
     /**
      * Represents a successful interaction with an external converter.

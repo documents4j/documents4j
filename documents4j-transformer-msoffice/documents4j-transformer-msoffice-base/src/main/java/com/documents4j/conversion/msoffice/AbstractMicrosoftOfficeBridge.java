@@ -1,5 +1,14 @@
 package com.documents4j.conversion.msoffice;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.zeroturnaround.exec.StartedProcess;
+
 import com.documents4j.api.DocumentType;
 import com.documents4j.conversion.AbstractExternalConverter;
 import com.documents4j.conversion.ExternalConverterScriptResult;
@@ -7,14 +16,6 @@ import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
 import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
-import org.slf4j.Logger;
-import org.zeroturnaround.exec.StartedProcess;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A base implementation of converting a file using a MS Office component.
@@ -74,14 +75,38 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                                 target.getAbsolutePath(),
                                 microsoftOfficeFormat.getValue())};
             } else if (OsUtils.isMac()) {
-                command = new String[]{"osascript",
-                        doubleQuote(conversionScript.getAbsolutePath(),
-                                source.getAbsolutePath(),
-                                target.getAbsolutePath(),
-                                microsoftOfficeFormat.getValue())};
+                command = new String[]{"zsh", "-c", "\"osascript " +
+                                       conversionScript.getAbsolutePath() + " " +
+                                       source.getAbsolutePath() + " " +
+                                       target.getAbsolutePath() + " " + 
+                                       microsoftOfficeFormat.getValue() + "\""};
             }
-            getLogger().trace("Running command for conversion {},", Arrays.toString(command));
-
+            getLogger().info("Running command for conversion '{}'", Arrays.toString(command));
+            
+//            ProcessBuilder processBuilder = new ProcessBuilder();
+//            processBuilder.command(command);
+//            try {
+//
+//                Process process = processBuilder.start();
+//
+//                BufferedReader reader = new BufferedReader(
+//                        new InputStreamReader(process.getErrorStream()));
+//
+//                     String line;
+//                     while ((line = reader.readLine()) != null) {
+//                        System.out.println("E: " + line);
+//                    }
+//
+//
+//                int success = process.waitFor();
+//                
+//                System.out.println("succ: " + success);
+                // check the status
+//            } catch (IOException | InterruptedException e) {
+//                // do some logging
+//            }
+            
+            
             return makePresetProcessExecutor()
                     .command(command)
                     .destroyOnExit()

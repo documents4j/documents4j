@@ -17,10 +17,10 @@ import java.util.Random;
  */
 enum MicrosoftExcelScript implements MicrosoftOfficeScript {
 
-    CONVERSION("/excel_convert" + (OsUtils.isWindows()?".vbs":(OsUtils.isMac()?".applescript":".sh"))),
-    STARTUP("/excel_start" + (OsUtils.isWindows()?".vbs":(OsUtils.isMac()?".applescript":".sh"))),
-    SHUTDOWN("/excel_shutdown" + (OsUtils.isWindows()?".vbs":(OsUtils.isMac()?".applescript":".sh"))),
-    ASSERTION("/excel_assert" + (OsUtils.isWindows()?".vbs":(OsUtils.isMac()?".applescript":".sh")));
+    CONVERSION("/excel_convert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    STARTUP("/excel_start" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    SHUTDOWN("/excel_shutdown" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    ASSERTION("/excel_assert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh")));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftExcelBridge.class);
     private static final Random RANDOM = new Random();

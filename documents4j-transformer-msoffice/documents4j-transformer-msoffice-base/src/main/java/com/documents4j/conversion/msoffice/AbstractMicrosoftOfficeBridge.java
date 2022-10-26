@@ -6,11 +6,16 @@ import com.documents4j.conversion.ExternalConverterScriptResult;
 import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Supplier;
 import org.slf4j.Logger;
+import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.StartedProcess;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -22,12 +27,23 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
     private final File conversionScript;
 
+    protected final boolean exitCodeFromStandardOutput;
+
+    protected AbstractMicrosoftOfficeBridge(File baseFolder,
+                                         long processTimeout,
+                                         TimeUnit processTimeoutUnit,
+                                         MicrosoftOfficeScript conversionScript) {
+        this(baseFolder, processTimeout, processTimeoutUnit, conversionScript, false);
+    }
+
     protected AbstractMicrosoftOfficeBridge(File baseFolder,
                                             long processTimeout,
                                             TimeUnit processTimeoutUnit,
-                                            MicrosoftOfficeScript conversionScript) {
+                                            MicrosoftOfficeScript conversionScript,
+                                            boolean exitCodeFromStandardOutput) {
         super(baseFolder, processTimeout, processTimeoutUnit);
         this.conversionScript = conversionScript.materializeIn(baseFolder);
+        this.exitCodeFromStandardOutput = exitCodeFromStandardOutput;
     }
 
     protected void tryStart(MicrosoftOfficeScript startupScript) {
@@ -57,10 +73,21 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
     @Override
     public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
-        return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
+        if (exitCodeFromStandardOutput) {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            return new ProcessFutureWrapper(
+                    doStartConversion(source, sourceType, target, targetType, () -> makePresetProcessExecutor(outputStream)),
+                    processResult -> Integer.parseInt(new String(outputStream.toByteArray(), StandardCharsets.UTF_8)));
+        } else {
+            return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
+        }
     }
 
     protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
+        return doStartConversion(source, sourceType, target, targetType, this::makePresetProcessExecutor);
+    }
+
+    protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType, Supplier<ProcessExecutor> executorSupplier) {
         getLogger().info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
@@ -73,7 +100,7 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
             getLogger().trace("Running command for conversion {},", Arrays.toString(command));
 
-            return makePresetProcessExecutor()
+            return executorSupplier.get()
                     .command(command)
                     .destroyOnExit()
                     .addListener(targetNameCorrector(target, microsoftOfficeFormat.getFileExtension()))

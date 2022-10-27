@@ -2,6 +2,8 @@ package com.documents4j.conversion.msoffice;
 
 import com.documents4j.api.DocumentType;
 import com.documents4j.conversion.ViableConversion;
+import com.documents4j.util.OsUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +32,7 @@ public class MicrosoftPowerpointBridge extends AbstractMicrosoftOfficeBridge {
     private static final Semaphore CONVERSION_LOCK = new Semaphore(3, true);
 
     public MicrosoftPowerpointBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftPowerpointScript.CONVERSION);
+        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftPowerpointScript.CONVERSION, OsUtils.isMac());
         startUp();
     }
 

@@ -121,7 +121,7 @@ class FailureAwareConverter implements IConverter {
 
     private class FailureAwareFileConsumer implements IFileConsumer {
 
-        private IFileConsumer fileConsumer;
+        private final IFileConsumer fileConsumer;
 
         private FailureAwareFileConsumer(IFileConsumer fileConsumer) {
             this.fileConsumer = fileConsumer;

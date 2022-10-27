@@ -131,7 +131,7 @@ abstract class AbstractFutureWrappingPriorityFuture<T, S extends IConversionCont
         }
     }
 
-    private RuntimeException processException(Exception e) {
+    private static RuntimeException processException(Exception e) {
         if (e instanceof ExecutionException) {
             return processException((Exception) e.getCause());
         } else if (e instanceof InterruptedException) {

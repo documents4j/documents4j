@@ -1,6 +1,7 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.throwables.FileSystemInteractionException;
+import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -16,10 +17,10 @@ import java.util.Random;
  */
 enum MicrosoftExcelScript implements MicrosoftOfficeScript {
 
-    CONVERSION("/excel_convert.vbs"),
-    STARTUP("/excel_start.vbs"),
-    SHUTDOWN("/excel_shutdown.vbs"),
-    ASSERTION("/excel_assert.vbs");
+    CONVERSION("/excel_convert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    STARTUP("/excel_start" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    SHUTDOWN("/excel_shutdown" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    ASSERTION("/excel_assert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh")));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftExcelBridge.class);
     private static final Random RANDOM = new Random();

@@ -133,7 +133,7 @@ class CopyConverter extends ConverterAdapter {
         }
     }
 
-    private class IllegalFormatConversionJob extends ConversionJobAdapter
+    private static class IllegalFormatConversionJob extends ConversionJobAdapter
             implements IConversionJobWithPriorityUnspecified, IConversionJobWithTargetUnspecified {
 
         private final IInputStreamConsumer callback;

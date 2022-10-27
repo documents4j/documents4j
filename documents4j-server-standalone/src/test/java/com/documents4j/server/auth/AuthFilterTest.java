@@ -8,8 +8,6 @@ import javax.ws.rs.core.UriInfo;
 import java.util.Base64;
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 public class AuthFilterTest {

@@ -47,7 +47,7 @@ class InputStreamConsumerToFileConsumer implements IFileConsumer {
         }
     }
 
-    private void tryDelete(File file) {
+    private static void tryDelete(File file) {
         if (file.exists() && !file.delete()) {
             LOGGER.warn("Could not delete target file {} after unsuccessful conversion", file);
         }

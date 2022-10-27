@@ -156,7 +156,7 @@ public class RemoteConverter extends ConverterAdapter {
                 .get(ConverterServerInformation.class));
     }
 
-    private ConverterServerInformation logConverterServerInformation(ConverterServerInformation converterServerInformation) {
+    private static ConverterServerInformation logConverterServerInformation(ConverterServerInformation converterServerInformation) {
         LOGGER.info("Currently operational @ conversion server: {}", converterServerInformation.isOperational());
         LOGGER.info("Request timeout @ conversion server: {}", converterServerInformation.getTimeout());
         LOGGER.info("Protocol version @ conversion server: {}", converterServerInformation.getProtocolVersion());

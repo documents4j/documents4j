@@ -17,22 +17,23 @@ class LogLevelValueConverter implements ValueConverter<Level> {
     @Override
     public Level convert(String value) {
         value = value.toLowerCase();
-        if (value.equals(LEVEL_OFF)) {
-            return Level.OFF;
-        } else if (value.equals(LEVEL_ERROR)) {
-            return Level.ERROR;
-        } else if (value.equals(LEVEL_WARN)) {
-            return Level.WARN;
-        } else if (value.equals(LEVEL_INFO)) {
-            return Level.INFO;
-        } else if (value.equals(LEVEL_DEBUG)) {
-            return Level.DEBUG;
-        } else if (value.equals(LEVEL_TRACE)) {
-            return Level.TRACE;
-        } else if (value.equals(LEVEL_ALL)) {
-            return Level.ALL;
-        } else {
-            throw new ValueConversionException("No valid log level: " + value);
+        switch (value) {
+            case LEVEL_OFF:
+                return Level.OFF;
+            case LEVEL_ERROR:
+                return Level.ERROR;
+            case LEVEL_WARN:
+                return Level.WARN;
+            case LEVEL_INFO:
+                return Level.INFO;
+            case LEVEL_DEBUG:
+                return Level.DEBUG;
+            case LEVEL_TRACE:
+                return Level.TRACE;
+            case LEVEL_ALL:
+                return Level.ALL;
+            default:
+                throw new ValueConversionException("No valid log level: " + value);
         }
 
     }

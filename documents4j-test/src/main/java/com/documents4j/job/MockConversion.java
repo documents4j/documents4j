@@ -44,7 +44,7 @@ public enum MockConversion {
             assertEquals(DELIMITER, raw.charAt(0));
             int secondDelimiterIndex = raw.indexOf(DELIMITER, 1);
             assertTrue(secondDelimiterIndex >= 0);
-            messageCode = Integer.valueOf(raw.substring(1, secondDelimiterIndex));
+            messageCode = Integer.parseInt(raw.substring(1, secondDelimiterIndex));
             message = raw.substring(secondDelimiterIndex + 1);
         } catch (IOException e) {
             throw new AssertionError("Could not read input stream");
@@ -114,11 +114,8 @@ public enum MockConversion {
     }
 
     public File asFile(String message, File file) throws IOException {
-        InputStream inputStream = toInputStream(message);
-        try {
+        try (InputStream inputStream = toInputStream(message)) {
             Files.asByteSink(file).writeFrom(inputStream);
-        } finally {
-            inputStream.close();
         }
         return file;
     }

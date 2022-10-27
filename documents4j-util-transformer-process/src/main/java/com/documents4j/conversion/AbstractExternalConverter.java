@@ -10,6 +10,7 @@ import org.zeroturnaround.exec.stream.slf4j.Slf4jStream;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -53,9 +54,14 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         return processTimeout;
     }
 
+
     protected ProcessExecutor makePresetProcessExecutor() {
+        return makePresetProcessExecutor(Slf4jStream.of(logger).asInfo());
+    }
+
+    protected ProcessExecutor makePresetProcessExecutor(OutputStream outputStream) {
         return new ProcessExecutor()
-                .redirectOutput(Slf4jStream.of(logger).asInfo())
+                .redirectOutput(outputStream)
                 .redirectError(Slf4jStream.of(logger).asInfo())
                 .readOutput(true)
                 .directory(getBaseFolder())

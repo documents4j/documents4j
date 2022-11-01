@@ -2,11 +2,13 @@ package com.documents4j.conversion.msoffice;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
+import org.zeroturnaround.exec.ProcessExecutor;
 import org.zeroturnaround.exec.StartedProcess;
 
 import com.documents4j.api.DocumentType;
@@ -16,20 +18,7 @@ import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
 import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
-
 import com.google.common.base.Supplier;
-import org.slf4j.Logger;
-import org.zeroturnaround.exec.ProcessExecutor;
-import org.zeroturnaround.exec.StartedProcess;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -86,10 +75,12 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
     @Override
     public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
         if (exitCodeFromStandardOutput) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             return new ProcessFutureWrapper(
-                    doStartConversion(source, sourceType, target, targetType, () -> makePresetProcessExecutor(outputStream)),
-                    processResult -> Integer.parseInt(new String(outputStream.toByteArray(), StandardCharsets.UTF_8)));
+                    doStartConversion(source, sourceType, target, targetType, () -> makePresetProcessExecutor()),
+                    processResult -> {
+                    	String s = new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\r\n", " ").trim(); 
+                    	return Integer.parseInt(s);
+                    });
         } else {
             return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
         }

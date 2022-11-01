@@ -1,15 +1,15 @@
 package com.documents4j.conversion;
 
-import com.documents4j.throwables.ConverterException;
-import org.zeroturnaround.exec.ProcessResult;
-import org.zeroturnaround.exec.StartedProcess;
-
-import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.ToIntFunction;
+
+import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.StartedProcess;
+
+import com.documents4j.throwables.ConverterException;
 
 public class ProcessFutureWrapper implements Future<Boolean> {
 

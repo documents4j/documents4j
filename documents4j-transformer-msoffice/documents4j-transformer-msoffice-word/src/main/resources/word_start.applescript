@@ -1,4 +1,4 @@
-set appName to "Microsoft Excel"
+set appName to "Microsoft Word"
 
 try 
 if application appName is running then

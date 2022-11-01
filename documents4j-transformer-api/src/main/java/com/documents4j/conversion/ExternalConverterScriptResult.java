@@ -1,6 +1,5 @@
 package com.documents4j.conversion;
 
-import com.documents4j.util.OsUtils;
 import com.documents4j.util.Reaction;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;

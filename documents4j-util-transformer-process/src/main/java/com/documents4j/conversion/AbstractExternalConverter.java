@@ -3,12 +3,9 @@ package com.documents4j.conversion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.ToIntFunction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeroturnaround.exec.ProcessExecutor;
@@ -62,7 +59,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
         return makePresetProcessExecutor(Slf4jStream.of(logger).asInfo());
     }
 
-    protected ProcessExecutor makePresetProcessExecutor(OutputStream outputStream) { 
+    protected ProcessExecutor makePresetProcessExecutor(OutputStream outputStream) {
         return new ProcessExecutor()
                 .redirectOutput(outputStream)
                 .redirectError(Slf4jStream.of(logger).asInfo())
@@ -89,8 +86,8 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
                                .execute().getExitValue();
             } else if (OsUtils.isMac()) {
                 command = new String[]{"/usr/bin/osascript", script.getAbsolutePath()};
-                ProcessResult res = makePresetProcessExecutor().command(command).execute(); 
-                ToIntFunction<ProcessResult> extractor = ( processResult -> Integer.parseInt(new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\\n", "")) );
+                ProcessResult res = makePresetProcessExecutor().command(command).execute();
+                //ToIntFunction<ProcessResult> extractor = ( processResult -> Integer.parseInt(new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\\n", "")) );
                 //exitCode = extractor.applyAsInt(res);
                 exitCode = res.getExitValue();
             }

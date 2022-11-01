@@ -78,8 +78,8 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
             return new ProcessFutureWrapper(
                     doStartConversion(source, sourceType, target, targetType, () -> makePresetProcessExecutor()),
                     processResult -> {
-                    	String s = new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\r\n", " ").trim(); 
-                    	return Integer.parseInt(s);
+                        String s = new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\r\n", " ").trim();
+                        return Integer.parseInt(s);
                     });
         } else {
             return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
@@ -103,14 +103,14 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
                                 target.getAbsolutePath(),
                                 microsoftOfficeFormat.getValue())};
             } else if (OsUtils.isMac()) {
-                command = new String[]{"/usr/bin/osascript",                                  
-                					   conversionScript.getAbsolutePath(),
+                command = new String[]{"/usr/bin/osascript",
+                                       conversionScript.getAbsolutePath(),
                                        source.getAbsolutePath(),
                                        target.getAbsolutePath(),
                                        microsoftOfficeFormat.getValue()};
             }
             getLogger().info("Running command for conversion '{}'", Arrays.toString(command));
-            
+
            return executorSupplier.get()
                     .command(command)
                     .destroyOnExit()

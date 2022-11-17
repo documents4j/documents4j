@@ -2,7 +2,7 @@ package com.documents4j.util;
 
 public class OsUtils {
 
-    private static String myOS = System.getProperty("os.name").toLowerCase();
+    private static final String myOS = System.getProperty("os.name").toLowerCase();
 
     private OsUtils() {
         /* empty, but suppress visibility outside of package */

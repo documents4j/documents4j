@@ -77,16 +77,16 @@ public class MicrosoftOfficeAssertionEngine {
                 .readOutput(true)
                 .exitValueAny()
                 .execute();
+        } else {
+            new ProcessExecutor()
+                    .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))
+                    .redirectOutput(Slf4jStream.of(LOGGER).asInfo())
+                    .redirectError(Slf4jStream.of(LOGGER).asInfo())
+                    .timeout(1L, TimeUnit.MINUTES)
+                    .exitValueAny()
+                    .execute()
+                    .getExitValue();
         }
-
-        new ProcessExecutor()
-                .command(Arrays.asList("cmd", "/C", String.format("\"%s\"", wordShutdownScript.getAbsolutePath())))
-                .redirectOutput(Slf4jStream.of(LOGGER).asInfo())
-                .redirectError(Slf4jStream.of(LOGGER).asInfo())
-                .timeout(1L, TimeUnit.MINUTES)
-                .exitValueAny()
-                .execute()
-                .getExitValue();
     }
 
     public void shutDown() {

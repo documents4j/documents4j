@@ -90,7 +90,7 @@ public abstract class AbstractExternalConverter implements IExternalConverter {
             } else if (OsUtils.isMac()) {
                 command = new String[]{"/usr/bin/osascript", script.getAbsolutePath()};
                 ProcessResult res = makePresetProcessExecutor().command(command).execute();
-                ToIntFunction<ProcessResult> extractor = ( processResult -> Integer.parseInt(new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\\n", "")) );
+                ToIntFunction<ProcessResult> extractor = result -> Integer.parseInt(new String(result.output(), StandardCharsets.UTF_8).replaceAll("\\n", ""));
                 exitCode = extractor.applyAsInt(res);
             }
             logger.trace("Got exitcode {} for command {}", exitCode, Arrays.toString(command));

@@ -1,19 +1,29 @@
 package com.documents4j.conversion;
 
-import com.documents4j.throwables.ConverterException;
-import org.zeroturnaround.exec.StartedProcess;
-
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.ToIntFunction;
+
+import org.zeroturnaround.exec.ProcessResult;
+import org.zeroturnaround.exec.StartedProcess;
+
+import com.documents4j.throwables.ConverterException;
 
 public class ProcessFutureWrapper implements Future<Boolean> {
 
     private final StartedProcess startedProcess;
 
-    public ProcessFutureWrapper(StartedProcess processFuture) {
+    private final ToIntFunction<ProcessResult> extractor;
+
+    public ProcessFutureWrapper(StartedProcess startedProcess) {
+        this(startedProcess, ProcessResult::getExitValue);
+    }
+
+    public ProcessFutureWrapper(StartedProcess processFuture, ToIntFunction<ProcessResult> extractor) {
         this.startedProcess = processFuture;
+        this.extractor = extractor;
     }
 
     @Override
@@ -33,8 +43,7 @@ public class ProcessFutureWrapper implements Future<Boolean> {
 
     @Override
     public Boolean get() throws InterruptedException, ExecutionException {
-        int exitValue = startedProcess.getFuture().get().getExitValue();
-
+        int exitValue = extractor.applyAsInt(startedProcess.getFuture().get());
         return evaluateExitValue(exitValue);
     }
 

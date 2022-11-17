@@ -2,6 +2,8 @@ package com.documents4j.conversion.msoffice;
 
 import com.documents4j.api.DocumentType;
 import com.documents4j.conversion.ViableConversion;
+import com.documents4j.util.OsUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +43,7 @@ public class MicrosoftExcelBridge extends AbstractMicrosoftOfficeBridge {
     private static final Semaphore CONVERSION_LOCK = new Semaphore(1, true);
 
     public MicrosoftExcelBridge(File baseFolder, long processTimeout, TimeUnit processTimeoutUnit) {
-        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftExcelScript.CONVERSION);
+        super(baseFolder, processTimeout, processTimeoutUnit, MicrosoftExcelScript.CONVERSION, OsUtils.isMac());
         startUp();
     }
 

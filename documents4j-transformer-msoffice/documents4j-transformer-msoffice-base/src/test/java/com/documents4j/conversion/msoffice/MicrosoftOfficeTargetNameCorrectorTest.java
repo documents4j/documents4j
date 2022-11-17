@@ -2,6 +2,7 @@ package com.documents4j.conversion.msoffice;
 
 import com.documents4j.conversion.ExternalConverterScriptResult;
 import com.documents4j.throwables.FileSystemInteractionException;
+import com.documents4j.util.OsUtils;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import org.junit.After;
@@ -9,6 +10,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -89,7 +93,8 @@ public class MicrosoftOfficeTargetNameCorrectorTest {
 
     @Test(expected = FileSystemInteractionException.class)
     public void testRenamingProcessSuccessfulFileWithoutFileNameExtensionBlocked() throws Exception {
-        Process process = Mockito.mock(Process.class);
+    	assumeTrue(OsUtils.isWindows());
+    	Process process = Mockito.mock(Process.class);
         Mockito.when(process.exitValue()).thenReturn(ExternalConverterScriptResult.CONVERSION_SUCCESSFUL.getExitValue());
 
         File target = makeFile("." + FOO);

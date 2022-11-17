@@ -1,19 +1,25 @@
 package com.documents4j.conversion.msoffice;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.zeroturnaround.exec.ProcessExecutor;
+import org.zeroturnaround.exec.StartedProcess;
+
 import com.documents4j.api.DocumentType;
 import com.documents4j.conversion.AbstractExternalConverter;
 import com.documents4j.conversion.ExternalConverterScriptResult;
 import com.documents4j.conversion.ProcessFutureWrapper;
 import com.documents4j.throwables.ConverterAccessException;
+import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
-import org.slf4j.Logger;
-import org.zeroturnaround.exec.StartedProcess;
+import com.google.common.base.Supplier;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A base implementation of converting a file using a MS Office component.
@@ -22,12 +28,23 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
     private final File conversionScript;
 
+    protected final boolean exitCodeFromStandardOutput;
+
+    protected AbstractMicrosoftOfficeBridge(File baseFolder,
+                                         long processTimeout,
+                                         TimeUnit processTimeoutUnit,
+                                         MicrosoftOfficeScript conversionScript) {
+        this(baseFolder, processTimeout, processTimeoutUnit, conversionScript, false);
+    }
+
     protected AbstractMicrosoftOfficeBridge(File baseFolder,
                                             long processTimeout,
                                             TimeUnit processTimeoutUnit,
-                                            MicrosoftOfficeScript conversionScript) {
+                                            MicrosoftOfficeScript conversionScript,
+                                            boolean exitCodeFromStandardOutput) {
         super(baseFolder, processTimeout, processTimeoutUnit);
         this.conversionScript = conversionScript.materializeIn(baseFolder);
+        this.exitCodeFromStandardOutput = exitCodeFromStandardOutput;
     }
 
     protected void tryStart(MicrosoftOfficeScript startupScript) {
@@ -57,23 +74,44 @@ public abstract class AbstractMicrosoftOfficeBridge extends AbstractExternalConv
 
     @Override
     public Future<Boolean> startConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
-        return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
+        if (exitCodeFromStandardOutput) {
+            return new ProcessFutureWrapper(
+                    doStartConversion(source, sourceType, target, targetType, () -> makePresetProcessExecutor()),
+                    processResult -> {
+                        String s = new String(processResult.output(), StandardCharsets.UTF_8).replaceAll("\r\n", " ").trim();
+                        return Integer.parseInt(s);
+                    });
+        } else {
+            return new ProcessFutureWrapper(doStartConversion(source, sourceType, target, targetType));
+        }
     }
 
     protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType) {
+        return doStartConversion(source, sourceType, target, targetType, this::makePresetProcessExecutor);
+    }
+
+    protected StartedProcess doStartConversion(File source, DocumentType sourceType, File target, DocumentType targetType, Supplier<ProcessExecutor> executorSupplier) {
         getLogger().info("Requested conversion from {} ({}) to {} ({})", source, sourceType, target, targetType);
         try {
             MicrosoftOfficeFormat microsoftOfficeFormat = formatOf(targetType);
             // Always call destroyOnExit before adding a listener: https://github.com/zeroturnaround/zt-exec/issues/14
-            String[] command = {"cmd", "/S", "/C",
-                    doubleQuote(conversionScript.getAbsolutePath(),
-                            source.getAbsolutePath(),
-                            target.getAbsolutePath(),
-                            microsoftOfficeFormat.getValue())};
+            String[] command = null;
+            if (OsUtils.isWindows()) {
+                command = new String[]{"cmd", "/S", "/C",
+                        doubleQuote(conversionScript.getAbsolutePath(),
+                                source.getAbsolutePath(),
+                                target.getAbsolutePath(),
+                                microsoftOfficeFormat.getValue())};
+            } else if (OsUtils.isMac()) {
+                command = new String[]{"/usr/bin/osascript",
+                                       conversionScript.getAbsolutePath(),
+                                       source.getAbsolutePath(),
+                                       target.getAbsolutePath(),
+                                       microsoftOfficeFormat.getValue()};
+            }
+            getLogger().info("Running command for conversion '{}'", Arrays.toString(command));
 
-            getLogger().trace("Running command for conversion {},", Arrays.toString(command));
-
-            return makePresetProcessExecutor()
+           return executorSupplier.get()
                     .command(command)
                     .destroyOnExit()
                     .addListener(targetNameCorrector(target, microsoftOfficeFormat.getFileExtension()))

@@ -1,6 +1,7 @@
 package com.documents4j.conversion.msoffice;
 
 import com.documents4j.throwables.FileSystemInteractionException;
+import com.documents4j.util.OsUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -13,10 +14,10 @@ import java.util.Random;
 
 enum MicrosoftWordScript implements MicrosoftOfficeScript {
 
-    CONVERSION("/word_convert.vbs"),
-    STARTUP("/word_start.vbs"),
-    SHUTDOWN("/word_shutdown.vbs"),
-    ASSERTION("/word_assert.vbs");
+    CONVERSION("/word_convert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    STARTUP("/word_start" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    SHUTDOWN("/word_shutdown" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh"))),
+    ASSERTION("/word_assert" + (OsUtils.isWindows() ? ".vbs" : (OsUtils.isMac() ? ".applescript" : ".sh")));
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MicrosoftWordBridge.class);
     private static final Random RANDOM = new Random();

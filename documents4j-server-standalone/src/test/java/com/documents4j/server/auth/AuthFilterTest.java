@@ -3,8 +3,8 @@ package com.documents4j.server.auth;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.UriInfo;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.UriInfo;
 import java.util.Base64;
 import java.util.Collections;
 

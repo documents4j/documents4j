@@ -1,8 +1,8 @@
 package com.documents4j.ws.endpoint;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Provides an endpoint that is not protected and returns always 200 OK if the service is running.

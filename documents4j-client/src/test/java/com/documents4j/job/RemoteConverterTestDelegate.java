@@ -6,7 +6,7 @@ import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
 import org.glassfish.jersey.test.spi.TestContainerException;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 import java.net.URI;
 
 import static org.junit.Assert.assertEquals;

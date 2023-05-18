@@ -1,6 +1,7 @@
 package com.documents4j.ws.application;
 
-import com.documents4j.api.IConverter;
+import com.documents4j.api
+        .IConverter;
 import com.documents4j.conversion.IExternalConverter;
 import com.documents4j.job.LocalConverter;
 import org.glassfish.jersey.server.spi.Container;
@@ -8,7 +9,7 @@ import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.Provider;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;

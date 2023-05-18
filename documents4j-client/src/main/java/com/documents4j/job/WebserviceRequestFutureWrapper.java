@@ -4,7 +4,7 @@ import com.documents4j.throwables.ConverterException;
 import com.documents4j.ws.ConverterNetworkProtocol;
 import com.google.common.base.MoreObjects;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

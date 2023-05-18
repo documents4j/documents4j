@@ -79,12 +79,6 @@
             <artifactId>jul-to-slf4j</artifactId>
         </dependency>
 
-        <!-- Add dependency removed in Java 11 -->
-        <dependency>
-            <groupId>javax.activation</groupId>
-            <artifactId>activation</artifactId>
-        </dependency>
-
         <!-- Testing dependencies -->
         <dependency>
             <groupId>junit</groupId>

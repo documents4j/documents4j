@@ -82,13 +82,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <shaded.classifier>shaded</shaded.classifier>
-        <version.javax.rs>2.0.1</version.javax.rs>
+        <version.jakarta.rs>3.0.0</version.jakarta.rs>
         <version.javax.servlet>3.0.1</version.javax.servlet>
-        <version.javax.inject>1</version.javax.inject>
-        <version.javax.annotation>1.2</version.javax.annotation>
-        <version.javax.activation>1.1.1</version.javax.activation>
-        <version.javax.jaxb>2.3.0</version.javax.jaxb>
-        <version.jersey>2.29</version.jersey>
+        <version.jakarta.inject>2.0.0</version.jakarta.inject>
+        <version.jakarta.bind>3.0.0</version.jakarta.bind>
+        <version.glashfish.jaxb>3.0.2</version.glashfish.jaxb>
+        <version.jersey>3.0.2</version.jersey>
         <version.guava>30.0-jre</version.guava>
         <version.zt-exec>1.11</version.zt-exec>
         <version.jopt-simple>5.0.4</version.jopt-simple>
@@ -213,9 +212,9 @@
 
             <!-- Java extensions -->
             <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>javax.ws.rs-api</artifactId>
-                <version>${version.javax.rs}</version>
+                <groupId>jakarta.ws.rs</groupId>
+                <artifactId>jakarta.ws.rs-api</artifactId>
+                <version>${version.jakarta.rs}</version>
             </dependency>
 
             <dependency>
@@ -225,39 +224,21 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>${version.javax.inject}</version>
+                <groupId>jakarta.inject</groupId>
+                <artifactId>jakarta.inject-api</artifactId>
+                <version>${version.jakarta.inject}</version>
             </dependency>
 
             <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>${version.javax.annotation}</version>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${version.jakarta.bind}</version>
             </dependency>
 
             <dependency>
-                <groupId>javax.activation</groupId>
-                <artifactId>activation</artifactId>
-                <version>${version.javax.activation}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${version.javax.jaxb}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-core</artifactId>
-                <version>${version.javax.jaxb}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.sun.xml.bind</groupId>
-                <artifactId>jaxb-impl</artifactId>
-                <version>${version.javax.jaxb}</version>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${version.glashfish.jaxb}</version>
             </dependency>
 
             <!-- Testing / Logging -->

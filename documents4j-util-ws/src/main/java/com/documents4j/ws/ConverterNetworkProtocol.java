@@ -6,7 +6,7 @@ import com.documents4j.util.Reaction;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * This class is a non-instantiable carrier for values that are used in network communication between a

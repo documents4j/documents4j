@@ -8,10 +8,10 @@ import com.documents4j.ws.application.WebConverterTestConfiguration;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Test;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;

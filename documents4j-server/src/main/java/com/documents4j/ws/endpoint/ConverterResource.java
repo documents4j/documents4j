@@ -6,13 +6,13 @@ import com.documents4j.ws.ConverterNetworkProtocol;
 import com.documents4j.ws.ConverterServerInformation;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 
-import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.Suspended;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.io.InputStream;
 
 @Path(ConverterNetworkProtocol.RESOURCE_PATH)

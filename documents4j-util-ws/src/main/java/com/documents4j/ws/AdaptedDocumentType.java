@@ -2,7 +2,7 @@ package com.documents4j.ws;
 
 import com.documents4j.api.DocumentType;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 public class AdaptedDocumentType {
 

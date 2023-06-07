@@ -55,7 +55,7 @@ public class CommandDescription {
             "is currently very busy.";
 
     public static final String ARGUMENT_LONG_SSL = "ssl";
-    public static final String ARGUMENT_SHORT_SSL = "E";
+    public static final String ARGUMENT_SHORT_SSL = "K";
     public static final String DESCRIPTION_CONTEXT_SSL = "Registers the JVM's default SSL context for encryption of conversions.";
 
     public static final String ARGUMENT_LONG_AUTH = "auth";

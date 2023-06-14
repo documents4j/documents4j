@@ -88,7 +88,7 @@
         <version.jakarta.bind>3.0.0</version.jakarta.bind>
         <version.glashfish.jaxb>3.0.2</version.glashfish.jaxb>
         <version.jersey>3.0.2</version.jersey>
-        <version.guava>30.0-jre</version.guava>
+        <version.guava>32.0.0-jre</version.guava>
         <version.zt-exec>1.11</version.zt-exec>
         <version.jopt-simple>5.0.4</version.jopt-simple>
         <version.slf4j>1.7.28</version.slf4j>

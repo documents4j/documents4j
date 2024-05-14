@@ -12,8 +12,8 @@ import static com.google.common.base.Preconditions.checkState;
 enum ExternalConverterDiscovery {
 
     MICROSOFT_WORD("com.documents4j.conversion.msoffice.MicrosoftWordBridge"),
-    MICROSOFT_EXCEL("com.documents4j.conversion.msoffice.MicrosoftExcelBridge")/*,
-    MICROSOFT_POWERPOINT("com.documents4j.conversion.msoffice.MicrosoftPowerpointBridge")*/;
+    MICROSOFT_EXCEL("com.documents4j.conversion.msoffice.MicrosoftExcelBridge"),
+    MICROSOFT_POWERPOINT("com.documents4j.conversion.msoffice.MicrosoftPowerpointBridge");
 
     private final String className;
 

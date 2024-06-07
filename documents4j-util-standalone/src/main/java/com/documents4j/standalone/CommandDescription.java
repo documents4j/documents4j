@@ -77,6 +77,11 @@ public class CommandDescription {
             "by the converter. Valid log levels are 'off', 'error', 'warn', 'info', 'debug' and 'trace'. Without explicit configuration, " +
             "the 'warn' level is activated which is also the recommended level for production use of the converter.";
 
+    public static final String ARGUMENT_LONG_JSON_LOG = "json-log";
+    public static final String ARGUMENT_SHORT_JSON_LOG = "J";
+    public static final String DESCRIPTION_ARGUMENT_JSON_LOG = "External log aggregator services often require log output " +
+            "to be JSON. This allows for easier parsing of exception stack traces.";
+
     public static final String ARGUMENT_LONG_ENABLED_CONVERTER = "enable";
     public static final String ARGUMENT_SHORT_ENABLED_CONVERTER = "E";
     public static final String DESCRIPTION_ARGUMENT_ENABLED_CONVERTER = "The fully qualified Java class name of the document converter to enable.";

@@ -91,26 +91,27 @@
         <version.guava>30.0-jre</version.guava>
         <version.zt-exec>1.11</version.zt-exec>
         <version.jopt-simple>5.0.4</version.jopt-simple>
-        <version.slf4j>1.7.28</version.slf4j>
-        <version.logback>1.2.3</version.logback>
+        <version.slf4j>2.0.13</version.slf4j>
+        <version.logback>1.5.6</version.logback>
         <version.junit>4.13.1</version.junit>
         <version.mockito>3.0.0</version.mockito>
         <version.thread-weaver>0.2</version.thread-weaver>
         <version.jetty>9.4.20.v20190813</version.jetty>
-        <version.maven.compiler-plugin>3.11.0</version.maven.compiler-plugin>
-        <version.maven.surefire-plugin>2.16</version.maven.surefire-plugin>
-        <version.maven.source-plugin>3.3.0</version.maven.source-plugin>
-        <version.maven.javadoc-plugin>3.5.0</version.maven.javadoc-plugin>
-        <version.maven.gpg-plugin>1.6</version.maven.gpg-plugin>
-        <version.maven.war-plugin>2.3</version.maven.war-plugin>
-        <version.maven.shade-plugin>2.1</version.maven.shade-plugin>
+        <version.logstash.encoder>7.4</version.logstash.encoder>
+        <version.maven.compiler-plugin>3.13.0</version.maven.compiler-plugin>
+        <version.maven.surefire-plugin>3.2.5</version.maven.surefire-plugin>
+        <version.maven.source-plugin>3.3.1</version.maven.source-plugin>
+        <version.maven.javadoc-plugin>3.7.0</version.maven.javadoc-plugin>
+        <version.maven.gpg-plugin>3.2.4</version.maven.gpg-plugin>
+        <version.maven.war-plugin>3.4.0</version.maven.war-plugin>
+        <version.maven.shade-plugin>3.6.0</version.maven.shade-plugin>
         <version.maven.cobertura-plugin>2.7</version.maven.cobertura-plugin>
         <version.maven.checkstyle-plugin>2.15</version.maven.checkstyle-plugin>
-        <version.maven.resources-plugin>2.6</version.maven.resources-plugin>
-        <version.maven.release-plugin>2.5.1</version.maven.release-plugin>
-        <version.maven.install-plugin>2.5.1</version.maven.install-plugin>
-        <version.maven.jxr-plugin>2.3</version.maven.jxr-plugin>
-        <version.java>8</version.java>
+        <version.maven.resources-plugin>3.3.1</version.maven.resources-plugin>
+        <version.maven.release-plugin>3.0.1</version.maven.release-plugin>
+        <version.maven.install-plugin>3.1.2</version.maven.install-plugin>
+        <version.maven.jxr-plugin>3.4.0</version.maven.jxr-plugin>
+        <version.java>11</version.java>
     </properties>
 
     <developers>
@@ -257,6 +258,12 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${version.logback}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${version.logstash.encoder}</version>
             </dependency>
 
             <dependency>

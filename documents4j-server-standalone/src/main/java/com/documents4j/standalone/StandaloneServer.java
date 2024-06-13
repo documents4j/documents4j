@@ -326,8 +326,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<File> makeBaseFolderSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
-                                CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
+                        CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
+                        CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
                         CommandDescription.DESCRIPTION_CONTEXT_BASE_FOLDER
                 )
                 .withRequiredArg()
@@ -339,8 +339,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Integer> makeCorePoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
-                                CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
+                        CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
+                        CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
                         CommandDescription.DESCRIPTION_CONTEXT_CORE_POOL_SIZE
                 )
                 .withRequiredArg()
@@ -352,8 +352,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Integer> makeFallbackPoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
-                                CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
+                        CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
+                        CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
                         CommandDescription.DESCRIPTION_CONTEXT_MAXIMUM_POOL_SIZE
                 )
                 .withRequiredArg()
@@ -365,8 +365,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeKeepAliveTimeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
-                                CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
+                        CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
+                        CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
                         CommandDescription.DESCRIPTION_CONTEXT_KEEP_ALIVE_TIME
                 )
                 .withRequiredArg()
@@ -378,8 +378,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeProcessTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
-                                CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
+                        CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
+                        CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
                         CommandDescription.DESCRIPTION_CONTEXT_PROCESS_TIME_OUT
                 )
                 .withRequiredArg()
@@ -391,8 +391,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
-                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
+                        CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
+                        CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
                         CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIMEOUT
                 )
                 .withRequiredArg()
@@ -404,8 +404,8 @@ public class StandaloneServer {
     private static OptionSpec<?> makeSslSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_SSL,
-                                CommandDescription.ARGUMENT_SHORT_SSL),
+                        CommandDescription.ARGUMENT_LONG_SSL,
+                        CommandDescription.ARGUMENT_SHORT_SSL),
                         CommandDescription.DESCRIPTION_CONTEXT_SSL
                 );
     }
@@ -413,8 +413,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<String> makeAuthSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_AUTH,
-                                CommandDescription.ARGUMENT_SHORT_AUTH),
+                        CommandDescription.ARGUMENT_LONG_AUTH,
+                        CommandDescription.ARGUMENT_SHORT_AUTH),
                         CommandDescription.DESCRIPTION_CONTEXT_AUTH
                 ).withRequiredArg()
                 .ofType(String.class);
@@ -423,8 +423,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
-                                CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
+                        CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
+                        CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
                         CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE
                 )
                 .withRequiredArg()
@@ -436,8 +436,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
-                                CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
+                        CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
+                        CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
                         CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
                 )
                 .withRequiredArg()
@@ -458,8 +458,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterDisabledSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_DISABLED_CONVERTER,
-                                CommandDescription.ARGUMENT_SHORT_DISABLED_CONVERTER),
+                        CommandDescription.ARGUMENT_LONG_DISABLED_CONVERTER,
+                        CommandDescription.ARGUMENT_SHORT_DISABLED_CONVERTER),
                         CommandDescription.DESCRIPTION_CONTEXT_DISABLED_CONVERTER
                 )
                 .withRequiredArg()
@@ -470,8 +470,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterEnabledSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_ENABLED_CONVERTER,
-                                CommandDescription.ARGUMENT_SHORT_ENABLED_CONVERTER),
+                        CommandDescription.ARGUMENT_LONG_ENABLED_CONVERTER,
+                        CommandDescription.ARGUMENT_SHORT_ENABLED_CONVERTER),
                         CommandDescription.DESCRIPTION_CONTEXT_ENABLED_CONVERTER
                 )
                 .withRequiredArg()
@@ -486,8 +486,8 @@ public class StandaloneServer {
     private static OptionSpec<Void> makeHelpSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_HELP,
-                                CommandDescription.ARGUMENT_SHORT_HELP),
+                        CommandDescription.ARGUMENT_LONG_HELP,
+                        CommandDescription.ARGUMENT_SHORT_HELP),
                         CommandDescription.DESCRIPTION_CONTEXT_HELP
                 )
                 .forHelp();
@@ -496,8 +496,8 @@ public class StandaloneServer {
     private static OptionSpec<Void> makeServiceModeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                                CommandDescription.ARGUMENT_LONG_SERVICE_MODE,
-                                CommandDescription.ARGUMENT_SHORT_SERVICE_MODE),
+                        CommandDescription.ARGUMENT_LONG_SERVICE_MODE,
+                        CommandDescription.ARGUMENT_SHORT_SERVICE_MODE),
                         CommandDescription.DESCRIPTION_CONTEXT_SERVICE_MODE
                 );
     }

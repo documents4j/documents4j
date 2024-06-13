@@ -447,12 +447,12 @@ public class StandaloneServer {
     }
 
     private static OptionSpec<?> makeJsonLogSpec(OptionParser optionParser) {
-        return optionParser.acceptsAll(
-                Arrays.asList(
+        return optionParser
+                .acceptsAll(Arrays.asList(
                         CommandDescription.ARGUMENT_LONG_JSON_LOG,
                         CommandDescription.ARGUMENT_SHORT_JSON_LOG),
-                CommandDescription.DESCRIPTION_ARGUMENT_JSON_LOG
-        );
+                        CommandDescription.DESCRIPTION_ARGUMENT_JSON_LOG
+                );
     }
 
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterDisabledSpec(OptionParser optionParser) {

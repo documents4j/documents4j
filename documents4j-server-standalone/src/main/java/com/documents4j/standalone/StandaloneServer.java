@@ -1,24 +1,11 @@
 package com.documents4j.standalone;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.jul.LevelChangePropagator;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.Context;
-import ch.qos.logback.core.OutputStreamAppender;
-import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
-import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
-import ch.qos.logback.core.util.FileSize;
 import com.documents4j.builder.ConverterServerBuilder;
 import com.documents4j.conversion.IExternalConverter;
 import com.documents4j.job.LocalConverter;
 import com.documents4j.ws.application.IWebConverterConfiguration;
 import joptsimple.*;
-import net.logstash.logback.composite.loggingevent.*;
-import net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +25,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * Entry point for a command-line invoked standalone conversion server.
  */
 public class StandaloneServer {
+    private static final Logger LOG = LoggerFactory.getLogger(StandaloneServer.class);
 
     private StandaloneServer() {
         throw new UnsupportedOperationException();
@@ -51,29 +39,31 @@ public class StandaloneServer {
      */
     public static void main(String[] args) {
         try {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+
             ConverterServerBuilder builder = asBuilder(args);
             HttpServer httpServer = builder.build();
-            Logger logger = LoggerFactory.getLogger(StandaloneServer.class);
             try {
-                sayHello(builder, logger);
+                sayHello(builder);
                 if (builder.isServiceMode()) {
-                    System.out.println("The documents4j server is up and running in service mode and will not terminate until process interruption.");
+                    LOG.info("The documents4j server is up and running in service mode and will not terminate until process interruption.");
                     try {
                         Thread.currentThread().join();
                     } catch (InterruptedException ignored) {
-                        System.out.println("Received interruption signal which indicates server termination.");
+                        LOG.info("Received interruption signal which indicates server termination.");
                     }
                 } else {
-                    System.out.println("The documents4j server is up and running. Hit the enter key to shut it down...");
+                    LOG.info("The documents4j server is up and running. Hit the enter key to shut it down...");
                     if (System.in.read() == -1) {
-                        System.out.println("Console read terminated without receiving user input");
+                        LOG.info("Console read terminated without receiving user input");
                     }
                 }
-                sayGoodbye(builder, logger);
+                sayGoodbye(builder);
             } finally {
                 httpServer.shutdownNow();
             }
-            System.out.println("Shut down successful. Goodbye!");
+            LOG.info("Shut down successful. Goodbye!");
         } catch (Exception e) {
             LoggerFactory.getLogger(StandaloneServer.class).error("The documents4j server terminated with an unexpected error", e);
             System.err.printf("Error: %s%n", e.getMessage());
@@ -105,15 +95,13 @@ public class StandaloneServer {
         OptionSpec<?> sslSpec = makeSslSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<String> authSpec = makeAuthSpec(optionParser);
-        ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
         ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
-        OptionSpec<?> jsonSpec = makeJsonLogSpec(optionParser);
 
         OptionSet optionSet;
         try {
             optionSet = optionParser.parse(args);
         } catch (OptionException e) {
-            System.out.println("The converter was started with unknown arguments: " + e.options());
+            LOG.info("The converter was started with unknown arguments: {}", e.options());
             optionParser.printHelpOn(System.out);
             System.exit(-1);
             throw e; // To satisfy the Java compiler.
@@ -126,7 +114,7 @@ public class StandaloneServer {
 
         URI baseUri = baseUriSpec.value(optionSet);
         if (baseUri == null) {
-            System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
+            LOG.info("No base URI parameter specified. (Use: <command> <base URI>)");
             System.exit(-1);
         }
 
@@ -146,16 +134,8 @@ public class StandaloneServer {
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
-        File logFile = logFileSpec.value(optionSet);
-
         Level level = logLevelSpec.value(optionSet);
-        System.out.println("Logging: The log level is set to " + level);
-
-        if (optionSet.has(jsonSpec)) {
-            configureJsonLogging(level);
-        } else {
-            configureRegularLogging(logFile, level);
-        }
+        LOG.info("Logging: The log level is set to " + level);
 
         ConverterServerBuilder builder = ConverterServerBuilder.builder()
                 .baseUri(baseUri)
@@ -173,7 +153,7 @@ public class StandaloneServer {
             try {
                 builder = builder.sslContext(SSLContext.getDefault());
             } catch (NoSuchAlgorithmException e) {
-                System.out.println("Could not access default SSL context: " + e.getMessage());
+                LOG.info("Could not access default SSL context: " + e.getMessage());
                 System.exit(-1);
             }
         }
@@ -183,151 +163,11 @@ public class StandaloneServer {
         return builder.serviceMode(serviceMode);
     }
 
-    private static void configureRegularLogging(File logFile, Level level) {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        OutputStreamAppender<ILoggingEvent> appender;
-        if (logFile == null) {
-            appender = configureConsoleLogging(loggerContext);
-        } else {
-            appender = configureFileLogging(logFile, loggerContext);
-        }
-
-        PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
-        patternLayoutEncoder.setPattern(LogDescription.LOG_PATTERN);
-        patternLayoutEncoder.setContext(loggerContext);
-        patternLayoutEncoder.start();
-        appender.setEncoder(patternLayoutEncoder);
-        appender.start();
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        loggerContext.stop();
-        rootLogger.detachAndStopAllAppenders();
-        rootLogger.addAppender(appender);
-        rootLogger.setLevel(level);
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
-        levelChangePropagator.setResetJUL(true);
-        levelChangePropagator.setContext(loggerContext);
-        levelChangePropagator.start();
-        loggerContext.addListener(levelChangePropagator);
-        loggerContext.start();
-    }
-
-    private static OutputStreamAppender<ILoggingEvent> configureConsoleLogging(LoggerContext loggerContext) {
-        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
-        consoleAppender.setName("com.documents4j.logger.server.console");
-        consoleAppender.setContext(loggerContext);
-        System.out.println("Logging: The log is printed to the console as patterns");
-        return consoleAppender;
-    }
-
-    private static OutputStreamAppender<ILoggingEvent> configureFileLogging(File logFile, LoggerContext loggerContext) {
-        RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
-        rollingFileAppender.setFile(logFile.getAbsolutePath());
-        rollingFileAppender.setName("com.documents4j.logger.server.file");
-        rollingFileAppender.setContext(loggerContext);
-        FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
-        fixedWindowRollingPolicy.setFileNamePattern(logFile.getAbsolutePath() + ".%i.gz");
-        fixedWindowRollingPolicy.setMaxIndex(LogDescription.MAXIMUM_LOG_HISTORY_INDEX);
-        fixedWindowRollingPolicy.setContext(loggerContext);
-        fixedWindowRollingPolicy.setParent(rollingFileAppender);
-        SizeBasedTriggeringPolicy<ILoggingEvent> sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-        sizeBasedTriggeringPolicy.setMaxFileSize(FileSize.valueOf(LogDescription.MAXIMUM_LOG_FILE_SIZE));
-        sizeBasedTriggeringPolicy.setContext(loggerContext);
-        rollingFileAppender.setRollingPolicy(fixedWindowRollingPolicy);
-        rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
-        sizeBasedTriggeringPolicy.start();
-        fixedWindowRollingPolicy.start();
-        System.out.println("Logging: The log is written to " + logFile);
-        return rollingFileAppender;
-    }
-
-    private static void configureJsonLogging(Level rootLogLevel) {
-        System.out.println("Logging: The log is printed to the console as JSON");
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        OutputStreamAppender<ILoggingEvent> appender = configureConsoleLogging(loggerContext);
-
-        LoggingEventCompositeJsonEncoder jsonEncoder = configureJsonEncoder(loggerContext);
-        jsonEncoder.start();
-
-        appender.setEncoder(jsonEncoder);
-        appender.start();
-
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        loggerContext.stop();
-        rootLogger.detachAndStopAllAppenders();
-        rootLogger.addAppender(appender);
-        rootLogger.setLevel(rootLogLevel);
-
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-
-        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
-        levelChangePropagator.setResetJUL(true);
-        levelChangePropagator.setContext(loggerContext);
-        levelChangePropagator.start();
-        loggerContext.addListener(levelChangePropagator);
-
-        loggerContext.start();
-    }
-
-    private static LoggingEventCompositeJsonEncoder configureJsonEncoder(Context context) {
-        LoggingEventFormattedTimestampJsonProvider timestamp = new LoggingEventFormattedTimestampJsonProvider();
-        timestamp.setFieldName("time");
-        timestamp.setPattern("[UNIX_TIMESTAMP_AS_NUMBER]");
-
-        LoggingEventPatternJsonProvider level = new LoggingEventPatternJsonProvider();
-        level.setPattern("{\n\"level\": \"%level\"\n}");
-
-        MessageJsonProvider message = new MessageJsonProvider();
-        message.setFieldName("msg");
-
-        LoggerNameJsonProvider loggerName = new LoggerNameJsonProvider();
-        loggerName.setFieldName("logger");
-
-        CallerDataJsonProvider callerData = new CallerDataJsonProvider();
-        callerData.setClassFieldName("class");
-        callerData.setMethodFieldName("method");
-        callerData.setLineFieldName("line");
-        callerData.setFileFieldName("file");
-
-        LoggingEventThreadNameJsonProvider threadName = new LoggingEventThreadNameJsonProvider();
-        threadName.setFieldName("thread");
-
-        MdcJsonProvider mdc = new MdcJsonProvider();
-
-        ArgumentsJsonProvider arguments = new ArgumentsJsonProvider();
-        arguments.setIncludeNonStructuredArguments(false);
-
-        StackTraceJsonProvider stackTrace = new StackTraceJsonProvider();
-        stackTrace.setFieldName("error.stack");
-
-        KeyValuePairsJsonProvider keyValuePairs = new KeyValuePairsJsonProvider();
-
-        LoggingEventJsonProviders providers = new LoggingEventJsonProviders();
-        providers.addTimestamp(timestamp);
-        providers.addProvider(level);
-        providers.addMessage(message);
-        providers.addLoggerName(loggerName);
-        providers.addCallerData(callerData);
-        providers.addThreadName(threadName);
-        providers.addMdc(mdc);
-        providers.addArguments(arguments);
-        providers.addStackTrace(stackTrace);
-        providers.addKeyValuePairs(keyValuePairs);
-
-        LoggingEventCompositeJsonEncoder jsonEncoder = new LoggingEventCompositeJsonEncoder();
-        jsonEncoder.setProviders(providers);
-        jsonEncoder.setContext(context);
-
-        return jsonEncoder;
-    }
-
     private static ArgumentAcceptingOptionSpec<File> makeBaseFolderSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
-                        CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
+                                CommandDescription.ARGUMENT_LONG_BASE_FOLDER,
+                                CommandDescription.ARGUMENT_SHORT_BASE_FOLDER),
                         CommandDescription.DESCRIPTION_CONTEXT_BASE_FOLDER
                 )
                 .withRequiredArg()
@@ -339,8 +179,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Integer> makeCorePoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
-                        CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
+                                CommandDescription.ARGUMENT_LONG_CORE_POOL_SIZE,
+                                CommandDescription.ARGUMENT_SHORT_CORE_POOL_SIZE),
                         CommandDescription.DESCRIPTION_CONTEXT_CORE_POOL_SIZE
                 )
                 .withRequiredArg()
@@ -352,8 +192,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Integer> makeFallbackPoolSizeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
-                        CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
+                                CommandDescription.ARGUMENT_LONG_MAXIMUM_POOL_SIZE,
+                                CommandDescription.ARGUMENT_SHORT_MAXIMUM_POOL_SIZE),
                         CommandDescription.DESCRIPTION_CONTEXT_MAXIMUM_POOL_SIZE
                 )
                 .withRequiredArg()
@@ -365,8 +205,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeKeepAliveTimeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
-                        CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
+                                CommandDescription.ARGUMENT_LONG_KEEP_ALIVE_TIME,
+                                CommandDescription.ARGUMENT_SHORT_KEEP_ALIVE_TIME),
                         CommandDescription.DESCRIPTION_CONTEXT_KEEP_ALIVE_TIME
                 )
                 .withRequiredArg()
@@ -378,8 +218,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeProcessTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
-                        CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
+                                CommandDescription.ARGUMENT_LONG_PROCESS_TIME_OUT,
+                                CommandDescription.ARGUMENT_SHORT_PROCESS_TIME_OUT),
                         CommandDescription.DESCRIPTION_CONTEXT_PROCESS_TIME_OUT
                 )
                 .withRequiredArg()
@@ -391,8 +231,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Long> makeRequestTimeoutSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
-                        CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
+                                CommandDescription.ARGUMENT_LONG_REQUEST_TIMEOUT,
+                                CommandDescription.ARGUMENT_SHORT_REQUEST_TIMEOUT),
                         CommandDescription.DESCRIPTION_CONTEXT_REQUEST_TIMEOUT
                 )
                 .withRequiredArg()
@@ -404,8 +244,8 @@ public class StandaloneServer {
     private static OptionSpec<?> makeSslSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_SSL,
-                        CommandDescription.ARGUMENT_SHORT_SSL),
+                                CommandDescription.ARGUMENT_LONG_SSL,
+                                CommandDescription.ARGUMENT_SHORT_SSL),
                         CommandDescription.DESCRIPTION_CONTEXT_SSL
                 );
     }
@@ -413,31 +253,18 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<String> makeAuthSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_AUTH,
-                        CommandDescription.ARGUMENT_SHORT_AUTH),
+                                CommandDescription.ARGUMENT_LONG_AUTH,
+                                CommandDescription.ARGUMENT_SHORT_AUTH),
                         CommandDescription.DESCRIPTION_CONTEXT_AUTH
                 ).withRequiredArg()
                 .ofType(String.class);
     }
 
-    private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
-                        CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
-                        CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_TO_FILE)
-                .ofType(File.class);
-        // defaults to null such that all log information is written to the console
-    }
-
     private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
-                        CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
+                                CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
+                                CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
                         CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
                 )
                 .withRequiredArg()
@@ -446,20 +273,11 @@ public class StandaloneServer {
                 .defaultsTo(Level.WARN);
     }
 
-    private static OptionSpec<?> makeJsonLogSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_JSON_LOG,
-                        CommandDescription.ARGUMENT_SHORT_JSON_LOG),
-                        CommandDescription.DESCRIPTION_ARGUMENT_JSON_LOG
-                );
-    }
-
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterDisabledSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_DISABLED_CONVERTER,
-                        CommandDescription.ARGUMENT_SHORT_DISABLED_CONVERTER),
+                                CommandDescription.ARGUMENT_LONG_DISABLED_CONVERTER,
+                                CommandDescription.ARGUMENT_SHORT_DISABLED_CONVERTER),
                         CommandDescription.DESCRIPTION_CONTEXT_DISABLED_CONVERTER
                 )
                 .withRequiredArg()
@@ -470,8 +288,8 @@ public class StandaloneServer {
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterEnabledSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_ENABLED_CONVERTER,
-                        CommandDescription.ARGUMENT_SHORT_ENABLED_CONVERTER),
+                                CommandDescription.ARGUMENT_LONG_ENABLED_CONVERTER,
+                                CommandDescription.ARGUMENT_SHORT_ENABLED_CONVERTER),
                         CommandDescription.DESCRIPTION_CONTEXT_ENABLED_CONVERTER
                 )
                 .withRequiredArg()
@@ -486,8 +304,8 @@ public class StandaloneServer {
     private static OptionSpec<Void> makeHelpSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_HELP,
-                        CommandDescription.ARGUMENT_SHORT_HELP),
+                                CommandDescription.ARGUMENT_LONG_HELP,
+                                CommandDescription.ARGUMENT_SHORT_HELP),
                         CommandDescription.DESCRIPTION_CONTEXT_HELP
                 )
                 .forHelp();
@@ -496,33 +314,33 @@ public class StandaloneServer {
     private static OptionSpec<Void> makeServiceModeSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_SERVICE_MODE,
-                        CommandDescription.ARGUMENT_SHORT_SERVICE_MODE),
+                                CommandDescription.ARGUMENT_LONG_SERVICE_MODE,
+                                CommandDescription.ARGUMENT_SHORT_SERVICE_MODE),
                         CommandDescription.DESCRIPTION_CONTEXT_SERVICE_MODE
                 );
     }
 
-    private static void sayHello(ConverterServerBuilder builder, Logger logger) {
-        System.out.println("Welcome to the documents4j server!");
+    private static void sayHello(ConverterServerBuilder builder) {
+        LOG.info("Welcome to the documents4j server!");
         String serverStartupMessage = String.format("%tc: Started server on '%s'", System.currentTimeMillis(), builder.getBaseUri());
-        logger.info(serverStartupMessage);
-        logServerInfo(builder, logger);
-        System.out.println(serverStartupMessage);
+        LOG.info(serverStartupMessage);
+        logServerInfo(builder);
+        LOG.info(serverStartupMessage);
     }
 
-    private static void logServerInfo(ConverterServerBuilder builder, Logger logger) {
-        logger.info("documents4j server is listening at {}", builder.getBaseUri());
-        logger.info("documents4j server is writing temporary files to: {}",
+    private static void logServerInfo(ConverterServerBuilder builder) {
+        LOG.info("documents4j server is listening at {}", builder.getBaseUri());
+        LOG.info("documents4j server is writing temporary files to: {}",
                 builder.getBaseFolder() == null ? "<temporary folder>" : builder.getBaseFolder());
-        logger.info("documents4j server worker threads: {} (+{}) - timeout: {} ms",
+        LOG.info("documents4j server worker threads: {} (+{}) - timeout: {} ms",
                 builder.getCorePoolSize(), builder.getMaximumPoolSize(), builder.getKeepAliveTime());
-        logger.info("documents4j server process timeout: {}", builder.getProcessTimeout());
-        logger.info("documents4j server request timeout: {}", builder.getRequestTimeout());
+        LOG.info("documents4j server process timeout: {}", builder.getProcessTimeout());
+        LOG.info("documents4j server request timeout: {}", builder.getRequestTimeout());
     }
 
-    private static void sayGoodbye(ConverterServerBuilder builder, Logger logger) {
+    private static void sayGoodbye(ConverterServerBuilder builder) {
         String serverShutdownMessage = String.format("%tc: Shutting down server on '%s'", System.currentTimeMillis(), builder.getBaseUri());
-        logger.info(serverShutdownMessage);
-        System.out.println(serverShutdownMessage);
+        LOG.info(serverShutdownMessage);
+        LOG.info(serverShutdownMessage);
     }
 }

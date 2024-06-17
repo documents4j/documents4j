@@ -86,7 +86,7 @@
         <version.javax.servlet>3.0.1</version.javax.servlet>
         <version.jakarta.inject>2.0.0</version.jakarta.inject>
         <version.jakarta.bind>3.0.0</version.jakarta.bind>
-        <version.glashfish.jaxb>3.0.2</version.glashfish.jaxb>
+        <version.glassfish.jaxb>3.0.2</version.glassfish.jaxb>
         <version.jersey>3.0.2</version.jersey>
         <version.guava>30.0-jre</version.guava>
         <version.zt-exec>1.11</version.zt-exec>
@@ -238,7 +238,7 @@
             <dependency>
                 <groupId>org.glassfish.jaxb</groupId>
                 <artifactId>jaxb-runtime</artifactId>
-                <version>${version.glashfish.jaxb}</version>
+                <version>${version.glassfish.jaxb}</version>
             </dependency>
 
             <!-- Testing / Logging -->

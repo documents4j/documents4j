@@ -1,16 +1,5 @@
 package com.documents4j.standalone;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
-import ch.qos.logback.classic.jul.LevelChangePropagator;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.ConsoleAppender;
-import ch.qos.logback.core.OutputStreamAppender;
-import ch.qos.logback.core.rolling.FixedWindowRollingPolicy;
-import ch.qos.logback.core.rolling.RollingFileAppender;
-import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy;
-import ch.qos.logback.core.util.FileSize;
 import com.documents4j.api.DocumentType;
 import com.documents4j.api.IConverter;
 import com.documents4j.api.IFileConsumer;
@@ -18,7 +7,6 @@ import com.documents4j.job.RemoteConverter;
 import joptsimple.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.net.ssl.SSLContext;
 import java.io.Console;
@@ -38,11 +26,12 @@ import static com.google.common.base.Preconditions.checkArgument;
  * A standalone client for communicating with a conversion server via command line.
  */
 public class StandaloneClient {
+    private static final Logger LOG = LoggerFactory.getLogger(StandaloneClient.class);
 
     private static final Map<DocumentType, String> FILE_NAME_EXTENSIONS;
 
     static {
-        FILE_NAME_EXTENSIONS = new HashMap<DocumentType, String>();
+        FILE_NAME_EXTENSIONS = new HashMap<>();
         FILE_NAME_EXTENSIONS.put(DocumentType.DOC, "doc");
         FILE_NAME_EXTENSIONS.put(DocumentType.DOCX, "docx");
         FILE_NAME_EXTENSIONS.put(DocumentType.XLS, "xls");
@@ -73,13 +62,12 @@ public class StandaloneClient {
         try {
             Console console = System.console();
             if (console == null) {
-                System.out.println("This application can only be used from the command line.");
+                LOG.error("This application can only be used from the command line.");
                 System.exit(-1);
             }
             IConverter converter = asConverter(args);
             try {
-                Logger logger = LoggerFactory.getLogger(StandaloneClient.class);
-                sayHello(converter, logger, console);
+                sayHello(converter, console);
                 DocumentType[] documentTypes = configureConversion(console, converter.getSupportedConversions());
                 console.printf("Enter '<source> [-> <target>]' for converting a file. Enter '\\q' for exiting this application.%n");
                 String argument;
@@ -91,7 +79,7 @@ public class StandaloneClient {
                             break;
                         } else if (argument.equals("\\f")) {
                             documentTypes = configureConversion(console, converter.getSupportedConversions());
-                        } else if (argument.trim().equals("")) {
+                        } else if (argument.trim().isEmpty()) {
                             continue;
                         }
                         int targetIndex = argument.indexOf("->");
@@ -104,30 +92,29 @@ public class StandaloneClient {
                         String target = targetIndex == -1 ? source + "." + extensionFor(documentTypes[1]) : argument.substring(targetIndex + 1);
                         File targetFile = normalize(target);
                         converter.convert(sourceFile).as(documentTypes[0])
-                                .to(targetFile, new LoggingFileConsumer(sourceFile, logger)).as(documentTypes[1])
+                                .to(targetFile, new LoggingFileConsumer(sourceFile, LOG)).as(documentTypes[1])
                                 .schedule();
                         console.printf("Scheduled conversion: %s -> %s%n", sourceFile, targetFile);
-                        logger.info("Converting {} to {}", sourceFile, targetFile);
+                        LOG.info("Converting {} to {}", sourceFile, targetFile);
                     } else {
-                        logger.error("Error when reading from console.");
+                        LOG.error("Error when reading from console.");
                     }
                 } while (argument != null);
-                sayGoodbye(converter, logger);
+                sayGoodbye(converter);
             } finally {
                 converter.shutDown();
             }
             console.printf("The connection was successfully closed. Goodbye!%n");
         } catch (Exception e) {
             LoggerFactory.getLogger(StandaloneClient.class).error("The document conversion client terminated with an unexpected error", e);
-            System.err.println(String.format("Error: %s", e.getMessage()));
-            System.err.println("Use option -? to display a list of legal commands.");
+            LOG.error("Error: {}. Use option -? to display a list of legal commands.", e.getMessage(), e);
             System.exit(-1);
         }
     }
 
     private static DocumentType[] configureConversion(Console console, Map<DocumentType, Set<DocumentType>> supportedConversions) {
         console.printf("The connected converter supports the following conversion formats:%n");
-        Map<Integer, DocumentType[]> conversionsByIndex = new HashMap<Integer, DocumentType[]>();
+        Map<Integer, DocumentType[]> conversionsByIndex = new HashMap<>();
         int index = 0;
         for (Map.Entry<DocumentType, Set<DocumentType>> entry : supportedConversions.entrySet()) {
             for (DocumentType targetType : entry.getValue()) {
@@ -178,14 +165,12 @@ public class StandaloneClient {
         OptionSpec<?> sslSpec = makeSslSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<String> authSpec = makeAuthSpec(optionParser);
-        ArgumentAcceptingOptionSpec<File> logFileSpec = makeLogFileSpec(optionParser);
-        ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
         OptionSet optionSet;
         try {
             optionSet = optionParser.parse(args);
         } catch (OptionException e) {
-            System.out.println("The converter was started with unknown arguments: " + e.options());
+            LOG.error("The converter was started with unknown arguments: {}", e.options());
             optionParser.printHelpOn(System.out);
             System.exit(-1);
             throw e; // System.exit does not guarantee a JVM exit.
@@ -198,16 +183,12 @@ public class StandaloneClient {
 
         URI baseUri = baseUriSpec.value(optionSet);
         if (baseUri == null) {
-            System.out.println("No base URI parameter specified. (Use: <command> <base URI>)");
+            LOG.error("No base URI parameter specified. (Use: <command> <base URI>)");
             System.exit(-1);
         }
 
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
-
-        File logFile = logFileSpec.value(optionSet);
-        Level level = logLevelSpec.value(optionSet);
-        configureLogging(logFile, level);
 
         System.out.println("Connecting to: " + baseUri);
 
@@ -216,7 +197,7 @@ public class StandaloneClient {
                 .baseUri(baseUri);
         if (optionSet.has(sslSpec)) {
             try {
-                builder = builder.sslContext(SSLContext.getDefault());
+                builder.sslContext(SSLContext.getDefault());
             } catch (NoSuchAlgorithmException e) {
                 System.out.println("Could not access default SSL context: " + e.getMessage());
                 System.exit(-1);
@@ -228,65 +209,6 @@ public class StandaloneClient {
             builder.basicAuthenticationCredentials(userPassArray[0], userPassArray[1]);
         }
         return builder.build();
-    }
-
-    private static void configureLogging(File logFile, Level level) {
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        OutputStreamAppender<ILoggingEvent> appender;
-        if (logFile == null) {
-            appender = configureConsoleLogging(loggerContext);
-        } else {
-            appender = configureFileLogging(logFile, loggerContext);
-        }
-        System.out.println("Logging: The log level is set to " + level);
-        PatternLayoutEncoder patternLayoutEncoder = new PatternLayoutEncoder();
-        patternLayoutEncoder.setPattern(LogDescription.LOG_PATTERN);
-        patternLayoutEncoder.setContext(loggerContext);
-        patternLayoutEncoder.start();
-        appender.setEncoder(patternLayoutEncoder);
-        appender.start();
-        ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME);
-        loggerContext.stop();
-        rootLogger.detachAndStopAllAppenders();
-        rootLogger.addAppender(appender);
-        rootLogger.setLevel(level);
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        SLF4JBridgeHandler.install();
-        LevelChangePropagator levelChangePropagator = new LevelChangePropagator();
-        levelChangePropagator.setResetJUL(true);
-        levelChangePropagator.setContext(loggerContext);
-        levelChangePropagator.start();
-        loggerContext.addListener(levelChangePropagator);
-        loggerContext.start();
-    }
-
-    private static OutputStreamAppender<ILoggingEvent> configureConsoleLogging(LoggerContext loggerContext) {
-        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<ILoggingEvent>();
-        consoleAppender.setName("com.documents4j.logger.client.console");
-        consoleAppender.setContext(loggerContext);
-        System.out.println("Logging: The log is printed to the console");
-        return consoleAppender;
-    }
-
-    private static OutputStreamAppender<ILoggingEvent> configureFileLogging(File logFile, LoggerContext loggerContext) {
-        RollingFileAppender<ILoggingEvent> rollingFileAppender = new RollingFileAppender<ILoggingEvent>();
-        rollingFileAppender.setFile(logFile.getAbsolutePath());
-        rollingFileAppender.setName("com.documents4j.logger.client.file");
-        rollingFileAppender.setContext(loggerContext);
-        FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
-        fixedWindowRollingPolicy.setFileNamePattern(logFile.getAbsolutePath() + ".%i.gz");
-        fixedWindowRollingPolicy.setMaxIndex(LogDescription.MAXIMUM_LOG_HISTORY_INDEX);
-        fixedWindowRollingPolicy.setContext(loggerContext);
-        fixedWindowRollingPolicy.setParent(rollingFileAppender);
-        SizeBasedTriggeringPolicy<ILoggingEvent> sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<ILoggingEvent>();
-        sizeBasedTriggeringPolicy.setMaxFileSize(FileSize.valueOf(LogDescription.MAXIMUM_LOG_FILE_SIZE));
-        sizeBasedTriggeringPolicy.setContext(loggerContext);
-        rollingFileAppender.setRollingPolicy(fixedWindowRollingPolicy);
-        rollingFileAppender.setTriggeringPolicy(sizeBasedTriggeringPolicy);
-        sizeBasedTriggeringPolicy.start();
-        fixedWindowRollingPolicy.start();
-        System.out.println("Logging: The log is written to " + logFile);
-        return rollingFileAppender;
     }
 
     private static NonOptionArgumentSpec<URI> makeBaseUriSpec(OptionParser optionParser) {
@@ -304,19 +226,6 @@ public class StandaloneClient {
                 .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_REQUEST_TIMEOUT)
                 .ofType(Long.class)
                 .defaultsTo(RemoteConverter.Builder.DEFAULT_REQUEST_TIMEOUT);
-    }
-
-    private static ArgumentAcceptingOptionSpec<File> makeLogFileSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_TO_FILE,
-                        CommandDescription.ARGUMENT_SHORT_LOG_TO_FILE),
-                        CommandDescription.DESCRIPTION_CONTEXT_LOG_TO_FILE
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_TO_FILE)
-                .ofType(File.class);
-        // defaults to null such that all log information is written to the console
     }
 
     private static OptionSpec<?> makeSslSpec(OptionParser optionParser) {
@@ -338,19 +247,6 @@ public class StandaloneClient {
                 .ofType(String.class);
     }
 
-    private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
-                        CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
-                        CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_LEVEL)
-                .withValuesConvertedBy(new LogLevelValueConverter())
-                .defaultsTo(Level.WARN);
-    }
-
     private static OptionSpec<Void> makeHelpSpec(OptionParser optionParser) {
         return optionParser
                 .acceptsAll(Arrays.asList(
@@ -361,19 +257,19 @@ public class StandaloneClient {
                 .forHelp();
     }
 
-    private static void sayHello(IConverter converter, Logger logger, Console console) {
+    private static void sayHello(IConverter converter, Console console) {
         console.printf("Welcome to the documents4j client!%n");
         boolean operational = converter.isOperational();
         if (operational) {
-            logger.info("Converter {} is operational", converter);
+            LOG.info("Converter {} is operational", converter);
         } else {
-            logger.warn("Converter {} is not operational", converter);
+            LOG.warn("Converter {} is not operational", converter);
         }
     }
 
-    private static void sayGoodbye(IConverter converter, Logger logger) {
+    private static void sayGoodbye(IConverter converter) {
         System.out.println("Disconnecting converter client...");
-        logger.info("Converter {} is disconnecting", converter);
+        LOG.info("Converter {} is disconnecting", converter);
     }
 
     private static class LoggingFileConsumer implements IFileConsumer {

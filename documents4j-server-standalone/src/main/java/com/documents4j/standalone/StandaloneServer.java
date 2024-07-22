@@ -135,7 +135,7 @@ public class StandaloneServer {
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
 
         Level level = logLevelSpec.value(optionSet);
-        LOG.info("Logging: The log level is set to " + level);
+        LOG.info("Logging: The log level is set to {}", level);
 
         ConverterServerBuilder builder = ConverterServerBuilder.builder()
                 .baseUri(baseUri)
@@ -153,7 +153,7 @@ public class StandaloneServer {
             try {
                 builder = builder.sslContext(SSLContext.getDefault());
             } catch (NoSuchAlgorithmException e) {
-                LOG.info("Could not access default SSL context: " + e.getMessage());
+                LOG.info("Could not access default SSL context: {}", e.getMessage());
                 System.exit(-1);
             }
         }

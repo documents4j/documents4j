@@ -4,7 +4,7 @@ import com.documents4j.api.IConverter;
 import com.documents4j.job.LocalConverter;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.slf4j.impl.SimpleLogger;
+import org.slf4j.simple.SimpleLogger;
 
 import java.io.File;
 import java.io.IOException;

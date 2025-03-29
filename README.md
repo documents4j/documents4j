@@ -269,6 +269,7 @@ Several time consuming operations such as building source code and javadoc artif
 
 [![Build Status](https://travis-ci.org/documents4j/documents4j.svg)](https://travis-ci.org/documents4j/documents4j)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.documents4j/documents4j)
+[![libs.tech recommends](https://libs.tech/project/11971604/badge.svg)](https://libs.tech/project/11971604/documents4j)
 [![Download](https://api.bintray.com/packages/raphw/maven/documents4j/images/download.svg)](https://bintray.com/raphw/maven/documents4j/_latestVersion)
 
 Licensing

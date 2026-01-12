@@ -62,14 +62,6 @@ public class CommandDescription {
     public static final String ARGUMENT_SHORT_AUTH = "A";
     public static final String DESCRIPTION_CONTEXT_AUTH = "Basic authentication credentials given as 'user:pass'.";
 
-    public static final String ARGUMENT_LONG_LOG_LEVEL = "level";
-    public static final String ARGUMENT_SHORT_LOG_LEVEL = "V";
-    public static final String DESCRIPTION_ARGUMENT_LOG_LEVEL = "The log level which determines the verbosity of the log messages. " +
-            "If this property is not set, only warnings and error messages are logged to the console.";
-    public static final String DESCRIPTION_CONTEXT_LOG_LEVEL = "The log level determines the verbosity of the logging that is enforced " +
-            "by the converter. Valid log levels are 'off', 'error', 'warn', 'info', 'debug' and 'trace'. Without explicit configuration, " +
-            "the 'warn' level is activated which is also the recommended level for production use of the converter.";
-
     public static final String ARGUMENT_LONG_ENABLED_CONVERTER = "enable";
     public static final String ARGUMENT_SHORT_ENABLED_CONVERTER = "E";
     public static final String DESCRIPTION_ARGUMENT_ENABLED_CONVERTER = "The fully qualified Java class name of the document converter to enable.";

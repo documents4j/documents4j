@@ -95,7 +95,6 @@ public class StandaloneServer {
         OptionSpec<?> sslSpec = makeSslSpec(optionParser);
 
         ArgumentAcceptingOptionSpec<String> authSpec = makeAuthSpec(optionParser);
-        ArgumentAcceptingOptionSpec<Level> logLevelSpec = makeLogLevelSpec(optionParser);
 
         OptionSet optionSet;
         try {
@@ -133,9 +132,6 @@ public class StandaloneServer {
         checkArgument(processTimeout >= 0L, "The process timeout timeout must not be negative");
         long requestTimeout = requestTimeoutSpec.value(optionSet);
         checkArgument(requestTimeout >= 0L, "The request timeout timeout must not be negative");
-
-        Level level = logLevelSpec.value(optionSet);
-        LOG.info("Logging: The log level is set to {}", level);
 
         ConverterServerBuilder builder = ConverterServerBuilder.builder()
                 .baseUri(baseUri)
@@ -258,19 +254,6 @@ public class StandaloneServer {
                         CommandDescription.DESCRIPTION_CONTEXT_AUTH
                 ).withRequiredArg()
                 .ofType(String.class);
-    }
-
-    private static ArgumentAcceptingOptionSpec<Level> makeLogLevelSpec(OptionParser optionParser) {
-        return optionParser
-                .acceptsAll(Arrays.asList(
-                        CommandDescription.ARGUMENT_LONG_LOG_LEVEL,
-                        CommandDescription.ARGUMENT_SHORT_LOG_LEVEL),
-                        CommandDescription.DESCRIPTION_CONTEXT_LOG_LEVEL
-                )
-                .withRequiredArg()
-                .describedAs(CommandDescription.DESCRIPTION_ARGUMENT_LOG_LEVEL)
-                .withValuesConvertedBy(new LogLevelValueConverter())
-                .defaultsTo(Level.WARN);
     }
 
     private static ArgumentAcceptingOptionSpec<Class<? extends IExternalConverter>> makeConverterDisabledSpec(OptionParser optionParser) {

@@ -62,13 +62,6 @@ public class CommandDescription {
     public static final String ARGUMENT_SHORT_AUTH = "A";
     public static final String DESCRIPTION_CONTEXT_AUTH = "Basic authentication credentials given as 'user:pass'.";
 
-    public static final String ARGUMENT_LONG_LOG_TO_FILE = "log";
-    public static final String ARGUMENT_SHORT_LOG_TO_FILE = "L";
-    public static final String DESCRIPTION_ARGUMENT_LOG_TO_FILE = "A file to which all log information will be written. If " +
-            "not set, all log information will be written to the console.";
-    public static final String DESCRIPTION_CONTEXT_LOG_TO_FILE = "This file will contain all log information instead of writing " +
-            "the log output to the console. Make sure that this file can be written to and that no other application holds locks to it.";
-
     public static final String ARGUMENT_LONG_LOG_LEVEL = "level";
     public static final String ARGUMENT_SHORT_LOG_LEVEL = "V";
     public static final String DESCRIPTION_ARGUMENT_LOG_LEVEL = "The log level which determines the verbosity of the log messages. " +
@@ -76,11 +69,6 @@ public class CommandDescription {
     public static final String DESCRIPTION_CONTEXT_LOG_LEVEL = "The log level determines the verbosity of the logging that is enforced " +
             "by the converter. Valid log levels are 'off', 'error', 'warn', 'info', 'debug' and 'trace'. Without explicit configuration, " +
             "the 'warn' level is activated which is also the recommended level for production use of the converter.";
-
-    public static final String ARGUMENT_LONG_JSON_LOG = "json-log";
-    public static final String ARGUMENT_SHORT_JSON_LOG = "J";
-    public static final String DESCRIPTION_ARGUMENT_JSON_LOG = "External log aggregator services often require log output " +
-            "to be JSON. This allows for easier parsing of exception stack traces.";
 
     public static final String ARGUMENT_LONG_ENABLED_CONVERTER = "enable";
     public static final String ARGUMENT_SHORT_ENABLED_CONVERTER = "E";

@@ -4,6 +4,7 @@ Const WdExportFormatPDF = 17
 Const MagicFormatPDFA = 999
 Const MagicFormatFilteredHTML = 10
 Const msoEncodingUTF8 = 65001
+Const wdExportCreateHeadingBookmarks = 1
 
 Dim arguments
 Set arguments = WScript.Arguments
@@ -49,7 +50,7 @@ Function ConvertFile( inputFile, outputFile, formatEnumeration )
     ' Convert: See http://msdn2.microsoft.com/en-us/library/bb221597.aspx
     On Error Resume Next
     If formatEnumeration = MagicFormatPDFA Then
-      wordDocument.ExportAsFixedFormat outputFile, WdExportFormatPDF, False, , , , , , , , , , , True
+      wordDocument.ExportAsFixedFormat outputFile, WdExportFormatPDF, False, , , , , , , , wdExportCreateHeadingBookmarks, , , True
     Else
       wordDocument.SaveAs outputFile, formatEnumeration
     End If
